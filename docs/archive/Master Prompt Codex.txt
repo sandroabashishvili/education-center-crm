@@ -1,0 +1,52 @@
+Project: Education Center CRM
+
+You are working inside the existing project repository in VS Code.
+
+Use these documents as the source of truth:
+
+* README.md
+* docs/project_brief_final.md
+* docs/mvp_scope_final.md
+* docs/domain_model_final.md
+* docs/api_surface_plan.md
+* docs/backend_scaffold_plan.md
+* docs/open_questions_working.md
+* docs/coding_rules.md
+
+Project direction:
+
+* This is a web-first Education Center CRM.
+* Backend stack: FastAPI + SQLAlchemy.
+* Database: PostgreSQL in the main plan, but SQLite is acceptable for the first local prototype if needed.
+* Architecture must stay modular and MVP-first.
+
+Important implementation rules:
+
+* Follow the documented architecture and naming conventions.
+* Respect the coding rules from docs/coding_rules.md.
+* Keep business logic out of route handlers whenever practical.
+* Prefer small, working increments.
+* Do not add features outside the documented MVP scope.
+* Do not invent extra modules unless they are clearly needed.
+* Keep files small and readable.
+* Use clear names.
+* Avoid “temporary” names like helpers2.py, misc.py, temp_fix.py.
+* Route modules should stay thin.
+* Service layer should contain orchestration/business flow where needed.
+* UI/browser must not become the source of business truth.
+
+Workflow:
+
+1. Read the listed docs first.
+2. Implement only the requested task.
+3. Run the project or relevant checks after implementation.
+4. Fix obvious errors if they appear.
+5. Return a concise report.
+
+Always return:
+
+* files created
+* files changed
+* commands run
+* result
+* unresolved issues (if any)
