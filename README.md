@@ -1,60 +1,67 @@
 # Education Center CRM
 
-A portfolio-grade Flask and SQLite application with a complete German-language interface for the day-to-day administration of a small education center.
+![Education Center CRM Dashboard](assets/dashboard-preview.png)
 
-![Education Center CRM dashboard](assets/dashboard-preview.png)
+Eine deutschsprachige Flask- und SQLite-Anwendung für die tägliche Verwaltung
+eines kleinen Bildungszentrums.
 
-## What it demonstrates
+**Portfolio-Demo:** [Statische Vorschau öffnen](https://sandro-abashishvili.sandroabashishvili.chatgpt.site/demos/education-crm/)
 
-- session-based admin login
-- student registry, search, filtering, profile view, editing, and lifecycle status
-- courses, teachers, groups, and group enrollment
-- lesson scheduling and per-student attendance
-- invoices, partial receipts, and automatically refreshed overdue status
-- dashboard KPIs calculated from the database
-- UTF-8 CSV exports for students and payments
-- responsive desktop and mobile layouts
-- service-layer business logic and automated regression tests
+Die Demo im Portfolio ist eine statische Vorschau, weil das Portfolio-Hosting
+keinen dauerhaft laufenden Flask-/SQLite-Prozess bereitstellt. Dieses
+GitHub-Repository enthält die funktionale Anwendung.
 
-## Portfolio demo
+## Was das Projekt demonstriert
 
-[Open the static portfolio preview](https://sandro-abashishvili.sandroabashishvili.chatgpt.site/demos/education-crm/)
+- sitzungsbasierte Administrator-Anmeldung
+- Teilnehmerverwaltung mit Suche, Filtern, Profil, Bearbeitung und Status
+- Kurse, Lehrkräfte, Gruppen und Gruppenzuordnung
+- Unterrichtsplanung und Anwesenheit pro Teilnehmer
+- Rechnungen, Teilzahlungen und automatisch aktualisierte Überfälligkeit
+- aus der Datenbank berechnete Dashboard-Kennzahlen
+- UTF-8-CSV-Exporte für Teilnehmer und Zahlungen
+- responsive Desktop- und Mobile-Oberfläche
+- getrennte Service-Schicht für Geschäftslogik
+- automatisierte Regressionstests
 
-The GitHub project contains the functional Flask application. The portfolio URL is a static preview because the portfolio hosting does not run a persistent SQLite backend.
-
-## Run locally
+## Lokal starten
 
 ```bash
+git clone https://github.com/sandroabashishvili/education-center-crm.git
+cd education-center-crm
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python app/main.py
 ```
 
-Open `http://127.0.0.1:5001`.
+Anschließend `http://127.0.0.1:5001/` öffnen.
 
-The database is created and populated with realistic demo records on first start.
+Beim ersten Start wird die Datenbank automatisch angelegt und mit realistischen
+Demodaten gefüllt.
 
-### Demo login
+### Demo-Anmeldung
 
 ```text
-Email:    admin@bildungszentrum.de
-Password: admin123
+E-Mail:  admin@bildungszentrum.de
+Passwort: admin123
 ```
 
-These credentials are for the local portfolio demo only.
+Diese Zugangsdaten sind ausschließlich für die lokale Portfolio-Demo bestimmt.
 
-## Test
+## Tests
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-The suite covers health and dashboard responses, authentication guards, student CRUD, POST-only deletion, group enrollment, attendance, overdue payments, and CSV exports.
+Die Tests decken unter anderem Health- und Dashboard-Antworten,
+Authentifizierungsschutz, Teilnehmer-CRUD, POST-only-Löschung,
+Gruppenzuordnung, Anwesenheit, überfällige Zahlungen und CSV-Exporte ab.
 
-## Configuration
+## Konfiguration
 
-Optional environment variables:
+Optionale Umgebungsvariablen:
 
 ```bash
 export CRM_SECRET_KEY="replace-this-for-non-demo-use"
@@ -62,35 +69,43 @@ export CRM_DB_PATH="/absolute/path/to/crm.db"
 export PORT="5001"
 ```
 
-See [.env.example](.env.example).
+Siehe [.env.example](.env.example).
 
-## Architecture
+## Architektur
 
 ```text
 .
 ├── app/
-│   ├── main.py       # Flask bootstrap and configuration
-│   ├── database.py   # SQLite schema, compatibility migrations, demo seed
-│   ├── models.py     # domain dataclasses
-│   ├── routes.py     # HTTP routes and request handling
-│   ├── services.py   # queries and business rules
-│   ├── templates.py  # server-rendered admin UI
-│   └── utils.py      # parsing helpers
+│   ├── main.py       # Flask-Start und Konfiguration
+│   ├── database.py   # SQLite-Schema, Migrationen und Demodaten
+│   ├── models.py     # Domain-Dataclasses
+│   ├── routes.py     # HTTP-Routen und Request-Verarbeitung
+│   ├── services.py   # Abfragen und Geschäftsregeln
+│   ├── templates.py  # serverseitig gerenderte Oberfläche
+│   └── utils.py      # Parsing-Helfer
 ├── assets/
 ├── docs/
 ├── tests/
 └── requirements.txt
 ```
 
-## Status and honest scope
+## Status und ehrliche Grenzen
 
-The current version is a completed portfolio MVP. It is designed for a local demonstration and uses SQLite with generated demo data.
+Der aktuelle Stand ist ein abgeschlossener Portfolio-MVP für eine lokale
+Demonstration. Er verwendet SQLite und erzeugte Beispieldaten und wird nicht als
+fertiges Produktions-SaaS dargestellt.
 
-It is not presented as a production SaaS. Production work would still require CSRF protection, per-role authorization rules, password-reset flows, audit logging, deployment configuration, database migrations, backups, and a production WSGI server.
+Für einen Produktivbetrieb wären zusätzlich CSRF-Schutz, rollenbasierte
+Berechtigungen, Passwort-Wiederherstellung, Audit-Logging,
+Deployment-Konfiguration, geregelte Datenbankmigrationen, Backups und ein
+Produktions-WSGI-Server erforderlich.
 
-See [current status](docs/current_status.md) for the detailed implementation boundary.
+Weitere Details: [docs/current_status.md](docs/current_status.md).
 
-## Author
+## Autor
 
-Aleksandre (Sandro) Abashishvili<br>
-[Portfolio](https://sandro-abashishvili.sandroabashishvili.chatgpt.site) · [GitHub](https://github.com/sandroabashishvili) · [LinkedIn](https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/)
+Aleksandre (Sandro) Abashishvili
+
+[Portfolio](https://sandro-abashishvili.sandroabashishvili.chatgpt.site/) ·
+[GitHub](https://github.com/sandroabashishvili) ·
+[LinkedIn](https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/)
