@@ -52,7 +52,7 @@ def register_routes(app):
         @wraps(view)
         def wrapped(*args, **kwargs):
             if not session.get("logged_in"):
-                flash("ცვლილების შესატანად გაიარეთ ავტორიზაცია.", "warning")
+                flash("Bitte melden Sie sich an, um Änderungen vorzunehmen.", "warning")
                 return redirect(url_for("index"))
             return view(*args, **kwargs)
         return wrapped
@@ -73,16 +73,16 @@ def register_routes(app):
                 user_name=user.full_name,
                 user_role=user.role,
             )
-            flash(f"მოგესალმებით, {user.full_name}.", "success")
+            flash(f"Willkommen, {user.full_name}.", "success")
         else:
-            flash("ელ-ფოსტა ან პაროლი არასწორია.", "danger")
+            flash("E-Mail-Adresse oder Passwort ist falsch.", "danger")
         return redirect(url_for("index"))
 
     @app.route("/logout", methods=["POST"])
     @login_required
     def logout():
         session.clear()
-        flash("სესიიდან გამოხვედით.", "success")
+        flash("Sie wurden erfolgreich abgemeldet.", "success")
         return redirect(url_for("index"))
 
     @app.route("/health", methods=["GET"])
@@ -107,7 +107,7 @@ def register_routes(app):
         conn.close()
         output = io.StringIO()
         writer = csv.writer(output)
-        writer.writerow(["ID", "Full name", "Email", "Phone", "Guardian", "Guardian phone", "Status", "Notes", "Created at"])
+        writer.writerow(["ID", "Name", "E-Mail", "Telefon", "Erziehungsberechtigte Person", "Telefon Erziehungsberechtigte", "Status", "Notizen", "Erstellt am"])
         writer.writerows(rows)
         return Response(
             "\ufeff" + output.getvalue(),
@@ -124,7 +124,7 @@ def register_routes(app):
         conn.close()
         output = io.StringIO()
         writer = csv.writer(output)
-        writer.writerow(["ID", "Student", "Group", "Amount due", "Amount paid", "Due date", "Paid at", "Status", "Method", "Note"])
+        writer.writerow(["ID", "Schüler", "Gruppe", "Fälliger Betrag", "Bezahlt", "Fällig am", "Bezahlt am", "Status", "Zahlungsart", "Notiz"])
         writer.writerows(rows)
         return Response(
             "\ufeff" + output.getvalue(),
@@ -169,7 +169,7 @@ def register_routes(app):
         student, groups, payments, enrollments = get_student_detail_service(conn, student_id)
         conn.close()
         if not student:
-            return "Student not found", 404
+            return "Schüler nicht gefunden", 404
         return render_template_string(STUDENT_DETAIL_HTML, student=student, groups=groups, payments=payments, enrollments=enrollments)
 
     @app.route("/students/<int:student_id>/delete", methods=["POST"])
@@ -218,7 +218,7 @@ def register_routes(app):
         ).fetchone()
         conn.close()
         if not student:
-            return "Student not found", 404
+            return "Schüler nicht gefunden", 404
         return render_template_string(EDIT_HTML, student=student)
 
     # --- COURSES ROUTES ---
@@ -234,7 +234,7 @@ def register_routes(app):
     @login_required
     def add_course_route():
         name = normalize_text(request.form.get("name") or request.form.get("title", ""))
-        category = normalize_text(request.form.get("category", "General"))
+        category = normalize_text(request.form.get("category", "Allgemein"))
         default_fee = parse_float(request.form.get("default_fee"))
         teacher = normalize_text(request.form.get("teacher", ""))
         description = normalize_text(request.form.get("description", ""))
@@ -317,7 +317,7 @@ def register_routes(app):
         all_students = get_students_service(conn)
         conn.close()
         if not group:
-            return "Group not found", 404
+            return "Gruppe nicht gefunden", 404
         return render_template_string(GROUP_DETAIL_HTML, group=group, members=members, lessons=lessons, all_students=all_students)
 
     @app.route("/groups/<int:group_id>/enroll", methods=["POST"])
@@ -346,7 +346,7 @@ def register_routes(app):
         group_id = parse_int(request.form.get("group_id"))
         starts_at = request.form.get("starts_at", "").replace("T", " ")
         ends_at = request.form.get("ends_at", "").replace("T", " ")
-        room_label = normalize_text(request.form.get("room_label", "Room 101"))
+        room_label = normalize_text(request.form.get("room_label", "Raum 101"))
         topic = normalize_text(request.form.get("topic", ""))
 
         if group_id and starts_at:
@@ -364,7 +364,7 @@ def register_routes(app):
         lesson, records = get_lesson_attendance(conn, lesson_id)
         conn.close()
         if not lesson:
-            return "Lesson not found", 404
+            return "Unterrichtstermin nicht gefunden", 404
         return render_template_string(ATTENDANCE_HTML, lesson=lesson, records=records)
 
     @app.route("/lessons/<int:lesson_id>/attendance/save", methods=["POST"])

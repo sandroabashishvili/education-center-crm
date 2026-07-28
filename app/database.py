@@ -76,7 +76,7 @@ def init_db(db_path=None):
             name TEXT,
             title TEXT,
             description TEXT,
-            category TEXT DEFAULT 'General',
+            category TEXT DEFAULT 'Allgemein',
             default_fee REAL DEFAULT 0.0,
             teacher TEXT,
             status TEXT NOT NULL DEFAULT 'active',
@@ -90,7 +90,7 @@ def init_db(db_path=None):
         ("name", "TEXT"),
         ("title", "TEXT"),
         ("description", "TEXT"),
-        ("category", "TEXT DEFAULT 'General'"),
+        ("category", "TEXT DEFAULT 'Allgemein'"),
         ("default_fee", "REAL DEFAULT 0.0"),
         ("teacher", "TEXT"),
         ("status", "TEXT DEFAULT 'active'"),
@@ -161,7 +161,7 @@ def init_db(db_path=None):
             teacher_id INTEGER,
             starts_at TEXT NOT NULL,
             ends_at TEXT NOT NULL,
-            room_label TEXT DEFAULT 'Room 101',
+            room_label TEXT DEFAULT 'Raum 101',
             delivery_mode TEXT DEFAULT 'in_person',
             topic TEXT,
             status TEXT NOT NULL DEFAULT 'scheduled',
@@ -239,7 +239,7 @@ def init_db(db_path=None):
         admin_pass = hash_password("admin123")
         cur.execute("""
             INSERT INTO users (full_name, email, phone, password_hash, role, status)
-            VALUES ('Admin User', 'admin@education.ge', '+995 599 000 000', ?, 'admin', 'active')
+            VALUES ('Administrator', 'admin@bildungszentrum.de', '+49 561 000000', ?, 'admin', 'active')
         """, (admin_pass,))
 
     # Seed default sample data if empty
@@ -248,9 +248,9 @@ def init_db(db_path=None):
         cur.execute("""
             INSERT INTO students (full_name, name, email, phone, guardian_name, guardian_phone, status, notes)
             VALUES
-            ('გიორგი ბერიძე', 'გიორგი ბერიძე', 'giorgi.b@gmail.com', '+995 599 112 233', 'მარიამ ბერიძე', '+995 599 112 234', 'active', 'მაღალი აკადემიური მოსწრება'),
-            ('ნინო კაპანაძე', 'ნინო კაპანაძე', 'nino.k@gmail.com', '+995 577 334 455', 'დავით კაპანაძე', '+995 577 334 456', 'active', 'ინგლისურის ჯგუფში'),
-            ('ალექსანდრე ჯაფარიძე', 'ალექსანდრე ჯაფარიძე', 'sandro.j@gmail.com', '+995 555 667 788', 'თამარ ჯაფარიძე', '+995 555 667 789', 'active', 'Python Web Course')
+            ('Jonas Becker', 'Jonas Becker', 'jonas.becker@example.de', '+49 151 11223344', 'Katrin Becker', '+49 151 11223345', 'active', 'Sehr gute Lernfortschritte'),
+            ('Lea Hoffmann', 'Lea Hoffmann', 'lea.hoffmann@example.de', '+49 152 33445566', 'Daniel Hoffmann', '+49 152 33445567', 'active', 'Teilnahme am Englischkurs'),
+            ('Noah Fischer', 'Noah Fischer', 'noah.fischer@example.de', '+49 155 66778899', 'Miriam Fischer', '+49 155 66778900', 'active', 'Teilnahme am Python-Webkurs')
         """)
 
     cur.execute("SELECT COUNT(*) FROM courses;")
@@ -258,9 +258,9 @@ def init_db(db_path=None):
         cur.execute("""
             INSERT INTO courses (name, title, description, category, default_fee, teacher, status)
             VALUES
-            ('Python & Web Development', 'Python & Web Development', 'სრული კურსი: Python, Flask, SQLite და Web Fundamentals', 'Programming', 350.0, 'დავით მგელაძე', 'active'),
-            ('English B2 Upper-Intermediate', 'English B2 Upper-Intermediate', 'ინტენსიური ინგლისურის კურსი სასაუბრო პრაქტიკით', 'Languages', 250.0, 'ელენე კვირიკაშვილი', 'active'),
-            ('UI/UX Design Fundamentals', 'UI/UX Design Fundamentals', 'Figma და პროტოტიპირების საფუძვლები', 'Design', 300.0, 'გიორგი მაისურაძე', 'active')
+            ('Python & Webentwicklung', 'Python & Webentwicklung', 'Praxisorientierter Kurs zu Python, Flask, SQLite und Web-Grundlagen', 'Programmierung', 350.0, 'Daniel Weber', 'active'),
+            ('Englisch B2 - Aufbaukurs', 'Englisch B2 - Aufbaukurs', 'Intensiver Englischkurs mit Schwerpunkt Konversation', 'Sprachen', 250.0, 'Elena König', 'active'),
+            ('Grundlagen UI/UX-Design', 'Grundlagen UI/UX-Design', 'Grundlagen in Figma und interaktivem Prototyping', 'Design', 300.0, 'Georg Meier', 'active')
         """)
 
     cur.execute("SELECT COUNT(*) FROM teachers;")
@@ -268,9 +268,9 @@ def init_db(db_path=None):
         cur.execute("""
             INSERT INTO teachers (full_name, email, phone, specialization, status)
             VALUES
-            ('დავით მგელაძე', 'davit.m@education.ge', '+995 599 445 566', 'Python, Backend, Databases', 'active'),
-            ('ელენე კვირიკაშვილი', 'elene.k@education.ge', '+995 577 556 677', 'English, IELTS', 'active'),
-            ('გიორგი მაისურაძე', 'giorgi.m@education.ge', '+995 555 667 788', 'UI/UX Design', 'active')
+            ('Daniel Weber', 'daniel.weber@example.de', '+49 151 44556677', 'Python, Backend, Datenbanken', 'active'),
+            ('Elena König', 'elena.koenig@example.de', '+49 152 55667788', 'Englisch, IELTS', 'active'),
+            ('Georg Meier', 'georg.meier@example.de', '+49 155 66778899', 'UI/UX-Design', 'active')
         """)
 
     cur.execute("SELECT COUNT(*) FROM groups;")
@@ -278,9 +278,9 @@ def init_db(db_path=None):
         course_rows = cur.execute("SELECT id FROM courses ORDER BY id ASC").fetchall()
         teacher_rows = cur.execute("SELECT id FROM teachers ORDER BY id ASC").fetchall()
         group_specs = [
-            ("Python 2026 - Group A", 12, "ორშაბათი / ოთხშაბათი 19:00"),
-            ("English B2 - Evening", 14, "სამშაბათი / ხუთშაბათი 18:30"),
-            ("UI/UX - Weekend", 10, "შაბათი 11:00"),
+            ("Python 2026 – Gruppe A", 12, "Montag / Mittwoch, 19:00 Uhr"),
+            ("Englisch B2 – Abendkurs", 14, "Dienstag / Donnerstag, 18:30 Uhr"),
+            ("UI/UX – Wochenendkurs", 10, "Samstag, 11:00 Uhr"),
         ]
         for index, course_row in enumerate(course_rows[:3]):
             teacher_id = teacher_rows[index][0] if index < len(teacher_rows) else None
@@ -333,8 +333,8 @@ def init_db(db_path=None):
                     teacher_id,
                     starts_at.strftime("%Y-%m-%d %H:%M"),
                     ends_at.strftime("%Y-%m-%d %H:%M"),
-                    f"Room {101 + index}",
-                    ("Python Functions", "Conversation Practice", "Figma Components")[index],
+                    f"Raum {101 + index}",
+                    ("Python-Funktionen", "Konversationstraining", "Figma-Komponenten")[index],
                 ),
             )
 
@@ -350,7 +350,7 @@ def init_db(db_path=None):
                 status = ("present", "late", "absent")[member_index % 3]
                 cur.execute(
                     "INSERT INTO attendance (lesson_id, student_id, status, note) VALUES (?, ?, ?, ?)",
-                    (lesson_id, student_id, status, "Demo attendance record"),
+                    (lesson_id, student_id, status, "Demo-Anwesenheitseintrag"),
                 )
 
     cur.execute("SELECT COUNT(*) FROM payments;")
@@ -358,9 +358,9 @@ def init_db(db_path=None):
         student_rows = cur.execute("SELECT id FROM students ORDER BY id ASC").fetchall()
         group_rows = cur.execute("SELECT id FROM groups ORDER BY id ASC").fetchall()
         payment_specs = [
-            (350.0, 350.0, 5, "paid", "bank_transfer", "მიმდინარე თვის გადასახადი"),
-            (250.0, 100.0, -2, "overdue", "cash", "ნაწილობრივი გადახდა"),
-            (300.0, 0.0, -5, "overdue", "cash", "გადასახდელი ინვოისი"),
+            (350.0, 350.0, 5, "paid", "bank_transfer", "Kursgebühr für den aktuellen Monat"),
+            (250.0, 100.0, -2, "overdue", "cash", "Teilzahlung"),
+            (300.0, 0.0, -5, "overdue", "cash", "Offene Rechnung"),
         ]
         today = datetime.now().date()
         for index, student_row in enumerate(student_rows):

@@ -6,17 +6,17 @@ NAV_HEADER = """
     <span class="brand-badge">🎓</span>
     <div>
       <div style="font-weight: 700; font-size: 1.1rem;">Education Center CRM</div>
-      <div style="font-size: 0.75rem; color: var(--muted);">Management System</div>
+      <div style="font-size: 0.75rem; color: var(--muted);">Verwaltungssystem</div>
     </div>
   </div>
   <nav class="nav-links">
     <a href="{{ url_for('index') }}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">📊 Dashboard</a>
-    <a href="{{ url_for('students_page') }}" class="nav-item {% if active_page == 'students' %}active{% endif %}">👥 Students</a>
-    <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}">📚 Courses</a>
-    <a href="{{ url_for('groups_page') }}" class="nav-item {% if active_page == 'groups' %}active{% endif %}">🏫 Groups</a>
-    <a href="{{ url_for('lessons_page') }}" class="nav-item {% if active_page == 'lessons' %}active{% endif %}">📅 Schedule</a>
-    <a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}">💰 Payments</a>
-    <a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}">👨‍🏫 Teachers</a>
+    <a href="{{ url_for('students_page') }}" class="nav-item {% if active_page == 'students' %}active{% endif %}">👥 Schüler</a>
+    <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}">📚 Kurse</a>
+    <a href="{{ url_for('groups_page') }}" class="nav-item {% if active_page == 'groups' %}active{% endif %}">🏫 Gruppen</a>
+    <a href="{{ url_for('lessons_page') }}" class="nav-item {% if active_page == 'lessons' %}active{% endif %}">📅 Unterricht</a>
+    <a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}">💰 Zahlungen</a>
+    <a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}">👨‍🏫 Lehrkräfte</a>
   </nav>
   <div class="auth-box">
     {% if session.get('logged_in') %}
@@ -25,13 +25,13 @@ NAV_HEADER = """
         <small>{{ session.get('user_role') }}</small>
       </span>
       <form action="{{ url_for('logout') }}" method="POST" style="margin: 0;">
-        <button type="submit" class="btn btn-sm btn-outline">Logout</button>
+        <button type="submit" class="btn btn-sm btn-outline">Abmelden</button>
       </form>
     {% else %}
       <form action="{{ url_for('login') }}" method="POST" class="login-form">
-        <input type="email" name="username" placeholder="admin@education.ge" autocomplete="username" required>
-        <input type="password" name="password" placeholder="Password" autocomplete="current-password" required>
-        <button type="submit" class="btn btn-sm">Login</button>
+        <input type="email" name="username" placeholder="admin@bildungszentrum.de" autocomplete="username" required>
+        <input type="password" name="password" placeholder="Passwort" autocomplete="current-password" required>
+        <button type="submit" class="btn btn-sm">Anmelden</button>
       </form>
     {% endif %}
   </div>
@@ -72,11 +72,15 @@ STYLES = """
   }
 
   .topbar {
+    position: sticky;
+    top: 0.75rem;
+    z-index: 20;
+    backdrop-filter: blur(18px);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--surface);
-    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.96);
+    padding: 0.85rem 1rem;
     border-radius: 16px;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
@@ -175,7 +179,10 @@ STYLES = """
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border);
   }
-  .card-title { font-size: 1.1rem; font-weight: 600; margin: 0; }
+  .card-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
+  .table-note { color: var(--muted); font-size: 0.82rem; }
+  .empty-state { text-align: center; color: var(--muted); padding: 2rem; }
+  button:disabled { opacity: 0.55; cursor: not-allowed; }
 
   table { width: 100%; border-collapse: collapse; text-align: left; }
   th { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); padding: 0.75rem; border-bottom: 1px solid var(--border); }
@@ -290,6 +297,15 @@ STYLES = """
   }
 
   @media (max-width: 600px) {
+    .nav-links {
+      flex-wrap: wrap;
+      overflow-x: visible;
+      gap: 0.25rem;
+    }
+    .nav-item {
+      padding: 0.42rem 0.6rem;
+      font-size: 0.84rem;
+    }
     .hero h1 { font-size: 1.2rem; line-height: 1.25; }
     .hero p { font-size: 0.86rem; }
     .stats-grid { grid-template-columns: 1fr; }
@@ -300,7 +316,7 @@ STYLES = """
 """
 
 BASE_LAYOUT = """<!doctype html>
-<html lang="ka">
+<html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -339,8 +355,8 @@ DASHBOARD_HTML = render_page(
     "Dashboard",
     """
     <div class="hero">
-      <h1>გამარჯობა, ადმინისტრატორო!</h1>
-      <p>სტუდენტები, ჯგუფები, დასწრება და გადახდები — ერთ სამუშაო სივრცეში.</p>
+      <h1>Guten Tag, Administrator!</h1>
+      <p>Schüler, Gruppen, Anwesenheit und Zahlungen in einem zentralen Arbeitsbereich.</p>
     </div>
 
     <div class="stats-grid">
@@ -348,49 +364,49 @@ DASHBOARD_HTML = render_page(
         <div class="stat-icon">👥</div>
         <div>
           <div class="stat-val">{{ metrics.total_students }}</div>
-          <div class="stat-lbl">აქტიური სტუდენტი</div>
+          <div class="stat-lbl">Aktive Schüler</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📚</div>
         <div>
           <div class="stat-val">{{ metrics.total_courses }}</div>
-          <div class="stat-lbl">კურსები</div>
+          <div class="stat-lbl">Kurse</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">🏫</div>
         <div>
           <div class="stat-val">{{ metrics.active_groups }}</div>
-          <div class="stat-lbl">აქტიური ჯგუფები</div>
+          <div class="stat-lbl">Aktive Gruppen</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📅</div>
         <div>
           <div class="stat-val">{{ metrics.today_lessons }}</div>
-          <div class="stat-lbl">დღევანდელი გაკვეთილი</div>
+          <div class="stat-lbl">Heutiger Unterricht</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">⚠️</div>
         <div>
           <div class="stat-val" style="color: {% if metrics.overdue_payments > 0 %}#dc2626{% else %}inherit{% endif %};">{{ metrics.overdue_payments }}</div>
-          <div class="stat-lbl">ვადაგადაცილებული</div>
+          <div class="stat-lbl">Überfällige Rechnungen</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">💰</div>
         <div>
-          <div class="stat-val">₾{{ "%.2f"|format(metrics.monthly_revenue) }}</div>
-          <div class="stat-lbl">მიმდინარე თვის შემოსავალი</div>
+          <div class="stat-val">€{{ "%.2f"|format(metrics.monthly_revenue) }}</div>
+          <div class="stat-lbl">Einnahmen im aktuellen Monat</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📊</div>
         <div>
           <div class="stat-val">{{ metrics.attendance_rate }}%</div>
-          <div class="stat-lbl">დასწრების მაჩვენებელი</div>
+          <div class="stat-lbl">Anwesenheitsquote</div>
         </div>
       </div>
     </div>
@@ -398,12 +414,12 @@ DASHBOARD_HTML = render_page(
     <div class="grid-2">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">👥 ბოლოს დამატებული სტუდენტები</h3>
-          <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">ყველას ნახვა</a>
+          <h3 class="card-title">👥 Zuletzt hinzugefügte Schüler</h3>
+          <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">Alle anzeigen</a>
         </div>
         <table>
           <thead>
-            <tr><th>ID</th><th>სახელი, გვარი</th><th>ელ-ფოსტა</th><th>მოქმედება</th></tr>
+            <tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Aktion</th></tr>
           </thead>
           <tbody>
             {% for s in metrics.recent_students %}
@@ -411,10 +427,10 @@ DASHBOARD_HTML = render_page(
               <td>#{{ s[0] }}</td>
               <td><strong>{{ s[1] }}</strong></td>
               <td>{{ s[2] }}</td>
-              <td><a href="{{ url_for('student_detail_page', student_id=s[0]) }}" class="btn btn-sm btn-outline">პროფილი</a></td>
+              <td><a href="{{ url_for('student_detail_page', student_id=s[0]) }}" class="btn btn-sm btn-outline">Profil</a></td>
             </tr>
             {% else %}
-            <tr><td colspan="4" style="text-align: center; color: var(--muted);">სტუდენტები ჯერ არ არის</td></tr>
+            <tr><td colspan="4" style="text-align: center; color: var(--muted);">Noch keine Schüler vorhanden</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -422,27 +438,27 @@ DASHBOARD_HTML = render_page(
 
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">💰 ბოლო გადახდები</h3>
-          <a href="{{ url_for('payments_page') }}" class="btn btn-sm btn-outline">ყველა გადახდა</a>
+          <h3 class="card-title">💰 Letzte Zahlungen</h3>
+          <a href="{{ url_for('payments_page') }}" class="btn btn-sm btn-outline">Alle Zahlungen</a>
         </div>
         <table>
           <thead>
-            <tr><th>სტუდენტი</th><th>თანხა</th><th>სტატუსი</th><th>ვადა</th></tr>
+            <tr><th>Schüler</th><th>Betrag</th><th>Status</th><th>Fällig am</th></tr>
           </thead>
           <tbody>
             {% for p in metrics.recent_payments %}
             <tr>
               <td><strong>{{ p[1] }}</strong></td>
-              <td>₾{{ "%.2f"|format(p[2]) }}</td>
+              <td>€{{ "%.2f"|format(p[2]) }}</td>
               <td>
                 <span class="badge {% if p[3] == 'paid' %}badge-success{% elif p[3] == 'partial' %}badge-info{% elif p[3] == 'overdue' %}badge-danger{% else %}badge-warning{% endif %}">
-                  {{ p[3] }}
+                  {{ p[3]|status_de }}
                 </span>
               </td>
-              <td>{{ p[4] }}</td>
+              <td>{{ p[4]|date_de }}</td>
             </tr>
             {% else %}
-            <tr><td colspan="4" style="text-align: center; color: var(--muted);">გადახდები არ არის</td></tr>
+            <tr><td colspan="4" style="text-align: center; color: var(--muted);">Noch keine Zahlungen vorhanden</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -454,39 +470,39 @@ DASHBOARD_HTML = render_page(
 
 # 2. Students Page Template
 STUDENTS_HTML = render_page(
-    "სტუდენტები",
+    "Schüler",
     """
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">👥 სტუდენტების მართვა</h3>
+        <h3 class="card-title">👥 Schülerverwaltung</h3>
         <div class="header-actions">
           {% if session.get('logged_in') %}
-          <a href="{{ url_for('export_students_csv') }}" class="btn btn-outline">CSV ექსპორტი</a>
-          <button onclick="document.getElementById('addStudentModal').style.display='flex'" class="btn">+ ახალი სტუდენტი</button>
+          <a href="{{ url_for('export_students_csv') }}" class="btn btn-outline">CSV exportieren</a>
+          <button onclick="document.getElementById('addStudentModal').style.display='flex'" class="btn">+ Neuer Schüler</button>
           {% endif %}
         </div>
       </div>
 
       <form method="GET" class="filter-bar">
-        <input type="text" name="q" value="{{ query }}" placeholder="ძებნა სახელით, ელ-ფოსტით ან ტელეფონით..." class="form-control" style="max-width: 320px;">
+        <input type="text" name="q" value="{{ query }}" placeholder="Nach Name, E-Mail oder Telefonnummer suchen..." class="form-control" style="max-width: 320px;">
         <select name="status" class="form-control" style="max-width: 180px;">
-          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>ყველა სტატუსი</option>
-          <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
-          <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Alle Status</option>
+          <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Aktiv</option>
+          <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inaktiv</option>
         </select>
-        <button type="submit" class="btn btn-secondary">ძებნა</button>
+        <button type="submit" class="btn btn-secondary">Suchen</button>
       </form>
 
       <table>
         <thead>
           <tr>
             <th>ID</th>
-            <th>სახელი, გვარი</th>
-            <th>ელ-ფოსტა</th>
-            <th>ტელეფონი</th>
-            <th>მშობელი/მეთვალყურე</th>
-            <th>სტატუსი</th>
-            <th>მოქმედება</th>
+            <th>Name</th>
+            <th>E-Mail</th>
+            <th>Telefon</th>
+            <th>Erziehungsberechtigte Person</th>
+            <th>Status</th>
+            <th>Aktion</th>
           </tr>
         </thead>
         <tbody>
@@ -498,22 +514,22 @@ STUDENTS_HTML = render_page(
             <td>{{ s[3] or 'N/A' }}</td>
             <td>{{ s[4] or '-' }} ({{ s[5] or '-' }})</td>
             <td>
-              <span class="badge {% if s[6] == 'active' %}badge-success{% else %}badge-neutral{% endif %}">{{ s[6] }}</span>
+              <span class="badge {% if s[6] == 'active' %}badge-success{% else %}badge-neutral{% endif %}">{{ s[6]|status_de }}</span>
             </td>
             <td>
               <div class="action-btns">
-                <a href="{{ url_for('student_detail_page', student_id=s[0]) }}" class="btn btn-sm btn-outline">ნახვა</a>
+                <a href="{{ url_for('student_detail_page', student_id=s[0]) }}" class="btn btn-sm btn-outline">Öffnen</a>
                 {% if session.get('logged_in') %}
-                <a href="{{ url_for('edit_student', student_id=s[0]) }}" class="btn btn-sm btn-secondary">რედაქტირება</a>
-                <form action="{{ url_for('delete_student', student_id=s[0]) }}" method="POST" style="margin:0;" onsubmit="return confirm('დარწმუნებული ხართ?');">
-                  <button type="submit" class="btn btn-sm btn-danger">წაშლა</button>
+                <a href="{{ url_for('edit_student', student_id=s[0]) }}" class="btn btn-sm btn-secondary">Bearbeiten</a>
+                <form action="{{ url_for('delete_student', student_id=s[0]) }}" method="POST" style="margin:0;" onsubmit="return confirm('Möchten Sie diesen Schüler wirklich löschen?');">
+                  <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
                 </form>
                 {% endif %}
               </div>
             </td>
           </tr>
           {% else %}
-          <tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 2rem;">სტუდენტები ვერ მოიძებნა</td></tr>
+          <tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 2rem;">Keine Schüler gefunden</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -522,35 +538,35 @@ STUDENTS_HTML = render_page(
     <!-- Modal Add Student -->
     <div id="addStudentModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
       <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
-        <h3>+ ახალი სტუდენტის დამატება</h3>
+        <h3>+ Neuen Schüler hinzufügen</h3>
         <form action="{{ url_for('add_student_route') }}" method="POST">
           <div class="form-group">
-            <label>სრული სახელი და გვარი *</label>
+            <label>Vollständiger Name *</label>
             <input type="text" name="full_name" required class="form-control">
           </div>
           <div class="form-group">
-            <label>ელ-ფოსტა *</label>
+            <label>E-Mail *</label>
             <input type="email" name="email" required class="form-control">
           </div>
           <div class="form-group">
-            <label>ტელეფონის ნომერი</label>
+            <label>Telefonnummer</label>
             <input type="text" name="phone" class="form-control">
           </div>
           <div class="form-group">
-            <label>მშობლის/მეთვალყურის სახელი</label>
+            <label>Name der erziehungsberechtigten Person</label>
             <input type="text" name="guardian_name" class="form-control">
           </div>
           <div class="form-group">
-            <label>მშობლის ტელეფონი</label>
+            <label>Telefon der erziehungsberechtigten Person</label>
             <input type="text" name="guardian_phone" class="form-control">
           </div>
           <div class="form-group">
-            <label>შენიშვნა</label>
+            <label>Notiz</label>
             <textarea name="notes" class="form-control" rows="2"></textarea>
           </div>
           <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-            <button type="button" onclick="document.getElementById('addStudentModal').style.display='none'" class="btn btn-secondary">გაუქმება</button>
-            <button type="submit" class="btn">შენახვა</button>
+            <button type="button" onclick="document.getElementById('addStudentModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Speichern</button>
           </div>
         </form>
       </div>
@@ -561,63 +577,63 @@ STUDENTS_HTML = render_page(
 
 # 3. Student Detail Page Template
 STUDENT_DETAIL_HTML = render_page(
-    "სტუდენტის პროფილი",
+    "Schülerprofil",
     """
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">👤 სტუდენტის პროფილი: {{ student[1] }}</h3>
-        <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">← უკან დაბრუნება</a>
+        <h3 class="card-title">👤 Schülerprofil: {{ student[1] }}</h3>
+        <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">← Zurück zur Übersicht</a>
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 12px;">
         <div><strong>ID:</strong> #{{ student[0] }}</div>
-        <div><strong>ელ-ფოსტა:</strong> {{ student[2] }}</div>
-        <div><strong>ტელეფონი:</strong> {{ student[3] or 'N/A' }}</div>
-        <div><strong>მშობელი:</strong> {{ student[4] or '-' }} ({{ student[5] or '-' }})</div>
-        <div><strong>სტატუსი:</strong> <span class="badge badge-success">{{ student[6] }}</span></div>
-        <div><strong>შენიშვნა:</strong> {{ student[7] or '-' }}</div>
+        <div><strong>E-Mail:</strong> {{ student[2] }}</div>
+        <div><strong>Telefon:</strong> {{ student[3] or 'N/A' }}</div>
+        <div><strong>Erziehungsberechtigte Person:</strong> {{ student[4] or '-' }} ({{ student[5] or '-' }})</div>
+        <div><strong>Status:</strong> <span class="badge badge-success">{{ student[6]|status_de }}</span></div>
+        <div><strong>Notiz:</strong> {{ student[7] or '-' }}</div>
       </div>
 
-      <h4>🏫 ჯგუფები & კურსები</h4>
+      <h4>🏫 Gruppen und Kurse</h4>
       <table>
         <thead>
-          <tr><th>ჯგუფის სახელი</th><th>კურსი</th><th>სტატუსი</th><th>წევრია (თარიღიდან)</th></tr>
+          <tr><th>Gruppenname</th><th>Kurs</th><th>Status</th><th>Mitglied seit</th></tr>
         </thead>
         <tbody>
           {% for g in groups %}
           <tr>
             <td><strong>{{ g[1] }}</strong></td>
             <td>{{ g[2] }}</td>
-            <td><span class="badge badge-info">{{ g[3] }}</span></td>
-            <td>{{ g[4] }}</td>
+            <td><span class="badge badge-info">{{ g[3]|status_de }}</span></td>
+            <td>{{ g[4]|date_de }}</td>
           </tr>
           {% else %}
-          <tr><td colspan="4" style="text-align: center; color: var(--muted);">სტუდენტი ჯერ არ არის ჯგუფში</td></tr>
+          <tr><td colspan="4" style="text-align: center; color: var(--muted);">Der Schüler ist noch keiner Gruppe zugeordnet</td></tr>
           {% endfor %}
         </tbody>
       </table>
 
-      <h4 style="margin-top: 1.5rem;">💰 გადახდების ისტორია</h4>
+      <h4 style="margin-top: 1.5rem;">💰 Zahlungsverlauf</h4>
       <table>
         <thead>
-          <tr><th>ID</th><th>დასაფარი თანხა</th><th>გადახდილი</th><th>ვადა</th><th>სტატუსი</th><th>გადახდის თარიღი</th></tr>
+          <tr><th>ID</th><th>Fälliger Betrag</th><th>Bezahlt</th><th>Fällig am</th><th>Status</th><th>Zahlungsdatum</th></tr>
         </thead>
         <tbody>
           {% for p in payments %}
           <tr>
             <td>#{{ p[0] }}</td>
-            <td>₾{{ "%.2f"|format(p[1]) }}</td>
-            <td>₾{{ "%.2f"|format(p[2]) }}</td>
-            <td>{{ p[3] }}</td>
+            <td>€{{ "%.2f"|format(p[1]) }}</td>
+            <td>€{{ "%.2f"|format(p[2]) }}</td>
+            <td>{{ p[3]|status_de }}</td>
             <td>
               <span class="badge {% if p[4] == 'paid' %}badge-success{% elif p[4] == 'partial' %}badge-info{% elif p[4] == 'overdue' %}badge-danger{% else %}badge-warning{% endif %}">
-                {{ p[4] }}
+                {{ p[4]|status_de }}
               </span>
             </td>
-            <td>{{ p[5] or '-' }}</td>
+            <td>{{ (p[5] or '-')|date_de }}</td>
           </tr>
           {% else %}
-          <tr><td colspan="6" style="text-align: center; color: var(--muted);">გადახდის ისტორია სუფთაა</td></tr>
+          <tr><td colspan="6" style="text-align: center; color: var(--muted);">Noch kein Zahlungsverlauf vorhanden</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -628,39 +644,39 @@ STUDENT_DETAIL_HTML = render_page(
 
 # 4. Courses Page Template
 COURSES_HTML = render_page(
-    "კურსები",
+    "Kurse",
     """
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">📚 კურსების კატალოგი</h3>
+        <h3 class="card-title">📚 Kurskatalog</h3>
         {% if session.get('logged_in') %}
-        <button onclick="document.getElementById('addCourseModal').style.display='flex'" class="btn">+ ახალი კურსი</button>
+        <button onclick="document.getElementById('addCourseModal').style.display='flex'" class="btn">+ Neuer Kurs</button>
         {% endif %}
       </div>
 
       <table>
         <thead>
-          <tr><th>ID</th><th>კურსის დასახელება</th><th>კატეგორია</th><th>სტანდარტული საფასური</th><th>პედაგოგი</th><th>სტატუსი</th><th>მოქმედება</th></tr>
+          <tr><th>ID</th><th>Kursbezeichnung</th><th>Kategorie</th><th>Standardgebühr</th><th>Lehrkraft</th><th>Status</th><th>Aktion</th></tr>
         </thead>
         <tbody>
           {% for c in courses %}
           <tr>
             <td>#{{ c[0] }}</td>
             <td><strong>{{ c[1] }}</strong><br><small style="color: var(--muted);">{{ c[2] or '' }}</small></td>
-            <td><span class="badge badge-info">{{ c[3] or 'General' }}</span></td>
-            <td>₾{{ "%.2f"|format(c[4] or 0) }}</td>
-            <td>{{ c[5] or 'Unassigned' }}</td>
-            <td><span class="badge badge-success">{{ c[6] }}</span></td>
+            <td><span class="badge badge-info">{{ c[3] or 'Allgemein' }}</span></td>
+            <td>€{{ "%.2f"|format(c[4] or 0) }}</td>
+            <td>{{ c[5] or 'Nicht zugewiesen' }}</td>
+            <td><span class="badge badge-success">{{ c[6]|status_de }}</span></td>
             <td>
               {% if session.get('logged_in') %}
-              <form action="{{ url_for('delete_course', course_id=c[0]) }}" method="POST" style="margin:0;" onsubmit="return confirm('წავშალოთ კურსი?');">
-                <button type="submit" class="btn btn-sm btn-danger">წაშლა</button>
+              <form action="{{ url_for('delete_course', course_id=c[0]) }}" method="POST" style="margin:0;" onsubmit="return confirm('Möchten Sie diesen Kurs wirklich löschen?');">
+                <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
               </form>
               {% endif %}
             </td>
           </tr>
           {% else %}
-          <tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 2rem;">კურსები ვერ მოიძებნა</td></tr>
+          <tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 2rem;">Keine Kurse gefunden</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -669,31 +685,31 @@ COURSES_HTML = render_page(
     <!-- Modal Add Course -->
     <div id="addCourseModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
       <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
-        <h3>+ ახალი კურსის დამატება</h3>
+        <h3>+ Neuen Kurs hinzufügen</h3>
         <form action="{{ url_for('add_course_route') }}" method="POST">
           <div class="form-group">
-            <label>კურსის დასახელება *</label>
+            <label>Kursbezeichnung *</label>
             <input type="text" name="name" required class="form-control">
           </div>
           <div class="form-group">
-            <label>კატეგორია</label>
+            <label>Kategorie</label>
             <input type="text" name="category" placeholder="Programming, Languages..." class="form-control">
           </div>
           <div class="form-group">
-            <label>სტანდარტული საფასური (₾)</label>
+            <label>Standardgebühr (€)</label>
             <input type="number" step="0.01" name="default_fee" value="300" class="form-control">
           </div>
           <div class="form-group">
-            <label>პედაგოგის სახელი</label>
+            <label>Name der Lehrkraft</label>
             <input type="text" name="teacher" class="form-control">
           </div>
           <div class="form-group">
-            <label>აღწერა</label>
+            <label>Beschreibung</label>
             <textarea name="description" class="form-control" rows="2"></textarea>
           </div>
           <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-            <button type="button" onclick="document.getElementById('addCourseModal').style.display='none'" class="btn btn-secondary">გაუქმება</button>
-            <button type="submit" class="btn">დამატება</button>
+            <button type="button" onclick="document.getElementById('addCourseModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Hinzufügen</button>
           </div>
         </form>
       </div>
@@ -704,19 +720,19 @@ COURSES_HTML = render_page(
 
 # 5. Groups Page Template
 GROUPS_HTML = render_page(
-    "ჯგუფები",
+    "Gruppen",
     """
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">🏫 სასწავლო ჯგუფები</h3>
+        <h3 class="card-title">🏫 Lerngruppen</h3>
         {% if session.get('logged_in') %}
-        <button onclick="document.getElementById('addGroupModal').style.display='flex'" class="btn">+ ახალი ჯგუფი</button>
+        <button onclick="document.getElementById('addGroupModal').style.display='flex'" class="btn">+ Neue Gruppe</button>
         {% endif %}
       </div>
 
       <table>
         <thead>
-          <tr><th>ID</th><th>ჯგუფის სახელი</th><th>კურსი</th><th>პედაგოგი</th><th>სტუდენტები (ტევადობა)</th><th>განრიგი</th><th>სტატუსი</th><th>მოქმედება</th></tr>
+          <tr><th>ID</th><th>Gruppenname</th><th>Kurs</th><th>Lehrkraft</th><th>Schüler / Kapazität</th><th>Zeitplan</th><th>Status</th><th>Aktion</th></tr>
         </thead>
         <tbody>
           {% for g in groups %}
@@ -726,14 +742,14 @@ GROUPS_HTML = render_page(
             <td>{{ g[2] }}</td>
             <td>{{ g[3] }}</td>
             <td><span class="badge badge-info">{{ g[5] }} / {{ g[4] }}</span></td>
-            <td>{{ g[6] or 'დაუდგენელია' }}</td>
-            <td><span class="badge badge-success">{{ g[7] }}</span></td>
+            <td>{{ g[6] or 'Nicht angegeben' }}</td>
+            <td><span class="badge badge-success">{{ g[7]|status_de }}</span></td>
             <td>
-              <a href="{{ url_for('group_detail_page', group_id=g[0]) }}" class="btn btn-sm btn-outline">დეტალები</a>
+              <a href="{{ url_for('group_detail_page', group_id=g[0]) }}" class="btn btn-sm btn-outline">Details</a>
             </td>
           </tr>
           {% else %}
-          <tr><td colspan="8" style="text-align: center; color: var(--muted); padding: 2rem;">ჯგუფები არ არის შექმნილი</td></tr>
+          <tr><td colspan="8" style="text-align: center; color: var(--muted); padding: 2rem;">Noch keine Gruppen angelegt</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -742,10 +758,10 @@ GROUPS_HTML = render_page(
     <!-- Modal Add Group -->
     <div id="addGroupModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
       <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
-        <h3>+ ახალი ჯგუფის შექმნა</h3>
+        <h3>+ Neue Gruppe erstellen</h3>
         <form action="{{ url_for('add_group_route') }}" method="POST">
           <div class="form-group">
-            <label>კურსი *</label>
+            <label>Kurs *</label>
             <select name="course_id" required class="form-control">
               {% for c in courses %}
               <option value="{{ c[0] }}">{{ c[1] }}</option>
@@ -753,29 +769,29 @@ GROUPS_HTML = render_page(
             </select>
           </div>
           <div class="form-group">
-            <label>პედაგოგი</label>
+            <label>Lehrkraft</label>
             <select name="teacher_id" class="form-control">
-              <option value="">-- აირჩიეთ --</option>
+              <option value="">-- Bitte auswählen --</option>
               {% for t in teachers %}
               <option value="{{ t[0] }}">{{ t[1] }}</option>
               {% endfor %}
             </select>
           </div>
           <div class="form-group">
-            <label>ჯგუფის დასახელება *</label>
-            <input type="text" name="name" required placeholder="მაგ: Python 2026 - Evening" class="form-control">
+            <label>Gruppenname *</label>
+            <input type="text" name="name" required placeholder="z. B. Python 2026 - Abendkurs" class="form-control">
           </div>
           <div class="form-group">
-            <label>ტევადობა (მაქს. სტუდენტი)</label>
+            <label>Kapazität (max. Schüler)</label>
             <input type="number" name="capacity" value="15" class="form-control">
           </div>
           <div class="form-group">
-            <label>განრიგის აღწერა</label>
-            <input type="text" name="schedule_description" placeholder="ორშაბათი - ოთხშაბათი 19:00" class="form-control">
+            <label>Beschreibung des Zeitplans</label>
+            <input type="text" name="schedule_description" placeholder="Montag und Mittwoch, 19:00 Uhr" class="form-control">
           </div>
           <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-            <button type="button" onclick="document.getElementById('addGroupModal').style.display='none'" class="btn btn-secondary">გაუქმება</button>
-            <button type="submit" class="btn">შექმნა</button>
+            <button type="button" onclick="document.getElementById('addGroupModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Erstellen</button>
           </div>
         </form>
       </div>
@@ -786,32 +802,32 @@ GROUPS_HTML = render_page(
 
 # 6. Group Detail Template
 GROUP_DETAIL_HTML = render_page(
-    "ჯგუფის დეტალები",
+    "Gruppendetails",
     """
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">🏫 ჯგუფი: {{ group[1] }}</h3>
-        <a href="{{ url_for('groups_page') }}" class="btn btn-sm btn-outline">← ჯგუფების სია</a>
+        <h3 class="card-title">🏫 Gruppe: {{ group[1] }}</h3>
+        <a href="{{ url_for('groups_page') }}" class="btn btn-sm btn-outline">← Gruppenübersicht</a>
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; background: #f8fafc; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
-        <div><strong>კურსი:</strong> {{ group[2] }}</div>
-        <div><strong>პედაგოგი:</strong> {{ group[3] }}</div>
-        <div><strong>ტევადობა:</strong> {{ members|length }} / {{ group[4] }}</div>
-        <div><strong>განრიგი:</strong> {{ group[7] or '-' }}</div>
-        <div><strong>სტატუსი:</strong> <span class="badge badge-success">{{ group[8] }}</span></div>
+        <div><strong>Kurs:</strong> {{ group[2] }}</div>
+        <div><strong>Lehrkraft:</strong> {{ group[3] }}</div>
+        <div><strong>Kapazität:</strong> {{ members|length }} / {{ group[4] }}</div>
+        <div><strong>Zeitplan:</strong> {{ group[7] or '-' }}</div>
+        <div><strong>Status:</strong> <span class="badge badge-success">{{ group[8]|status_de }}</span></div>
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h4>👨‍🎓 ჯგუფის წევრები (სტუდენტები)</h4>
+        <h4>👨‍🎓 Gruppenmitglieder</h4>
         {% if session.get('logged_in') %}
-        <button onclick="document.getElementById('enrollModal').style.display='flex'" class="btn btn-sm">+ სტუდენტის დამატება ჯგუფში</button>
+        <button onclick="document.getElementById('enrollModal').style.display='flex'" class="btn btn-sm">+ Schüler zur Gruppe hinzufügen</button>
         {% endif %}
       </div>
 
       <table>
         <thead>
-          <tr><th>ID</th><th>სახელი, გვარი</th><th>ელ-ფოსტა</th><th>ტელეფონი</th><th>წევრობის სტატუსი</th></tr>
+          <tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Mitgliedschaftsstatus</th></tr>
         </thead>
         <tbody>
           {% for m in members %}
@@ -820,10 +836,10 @@ GROUP_DETAIL_HTML = render_page(
             <td><strong>{{ m[1] }}</strong></td>
             <td>{{ m[2] }}</td>
             <td>{{ m[3] or '-' }}</td>
-            <td><span class="badge badge-success">{{ m[5] }}</span></td>
+            <td><span class="badge badge-success">{{ m[5]|status_de }}</span></td>
           </tr>
           {% else %}
-          <tr><td colspan="5" style="text-align: center; color: var(--muted);">ჯგუფში სტუდენტები არ არის ჩარიცხული</td></tr>
+          <tr><td colspan="5" style="text-align: center; color: var(--muted);">In dieser Gruppe sind noch keine Schüler eingeschrieben</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -832,10 +848,10 @@ GROUP_DETAIL_HTML = render_page(
     <!-- Modal Enroll Student -->
     <div id="enrollModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
       <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 420px);">
-        <h3>+ სტუდენტის ჩარიცხვა ჯგუფში</h3>
+        <h3>+ Schüler in die Gruppe aufnehmen</h3>
         <form action="{{ url_for('enroll_student_route', group_id=group[0]) }}" method="POST">
           <div class="form-group">
-            <label>აირჩიეთ სტუდენტი *</label>
+            <label>Schüler auswählen *</label>
             <select name="student_id" required class="form-control">
               {% for s in all_students %}
               <option value="{{ s[0] }}">{{ s[1] }} ({{ s[2] }})</option>
@@ -843,8 +859,8 @@ GROUP_DETAIL_HTML = render_page(
             </select>
           </div>
           <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-            <button type="button" onclick="document.getElementById('enrollModal').style.display='none'" class="btn btn-secondary">გაუქმება</button>
-            <button type="submit" class="btn">ჩარიცხვა</button>
+            <button type="button" onclick="document.getElementById('enrollModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Aufnehmen</button>
           </div>
         </form>
       </div>
@@ -855,19 +871,19 @@ GROUP_DETAIL_HTML = render_page(
 
 # 7. Lessons & Attendance Schedule Template
 LESSONS_HTML = render_page(
-    "გაკვეთილების განრიგი",
+    "Unterrichtsplan",
     """
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">📅 გაკვეთილების განრიგი & დასწრება</h3>
+        <h3 class="card-title">📅 Unterrichtsplan und Anwesenheit</h3>
         {% if session.get('logged_in') %}
-        <button onclick="document.getElementById('addLessonModal').style.display='flex'" class="btn">+ გაკვეთილის ჩანიშვნა</button>
+        <button onclick="document.getElementById('addLessonModal').style.display='flex'" class="btn">+ Unterricht planen</button>
         {% endif %}
       </div>
 
       <table>
         <thead>
-          <tr><th>ID</th><th>ჯგუფი</th><th>პედაგოგი</th><th>დაწყება</th><th>ოთახი</th><th>თემა</th><th>სტატუსი</th><th>დასწრება</th></tr>
+          <tr><th>ID</th><th>Gruppe</th><th>Lehrkraft</th><th>Beginn</th><th>Raum</th><th>Thema</th><th>Status</th><th>Anwesenheit</th></tr>
         </thead>
         <tbody>
           {% for l in lessons %}
@@ -875,16 +891,16 @@ LESSONS_HTML = render_page(
             <td>#{{ l[0] }}</td>
             <td><strong>{{ l[1] }}</strong></td>
             <td>{{ l[2] }}</td>
-            <td>{{ l[3] }}</td>
+            <td>{{ l[3]|datetime_de }}</td>
             <td><span class="badge badge-neutral">{{ l[5] }}</span></td>
             <td>{{ l[6] or '-' }}</td>
-            <td><span class="badge badge-info">{{ l[7] }}</span></td>
+            <td><span class="badge badge-info">{{ l[7]|status_de }}</span></td>
             <td>
-              <a href="{{ url_for('attendance_page', lesson_id=l[0]) }}" class="btn btn-sm btn-outline">📝 დასწრების მონიშვნა</a>
+              <a href="{{ url_for('attendance_page', lesson_id=l[0]) }}" class="btn btn-sm btn-outline">📝 Anwesenheit erfassen</a>
             </td>
           </tr>
           {% else %}
-          <tr><td colspan="8" style="text-align: center; color: var(--muted); padding: 2rem;">ჩანიშნული გაკვეთილები არ არის</td></tr>
+          <tr><td colspan="8" style="text-align: center; color: var(--muted); padding: 2rem;">Noch keine Unterrichtstermine geplant</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -893,10 +909,10 @@ LESSONS_HTML = render_page(
     <!-- Modal Add Lesson -->
     <div id="addLessonModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
       <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
-        <h3>+ ახალი გაკვეთილის ჩანიშვნა</h3>
+        <h3>+ Neuen Unterrichtstermin planen</h3>
         <form action="{{ url_for('add_lesson_route') }}" method="POST">
           <div class="form-group">
-            <label>ჯგუფი *</label>
+            <label>Gruppe *</label>
             <select name="group_id" required class="form-control">
               {% for g in groups %}
               <option value="{{ g[0] }}">{{ g[1] }}</option>
@@ -904,24 +920,24 @@ LESSONS_HTML = render_page(
             </select>
           </div>
           <div class="form-group">
-            <label>დაწყების დრო *</label>
+            <label>Beginn *</label>
             <input type="datetime-local" name="starts_at" required class="form-control">
           </div>
           <div class="form-group">
-            <label>დასრულების დრო *</label>
+            <label>Ende *</label>
             <input type="datetime-local" name="ends_at" required class="form-control">
           </div>
           <div class="form-group">
-            <label>ოთახი / აუდიტორია</label>
-            <input type="text" name="room_label" value="Room 101" class="form-control">
+            <label>Raum</label>
+            <input type="text" name="room_label" value="Raum 101" class="form-control">
           </div>
           <div class="form-group">
-            <label>გაკვეთილის თემა</label>
-            <input type="text" name="topic" placeholder="მაგ: Functions & Loops" class="form-control">
+            <label>Unterrichtsthema</label>
+            <input type="text" name="topic" placeholder="z. B. Funktionen und Schleifen" class="form-control">
           </div>
           <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-            <button type="button" onclick="document.getElementById('addLessonModal').style.display='none'" class="btn btn-secondary">გაუქმება</button>
-            <button type="submit" class="btn">ჩანიშვნა</button>
+            <button type="button" onclick="document.getElementById('addLessonModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Planen</button>
           </div>
         </form>
       </div>
@@ -932,18 +948,18 @@ LESSONS_HTML = render_page(
 
 # 8. Attendance Marking Template
 ATTENDANCE_HTML = render_page(
-    "დასწრების მონიშვნა",
+    "Anwesenheit erfassen",
     """
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">📝 დასწრების მონიშვნა: {{ lesson[1] }} ({{ lesson[3] }})</h3>
-        <a href="{{ url_for('lessons_page') }}" class="btn btn-sm btn-outline">← განრიგში დაბრუნება</a>
+        <h3 class="card-title">📝 Anwesenheit erfassen: {{ lesson[1] }} ({{ lesson[3]|datetime_de }})</h3>
+        <a href="{{ url_for('lessons_page') }}" class="btn btn-sm btn-outline">← Zurück zum Unterrichtsplan</a>
       </div>
 
       <form action="{{ url_for('save_attendance_route', lesson_id=lesson[0]) }}" method="POST">
         <table>
           <thead>
-            <tr><th>სტუდენტი</th><th>დასწრების სტატუსი</th><th>შენიშვნა</th></tr>
+            <tr><th>Schüler</th><th>Anwesenheitsstatus</th><th>Notiz</th></tr>
           </thead>
           <tbody>
             {% for r in records %}
@@ -951,25 +967,25 @@ ATTENDANCE_HTML = render_page(
               <td><strong>{{ r[1] }}</strong></td>
               <td>
                 <select name="status_{{ r[0] }}" class="form-control" style="width: 160px; display: inline-block;">
-                  <option value="present" {% if r[2] == 'present' %}selected{% endif %}>🟢 Present (ესწრება)</option>
-                  <option value="absent" {% if r[2] == 'absent' %}selected{% endif %}>🔴 Absent (არაა)</option>
-                  <option value="late" {% if r[2] == 'late' %}selected{% endif %}>🟡 Late (დააგვიანა)</option>
-                  <option value="excused" {% if r[2] == 'excused' %}selected{% endif %}>⚪ Excused (საპატიო)</option>
+                  <option value="present" {% if r[2] == 'present' %}selected{% endif %}>🟢 Anwesend</option>
+                  <option value="absent" {% if r[2] == 'absent' %}selected{% endif %}>🔴 Abwesend</option>
+                  <option value="late" {% if r[2] == 'late' %}selected{% endif %}>🟡 Verspätet</option>
+                  <option value="excused" {% if r[2] == 'excused' %}selected{% endif %}>⚪ Entschuldigt</option>
                 </select>
               </td>
               <td>
-                <input type="text" name="note_{{ r[0] }}" value="{{ r[3] }}" placeholder="შენიშვნა..." class="form-control">
+                <input type="text" name="note_{{ r[0] }}" value="{{ r[3] }}" placeholder="Notiz..." class="form-control">
               </td>
             </tr>
             {% else %}
-            <tr><td colspan="3" style="text-align: center; color: var(--muted);">ამ ჯგუფში სტუდენტები არ არის ჩარიცხული</td></tr>
+            <tr><td colspan="3" style="text-align: center; color: var(--muted);">In dieser Gruppe sind noch keine Schüler eingeschrieben</td></tr>
             {% endfor %}
           </tbody>
         </table>
 
         {% if records %}
         <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
-          <button type="submit" class="btn">💾 დასწრების შენახვა</button>
+          <button type="submit" class="btn">💾 Anwesenheit speichern</button>
         </div>
         {% endif %}
       </form>
@@ -980,33 +996,33 @@ ATTENDANCE_HTML = render_page(
 
 # 9. Payments Page Template
 PAYMENTS_HTML = render_page(
-    "გადახდები",
+    "Zahlungen",
     """
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">💰 გადახდები & ინვოისები</h3>
+        <h3 class="card-title">💰 Zahlungen und Rechnungen</h3>
         <div class="header-actions">
           {% if session.get('logged_in') %}
-          <a href="{{ url_for('export_payments_csv') }}" class="btn btn-outline">CSV ექსპორტი</a>
-          <button onclick="document.getElementById('addPaymentModal').style.display='flex'" class="btn">+ ინვოისის შექმნა</button>
+          <a href="{{ url_for('export_payments_csv') }}" class="btn btn-outline">CSV exportieren</a>
+          <button onclick="document.getElementById('addPaymentModal').style.display='flex'" class="btn">+ Neue Rechnung</button>
           {% endif %}
         </div>
       </div>
 
       <form method="GET" class="filter-bar">
         <select name="status" class="form-control" style="max-width: 200px;">
-          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>ყველა გადახდა</option>
-          <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Paid (გადახდილი)</option>
-          <option value="partial" {% if status_filter == 'partial' %}selected{% endif %}>Partial (ნაწილობრივ)</option>
-          <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending (მოლოდინში)</option>
-          <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Overdue (ვადაგადაცილებული)</option>
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Alle Zahlungen</option>
+          <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Bezahlt</option>
+          <option value="partial" {% if status_filter == 'partial' %}selected{% endif %}>Teilbezahlt</option>
+          <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Offen</option>
+          <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Überfällig</option>
         </select>
-        <button type="submit" class="btn btn-secondary">ფილტრი</button>
+        <button type="submit" class="btn btn-secondary">Filtern</button>
       </form>
 
       <table>
         <thead>
-          <tr><th>ID</th><th>სტუდენტი</th><th>ჯგუფი</th><th>გადასახდელი</th><th>გადახდილი</th><th>ვადა</th><th>სტატუსი</th><th>გადახდის მეთოდი</th><th>მოქმედება</th></tr>
+          <tr><th>ID</th><th>Schüler</th><th>Gruppe</th><th>Fälliger Betrag</th><th>Bezahlt</th><th>Fällig am</th><th>Status</th><th>Zahlungsart</th><th>Aktion</th></tr>
         </thead>
         <tbody>
           {% for p in payments %}
@@ -1014,23 +1030,23 @@ PAYMENTS_HTML = render_page(
             <td>#{{ p[0] }}</td>
             <td><strong>{{ p[1] }}</strong></td>
             <td>{{ p[2] }}</td>
-            <td>₾{{ "%.2f"|format(p[3]) }}</td>
-            <td>₾{{ "%.2f"|format(p[4]) }}</td>
-            <td>{{ p[5] }}</td>
+            <td>€{{ "%.2f"|format(p[3]) }}</td>
+            <td>€{{ "%.2f"|format(p[4]) }}</td>
+            <td>{{ p[5]|date_de }}</td>
             <td>
               <span class="badge {% if p[7] == 'paid' %}badge-success{% elif p[7] == 'partial' %}badge-info{% elif p[7] == 'overdue' %}badge-danger{% else %}badge-warning{% endif %}">
-                {{ p[7] }}
+                {{ p[7]|status_de }}
               </span>
             </td>
-            <td>{{ p[8] or 'cash' }}</td>
+            <td>{{ (p[8] or 'cash')|status_de }}</td>
             <td>
               {% if p[7] != 'paid' and session.get('logged_in') %}
-              <button onclick="openPayModal({{ p[0] }}, {{ p[3] - p[4] }})" class="btn btn-sm btn-outline">💵 თანხის მიღება</button>
+              <button onclick="openPayModal({{ p[0] }}, {{ p[3] - p[4] }})" class="btn btn-sm btn-outline">💵 Zahlung erfassen</button>
               {% endif %}
             </td>
           </tr>
           {% else %}
-          <tr><td colspan="9" style="text-align: center; color: var(--muted); padding: 2rem;">გადახდები ვერ მოიძებნა</td></tr>
+          <tr><td colspan="9" style="text-align: center; color: var(--muted); padding: 2rem;">Keine Zahlungen gefunden</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -1039,10 +1055,10 @@ PAYMENTS_HTML = render_page(
     <!-- Modal Add Invoice -->
     <div id="addPaymentModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
       <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
-        <h3>+ ახალი ინვოისის შექმნა</h3>
+        <h3>+ Neue Rechnung erstellen</h3>
         <form action="{{ url_for('add_payment_route') }}" method="POST">
           <div class="form-group">
-            <label>სტუდენტი *</label>
+            <label>Schüler *</label>
             <select name="student_id" required class="form-control">
               {% for s in students %}
               <option value="{{ s[0] }}">{{ s[1] }}</option>
@@ -1050,29 +1066,29 @@ PAYMENTS_HTML = render_page(
             </select>
           </div>
           <div class="form-group">
-            <label>ჯგუფი</label>
+            <label>Gruppe</label>
             <select name="group_id" class="form-control">
-              <option value="">-- არცერთი --</option>
+              <option value="">-- Keine Gruppe --</option>
               {% for g in groups %}
               <option value="{{ g[0] }}">{{ g[1] }}</option>
               {% endfor %}
             </select>
           </div>
           <div class="form-group">
-            <label>დასაფარი თანხა (₾) *</label>
+            <label>Fälliger Betrag (€) *</label>
             <input type="number" step="0.01" name="amount_due" required value="300.00" class="form-control">
           </div>
           <div class="form-group">
-            <label>გადახდის ვადა *</label>
+            <label>Fälligkeitsdatum *</label>
             <input type="date" name="due_date" required class="form-control">
           </div>
           <div class="form-group">
-            <label>შენიშვნა</label>
-            <input type="text" name="note" placeholder="მაგ: ივლისის სწავლის საფასური" class="form-control">
+            <label>Notiz</label>
+            <input type="text" name="note" placeholder="z. B. Kursgebühr Juli" class="form-control">
           </div>
           <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-            <button type="button" onclick="document.getElementById('addPaymentModal').style.display='none'" class="btn btn-secondary">გაუქმება</button>
-            <button type="submit" class="btn">შექმნა</button>
+            <button type="button" onclick="document.getElementById('addPaymentModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Erstellen</button>
           </div>
         </form>
       </div>
@@ -1081,20 +1097,20 @@ PAYMENTS_HTML = render_page(
     <!-- Modal Pay Receipt -->
     <div id="payModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
       <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 420px);">
-        <h3>💵 თანხის მიღების დაფიქსირება</h3>
+        <h3>💵 Zahlungseingang erfassen</h3>
         <form action="{{ url_for('record_payment_route') }}" method="POST">
           <input type="hidden" name="payment_id" id="pay_payment_id">
           <div class="form-group">
-            <label>გადახდილი თანხა (₾) *</label>
+            <label>Gezahlter Betrag (€) *</label>
             <input type="number" step="0.01" name="amount_paid" id="pay_amount" required class="form-control">
           </div>
           <div class="form-group">
-            <label>გადახდის თარიღი</label>
+            <label>Zahlungsdatum</label>
             <input type="date" name="paid_at" value="{{ today_date }}" class="form-control">
           </div>
           <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-            <button type="button" onclick="document.getElementById('payModal').style.display='none'" class="btn btn-secondary">გაუქმება</button>
-            <button type="submit" class="btn">დაფიქსირება</button>
+            <button type="button" onclick="document.getElementById('payModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Speichern</button>
           </div>
         </form>
       </div>
@@ -1113,19 +1129,19 @@ PAYMENTS_HTML = render_page(
 
 # 10. Teachers Page Template
 TEACHERS_HTML = render_page(
-    "პედაგოგები",
+    "Lehrkräfte",
     """
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">👨‍🏫 პედაგოგების დირექტორია</h3>
+        <h3 class="card-title">👨‍🏫 Verzeichnis der Lehrkräfte</h3>
         {% if session.get('logged_in') %}
-        <button onclick="document.getElementById('addTeacherModal').style.display='flex'" class="btn">+ ახალი პედაგოგი</button>
+        <button onclick="document.getElementById('addTeacherModal').style.display='flex'" class="btn">+ Neue Lehrkraft</button>
         {% endif %}
       </div>
 
       <table>
         <thead>
-          <tr><th>ID</th><th>სახელი, გვარი</th><th>ელ-ფოსტა</th><th>ტელეფონი</th><th>სპეციალიზაცია</th><th>სტატუსი</th></tr>
+          <tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Fachgebiet</th><th>Status</th></tr>
         </thead>
         <tbody>
           {% for t in teachers %}
@@ -1134,11 +1150,11 @@ TEACHERS_HTML = render_page(
             <td><strong>{{ t[1] }}</strong></td>
             <td>{{ t[2] }}</td>
             <td>{{ t[3] or '-' }}</td>
-            <td><span class="badge badge-info">{{ t[4] or 'General' }}</span></td>
-            <td><span class="badge badge-success">{{ t[5] }}</span></td>
+            <td><span class="badge badge-info">{{ t[4] or 'Allgemein' }}</span></td>
+            <td><span class="badge badge-success">{{ t[5]|status_de }}</span></td>
           </tr>
           {% else %}
-          <tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 2rem;">პედაგოგები ვერ მოიძებნა</td></tr>
+          <tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 2rem;">Keine Lehrkräfte gefunden</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -1147,27 +1163,27 @@ TEACHERS_HTML = render_page(
     <!-- Modal Add Teacher -->
     <div id="addTeacherModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
       <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
-        <h3>+ ახალი პედაგოგის დამატება</h3>
+        <h3>+ Neue Lehrkraft hinzufügen</h3>
         <form action="{{ url_for('add_teacher_route') }}" method="POST">
           <div class="form-group">
-            <label>სრული სახელი და გვარი *</label>
+            <label>Vollständiger Name *</label>
             <input type="text" name="full_name" required class="form-control">
           </div>
           <div class="form-group">
-            <label>ელ-ფოსტა *</label>
+            <label>E-Mail *</label>
             <input type="email" name="email" required class="form-control">
           </div>
           <div class="form-group">
-            <label>ტელეფონი</label>
+            <label>Telefon</label>
             <input type="text" name="phone" class="form-control">
           </div>
           <div class="form-group">
-            <label>სპეციალიზაცია</label>
+            <label>Fachgebiet</label>
             <input type="text" name="specialization" placeholder="Python, Languages, Math..." class="form-control">
           </div>
           <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-            <button type="button" onclick="document.getElementById('addTeacherModal').style.display='none'" class="btn btn-secondary">გაუქმება</button>
-            <button type="submit" class="btn">დამატება</button>
+            <button type="button" onclick="document.getElementById('addTeacherModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Hinzufügen</button>
           </div>
         </form>
       </div>
@@ -1181,51 +1197,51 @@ HTML = DASHBOARD_HTML
 COURSE_DETAIL_HTML = COURSES_HTML
 DETAIL_HTML = STUDENT_DETAIL_HTML
 EDIT_HTML = render_page(
-    "სტუდენტის რედაქტირება",
+    "Schüler bearbeiten",
     """
     <div class="card" style="max-width: 760px; margin-inline: auto;">
       <div class="card-header">
-        <h3 class="card-title">✏️ სტუდენტის რედაქტირება</h3>
-        <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">← უკან</a>
+        <h3 class="card-title">✏️ Schüler bearbeiten</h3>
+        <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">← Zurück</a>
       </div>
       <form method="POST">
         <div class="grid-2">
           <div class="form-group">
-            <label>სრული სახელი და გვარი *</label>
+            <label>Vollständiger Name *</label>
             <input class="form-control" name="name" value="{{ student[1] }}" required>
           </div>
           <div class="form-group">
-            <label>ელ-ფოსტა *</label>
+            <label>E-Mail *</label>
             <input class="form-control" type="email" name="email" value="{{ student[2] }}" required>
           </div>
           <div class="form-group">
-            <label>ტელეფონი</label>
+            <label>Telefon</label>
             <input class="form-control" name="phone" value="{{ student[3] or '' }}">
           </div>
           <div class="form-group">
-            <label>მშობელი / მეთვალყურე</label>
+            <label>Erziehungsberechtigte Person</label>
             <input class="form-control" name="guardian_name" value="{{ student[4] or '' }}">
           </div>
           <div class="form-group">
-            <label>მშობლის ტელეფონი</label>
+            <label>Telefon der erziehungsberechtigten Person</label>
             <input class="form-control" name="guardian_phone" value="{{ student[5] or '' }}">
           </div>
           <div class="form-group">
-            <label>სტატუსი</label>
+            <label>Status</label>
             <select class="form-control" name="status">
-              <option value="active" {% if student[6] == 'active' %}selected{% endif %}>Active</option>
-              <option value="inactive" {% if student[6] == 'inactive' %}selected{% endif %}>Inactive</option>
+              <option value="active" {% if student[6] == 'active' %}selected{% endif %}>Aktiv</option>
+              <option value="inactive" {% if student[6] == 'inactive' %}selected{% endif %}>Inaktiv</option>
               <option value="archived" {% if student[6] == 'archived' %}selected{% endif %}>Archived</option>
             </select>
           </div>
         </div>
         <div class="form-group">
-          <label>შენიშვნა</label>
+          <label>Notiz</label>
           <textarea class="form-control" name="notes" rows="3">{{ student[7] or '' }}</textarea>
         </div>
         <div class="header-actions">
-          <a href="{{ url_for('students_page') }}" class="btn btn-secondary">გაუქმება</a>
-          <button type="submit" class="btn">ცვლილებების შენახვა</button>
+          <a href="{{ url_for('students_page') }}" class="btn btn-secondary">Abbrechen</a>
+          <button type="submit" class="btn">Änderungen speichern</button>
         </div>
       </form>
     </div>

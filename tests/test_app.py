@@ -29,7 +29,7 @@ class CRMAppTests(unittest.TestCase):
     def login(client):
         return client.post(
             "/login",
-            data={"username": "admin@education.ge", "password": "admin123"},
+            data={"username": "admin@bildungszentrum.de", "password": "admin123"},
         )
 
     def test_health_and_dashboard(self):
@@ -41,7 +41,7 @@ class CRMAppTests(unittest.TestCase):
             dashboard = client.get("/")
             self.assertEqual(dashboard.status_code, 200)
             self.assertIn("Education Center CRM", dashboard.get_data(as_text=True))
-            self.assertIn("დღევანდელი გაკვეთილი", dashboard.get_data(as_text=True))
+            self.assertIn("Heutiger Unterricht", dashboard.get_data(as_text=True))
 
     def test_write_routes_require_login(self):
         with main.app.test_client() as client:
@@ -159,12 +159,12 @@ class CRMAppTests(unittest.TestCase):
             students = client.get("/exports/students.csv")
             self.assertEqual(students.status_code, 200)
             self.assertIn("education-crm-students.csv", students.headers["Content-Disposition"])
-            self.assertIn("Full name", students.get_data(as_text=True))
+            self.assertIn("Name", students.get_data(as_text=True))
 
             payments = client.get("/exports/payments.csv")
             self.assertEqual(payments.status_code, 200)
             self.assertIn("education-crm-payments.csv", payments.headers["Content-Disposition"])
-            self.assertIn("Amount due", payments.get_data(as_text=True))
+            self.assertIn("Fälliger Betrag", payments.get_data(as_text=True))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 
 from flask import Flask
@@ -10,11 +11,63 @@ from routes import register_routes
 APP_DIR = Path(__file__).resolve().parent
 DEFAULT_DB_PATH = APP_DIR / "crm.db"
 
+STATUS_LABELS_DE = {
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "planned": "Geplant",
+    "scheduled": "Geplant",
+    "completed": "Abgeschlossen",
+    "cancelled": "Abgesagt",
+    "enrolled": "Eingeschrieben",
+    "paid": "Bezahlt",
+    "partial": "Teilbezahlt",
+    "pending": "Offen",
+    "overdue": "Überfällig",
+    "cash": "Bar",
+    "card": "Karte",
+    "transfer": "Überweisung",
+    "bank_transfer": "Banküberweisung",
+    "present": "Anwesend",
+    "absent": "Abwesend",
+    "late": "Verspätet",
+    "excused": "Entschuldigt",
+}
+
+
+def status_de(value):
+    text = str(value or "").strip()
+    return STATUS_LABELS_DE.get(text.lower(), text)
+
+
+def date_de(value):
+    text = str(value or "").strip()
+    if not text or text == "-":
+        return "-"
+    try:
+        return datetime.fromisoformat(text[:10]).strftime("%d.%m.%Y")
+    except ValueError:
+        return text
+
+
+def datetime_de(value):
+    text = str(value or "").strip()
+    if not text or text == "-":
+        return "-"
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        return parsed.strftime("%d.%m.%Y, %H:%M")
+    except ValueError:
+        return text
+
+
 app = Flask(__name__)
 app.config.update(
     DB_PATH=Path(os.environ.get("CRM_DB_PATH", DEFAULT_DB_PATH)),
     SECRET_KEY=os.environ.get("CRM_SECRET_KEY", "local-demo-only-change-me"),
 )
+app.jinja_env.filters["status_de"] = status_de
+app.jinja_env.filters["date_de"] = date_de
+app.jinja_env.filters["datetime_de"] = datetime_de
 
 DB_PATH = app.config["DB_PATH"]
 database.DB_PATH = DB_PATH

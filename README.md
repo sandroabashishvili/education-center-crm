@@ -1,6 +1,6 @@
 # Education Center CRM
 
-A portfolio-grade Flask and SQLite application for the day-to-day administration of a small education center.
+A portfolio-grade Flask and SQLite application with a complete German-language interface for the day-to-day administration of a small education center.
 
 ![Education Center CRM dashboard](assets/dashboard-preview.png)
 
@@ -38,7 +38,7 @@ The database is created and populated with realistic demo records on first start
 ### Demo login
 
 ```text
-Email:    admin@education.ge
+Email:    admin@bildungszentrum.de
 Password: admin123
 ```
 
