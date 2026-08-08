@@ -5,11 +5,11 @@
 Eine deutschsprachige Flask- und SQLite-Anwendung für die tägliche Verwaltung
 eines kleinen Bildungszentrums.
 
-**Portfolio-Demo:** [Statische Vorschau öffnen](https://sandro-abashishvili.sandroabashishvili.chatgpt.site/demos/education-crm/)
+**Portfolio-Demo:** [Statische Vorschau öffnen](https://sandroabashishvili.github.io/education-center-crm/)
 
-Die Demo im Portfolio ist eine statische Vorschau, weil das Portfolio-Hosting
-keinen dauerhaft laufenden Flask-/SQLite-Prozess bereitstellt. Dieses
-GitHub-Repository enthält die funktionale Anwendung.
+Die GitHub-Pages-Demo ist eine statische Vorschau, weil GitHub Pages keinen
+dauerhaft laufenden Flask-/SQLite-Prozess bereitstellt. Dieses Repository
+enthält zusätzlich die funktionale lokale Anwendung.
 
 ## Was das Projekt demonstriert
 
@@ -104,8 +104,8 @@ Weitere Details: [docs/current_status.md](docs/current_status.md).
 
 ## Autor
 
-Aleksandre (Sandro) Abashishvili
+Sandro Abashishvili
 
-[Portfolio](https://sandro-abashishvili.sandroabashishvili.chatgpt.site/) ·
+[Portfolio](https://sandroabashishvili.github.io/) ·
 [GitHub](https://github.com/sandroabashishvili) ·
 [LinkedIn](https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/)
