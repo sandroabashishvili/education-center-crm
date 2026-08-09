@@ -5,6 +5,9 @@
 Eine deutschsprachige Flask- und SQLite-Anwendung für die tägliche Verwaltung
 eines kleinen Bildungszentrums.
 
+Sie bündelt Teilnehmer, Kurse, Gruppen, Anwesenheit, Rechnungen und Zahlungen
+in einem durchgängigen administrativen Arbeitsablauf.
+
 **Portfolio-Demo:** [Statische Vorschau öffnen](https://sandroabashishvili.github.io/education-center-crm/)
 
 Die GitHub-Pages-Demo ist eine statische Vorschau, weil GitHub Pages keinen
