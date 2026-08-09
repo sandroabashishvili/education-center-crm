@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% set active_page = "courses" %}
+{% block title %}Kurse - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card">
+      <div class="card-header">
+        <h3 class="card-title">📚 Kurskatalog</h3>
+        {% if session.get('logged_in') %}
+        <button onclick="document.getElementById('addCourseModal').style.display='flex'" class="btn">+ Neuer Kurs</button>
+        {% endif %}
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Kursbezeichnung</th><th>Kategorie</th><th>Standardgebühr</th><th>Status</th><th>Aktion</th></tr>
+        </thead>
+        <tbody>
+          {% for c in courses %}
+          <tr>
+            <td>#{{ c[0] }}</td>
+            <td><strong>{{ c[1] }}</strong><br><small style="color: var(--muted);">{{ c[2] or '' }}</small></td>
+            <td><span class="badge badge-info">{{ c[3] or 'Allgemein' }}</span></td>
+            <td>€{{ "%.2f"|format(c[4] or 0) }}</td>
+            <td><span class="badge badge-success">{{ c[5]|status_de }}</span></td>
+            <td>
+              {% if session.get('user_role') == 'admin' %}
+              <form action="{{ url_for('delete_course', course_id=c[0]) }}" method="POST" style="margin:0;" onsubmit="return confirm('Möchten Sie diesen Kurs wirklich löschen?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 2rem;">Keine Kurse gefunden</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Add Course -->
+    <div id="addCourseModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
+      <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
+        <h3>+ Neuen Kurs hinzufügen</h3>
+        <form action="{{ url_for('add_course_route') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-group">
+            <label>Kursbezeichnung *</label>
+            <input type="text" name="name" required class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Kategorie</label>
+            <input type="text" name="category" placeholder="Programming, Languages..." class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Standardgebühr (€)</label>
+            <input type="number" step="0.01" name="default_fee" value="300" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Beschreibung</label>
+            <textarea name="description" class="form-control" rows="2"></textarea>
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button type="button" onclick="document.getElementById('addCourseModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Hinzufügen</button>
+          </div>
+        </form>
+      </div>
+    </div>
+{% endblock %}

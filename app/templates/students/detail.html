@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% set active_page = "students" %}
+{% block title %}Schülerprofil - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card">
+      <div class="card-header">
+        <h3 class="card-title">👤 Schülerprofil: {{ student[1] }}</h3>
+        <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">← Zurück zur Übersicht</a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: 12px;">
+        <div><strong>ID:</strong> #{{ student[0] }}</div>
+        <div><strong>E-Mail:</strong> {{ student[2] }}</div>
+        <div><strong>Telefon:</strong> {{ student[3] or 'N/A' }}</div>
+        <div><strong>Erziehungsberechtigte Person:</strong> {{ student[4] or '-' }} ({{ student[5] or '-' }})</div>
+        <div><strong>Status:</strong> <span class="badge badge-success">{{ student[6]|status_de }}</span></div>
+        <div><strong>Notiz:</strong> {{ student[7] or '-' }}</div>
+      </div>
+
+      <h4>🏫 Gruppen und Kurse</h4>
+      <table>
+        <thead>
+          <tr><th>Gruppenname</th><th>Kurs</th><th>Status</th><th>Mitglied seit</th></tr>
+        </thead>
+        <tbody>
+          {% for g in groups %}
+          <tr>
+            <td><strong>{{ g[1] }}</strong></td>
+            <td>{{ g[2] }}</td>
+            <td><span class="badge badge-info">{{ g[3]|status_de }}</span></td>
+            <td>{{ g[4]|date_de }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" style="text-align: center; color: var(--muted);">Der Schüler ist noch keiner Gruppe zugeordnet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h4 style="margin-top: 1.5rem;">💰 Zahlungsverlauf</h4>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Fälliger Betrag</th><th>Bezahlt</th><th>Fällig am</th><th>Status</th><th>Zahlungsdatum</th></tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+          <tr>
+            <td>#{{ p[0] }}</td>
+            <td>€{{ "%.2f"|format(p[1]) }}</td>
+            <td>€{{ "%.2f"|format(p[2]) }}</td>
+            <td>{{ p[3]|status_de }}</td>
+            <td>
+              <span class="badge {% if p[4] == 'paid' %}badge-success{% elif p[4] == 'partial' %}badge-info{% elif p[4] == 'overdue' %}badge-danger{% else %}badge-warning{% endif %}">
+                {{ p[4]|status_de }}
+              </span>
+            </td>
+            <td>{{ (p[5] or '-')|date_de }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" style="text-align: center; color: var(--muted);">Noch kein Zahlungsverlauf vorhanden</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+{% endblock %}

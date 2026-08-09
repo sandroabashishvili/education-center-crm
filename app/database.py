@@ -1,387 +1,232 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from pathlib import Path
+import shutil
 import sqlite3
-import hashlib
+
+from werkzeug.security import generate_password_hash
 
 DB_PATH = Path(__file__).resolve().parent / "crm.db"
+SCHEMA_VERSION = 1
 
 
-def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode("utf-8")).hexdigest()
-
-
-def init_db(db_path=None):
-    path = Path(db_path or DB_PATH)
+def _connect(path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(path)
-    cur = conn.cursor()
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
 
-    # Enable foreign keys
-    cur.execute("PRAGMA foreign_keys = ON;")
 
-    # 1. Users table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            phone TEXT,
-            password_hash TEXT NOT NULL,
-            role TEXT NOT NULL DEFAULT 'admin',
-            status TEXT NOT NULL DEFAULT 'active',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+def _is_current_schema(path: Path) -> bool:
+    if not path.exists():
+        return True
+    try:
+        with _connect(path) as conn:
+            return conn.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION
+    except sqlite3.DatabaseError:
+        return False
+
+
+def _archive_legacy_database(path: Path) -> Path:
+    backup_dir = path.parent / "backups"
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    backup_path = backup_dir / f"{path.stem}-legacy-{timestamp}{path.suffix}"
+    shutil.copy2(path, backup_path)
+    path.unlink()
+    return backup_path
+
+
+def init_db(db_path=None) -> None:
+    path = Path(db_path or DB_PATH)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists() and not _is_current_schema(path):
+        _archive_legacy_database(path)
+
+    with _connect(path) as conn:
+        conn.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                phone TEXT,
+                password_hash TEXT NOT NULL,
+                role TEXT NOT NULL CHECK (role IN ('admin', 'manager', 'teacher')),
+                status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS students (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                phone TEXT,
+                guardian_name TEXT,
+                guardian_phone TEXT,
+                status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'archived')),
+                notes TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS courses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT,
+                category TEXT NOT NULL DEFAULT 'Allgemein',
+                default_fee REAL NOT NULL DEFAULT 0 CHECK (default_fee >= 0),
+                status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'archived')),
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS teachers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER UNIQUE,
+                full_name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                phone TEXT,
+                specialization TEXT,
+                status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+            );
+            CREATE TABLE IF NOT EXISTS groups (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                course_id INTEGER NOT NULL,
+                teacher_id INTEGER,
+                name TEXT NOT NULL,
+                capacity INTEGER NOT NULL DEFAULT 15 CHECK (capacity > 0),
+                start_date TEXT,
+                end_date TEXT,
+                schedule_description TEXT,
+                status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('planned', 'active', 'completed', 'archived')),
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE RESTRICT,
+                FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE SET NULL
+            );
+            CREATE TABLE IF NOT EXISTS group_students (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                group_id INTEGER NOT NULL,
+                student_id INTEGER NOT NULL,
+                status TEXT NOT NULL DEFAULT 'enrolled' CHECK (status IN ('enrolled', 'paused', 'completed', 'cancelled')),
+                joined_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE (group_id, student_id),
+                FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
+                FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+            );
+            CREATE TABLE IF NOT EXISTS lessons (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                group_id INTEGER NOT NULL,
+                teacher_id INTEGER,
+                starts_at TEXT NOT NULL,
+                ends_at TEXT NOT NULL,
+                room_label TEXT,
+                delivery_mode TEXT NOT NULL DEFAULT 'in_person' CHECK (delivery_mode IN ('in_person', 'online')),
+                topic TEXT,
+                status TEXT NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'completed', 'cancelled')),
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
+                FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE SET NULL
+            );
+            CREATE TABLE IF NOT EXISTS attendance (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                lesson_id INTEGER NOT NULL,
+                student_id INTEGER NOT NULL,
+                status TEXT NOT NULL CHECK (status IN ('present', 'absent', 'late', 'excused')),
+                note TEXT,
+                marked_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE (lesson_id, student_id),
+                FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE,
+                FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+            );
+            CREATE TABLE IF NOT EXISTS payments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id INTEGER NOT NULL,
+                group_id INTEGER,
+                amount_due REAL NOT NULL CHECK (amount_due > 0),
+                amount_paid REAL NOT NULL DEFAULT 0 CHECK (amount_paid >= 0),
+                due_date TEXT NOT NULL,
+                paid_at TEXT,
+                status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'partial', 'paid', 'overdue')),
+                method TEXT NOT NULL DEFAULT 'cash' CHECK (method IN ('cash', 'bank_transfer', 'card', 'other')),
+                note TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+                FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE SET NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_students_status ON students(status);
+            CREATE INDEX IF NOT EXISTS idx_groups_teacher ON groups(teacher_id);
+            CREATE INDEX IF NOT EXISTS idx_lessons_start ON lessons(starts_at);
+            CREATE INDEX IF NOT EXISTS idx_payments_status_due ON payments(status, due_date);
+            PRAGMA user_version = 1;
+            """
         )
-    """)
+        _seed_demo_data(conn)
 
-    # 2. Students table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS students (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT,
-            name TEXT,
-            email TEXT NOT NULL,
-            phone TEXT,
-            guardian_name TEXT,
-            guardian_phone TEXT,
-            status TEXT NOT NULL DEFAULT 'active',
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+def _seed_demo_data(conn: sqlite3.Connection) -> None:
+    if conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]:
+        return
+
+    users = [
+        ("Administrator", "admin@bildungszentrum.de", "+49 561 000000", "admin123", "admin"),
+        ("Mitarbeiter Demo", "manager@bildungszentrum.de", "+49 561 000001", "manager123", "manager"),
+        ("Daniel Weber", "teacher@bildungszentrum.de", "+49 561 000002", "teacher123", "teacher"),
+    ]
+    for full_name, email, phone, password, role in users:
+        conn.execute(
+            "INSERT INTO users (full_name, email, phone, password_hash, role) VALUES (?, ?, ?, ?, ?)",
+            (full_name, email, phone, generate_password_hash(password), role),
         )
-    """)
 
-    # Ensure all columns exist in students for backward compatibility
-    cur.execute("PRAGMA table_info(students);")
-    student_cols = [col[1] for col in cur.fetchall()]
-    for col_name, col_type in [
-        ("full_name", "TEXT"),
-        ("name", "TEXT"),
-        ("guardian_name", "TEXT"),
-        ("guardian_phone", "TEXT"),
-        ("status", "TEXT DEFAULT 'active'"),
-        ("notes", "TEXT"),
-        ("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    ]:
-        if col_name not in student_cols:
-            try:
-                cur.execute(f"ALTER TABLE students ADD COLUMN {col_name} {col_type};")
-            except sqlite3.OperationalError:
-                pass
-
-    cur.execute("UPDATE students SET full_name = name WHERE (full_name IS NULL OR full_name = '') AND name IS NOT NULL;")
-    cur.execute("UPDATE students SET name = full_name WHERE (name IS NULL OR name = '') AND full_name IS NOT NULL;")
-
-    # 3. Courses table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS courses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            title TEXT,
-            description TEXT,
-            category TEXT DEFAULT 'Allgemein',
-            default_fee REAL DEFAULT 0.0,
-            teacher TEXT,
-            status TEXT NOT NULL DEFAULT 'active',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    cur.execute("PRAGMA table_info(courses);")
-    course_cols = [col[1] for col in cur.fetchall()]
-    for col_name, col_type in [
-        ("name", "TEXT"),
-        ("title", "TEXT"),
-        ("description", "TEXT"),
-        ("category", "TEXT DEFAULT 'Allgemein'"),
-        ("default_fee", "REAL DEFAULT 0.0"),
-        ("teacher", "TEXT"),
-        ("status", "TEXT DEFAULT 'active'"),
-        ("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    ]:
-        if col_name not in course_cols:
-            try:
-                cur.execute(f"ALTER TABLE courses ADD COLUMN {col_name} {col_type};")
-            except sqlite3.OperationalError:
-                pass
-
-    cur.execute("UPDATE courses SET name = title WHERE (name IS NULL OR name = '') AND title IS NOT NULL;")
-    cur.execute("UPDATE courses SET title = name WHERE (title IS NULL OR title = '') AND name IS NOT NULL;")
-
-
-    # 4. Teachers table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS teachers (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            full_name TEXT NOT NULL,
-            email TEXT NOT NULL,
-            phone TEXT,
-            specialization TEXT,
-            status TEXT NOT NULL DEFAULT 'active',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
-        )
-    """)
-
-    # 5. Groups table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS groups (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            course_id INTEGER NOT NULL,
-            teacher_id INTEGER,
-            name TEXT NOT NULL,
-            capacity INTEGER DEFAULT 15,
-            start_date TEXT,
-            end_date TEXT,
-            schedule_description TEXT,
-            status TEXT NOT NULL DEFAULT 'active',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(course_id) REFERENCES courses(id) ON DELETE CASCADE,
-            FOREIGN KEY(teacher_id) REFERENCES teachers(id) ON DELETE SET NULL
-        )
-    """)
-
-    # 6. Group Students (enrollment junction table)
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS group_students (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            group_id INTEGER NOT NULL,
-            student_id INTEGER NOT NULL,
-            status TEXT NOT NULL DEFAULT 'enrolled',
-            joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(group_id, student_id),
-            FOREIGN KEY(group_id) REFERENCES groups(id) ON DELETE CASCADE,
-            FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE
-        )
-    """)
-
-    # 7. Lessons table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS lessons (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            group_id INTEGER NOT NULL,
-            teacher_id INTEGER,
-            starts_at TEXT NOT NULL,
-            ends_at TEXT NOT NULL,
-            room_label TEXT DEFAULT 'Raum 101',
-            delivery_mode TEXT DEFAULT 'in_person',
-            topic TEXT,
-            status TEXT NOT NULL DEFAULT 'scheduled',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(group_id) REFERENCES groups(id) ON DELETE CASCADE,
-            FOREIGN KEY(teacher_id) REFERENCES teachers(id) ON DELETE SET NULL
-        )
-    """)
-
-    # 8. Attendance table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS attendance (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            lesson_id INTEGER NOT NULL,
-            student_id INTEGER NOT NULL,
-            status TEXT NOT NULL DEFAULT 'present',
-            note TEXT,
-            marked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(lesson_id, student_id),
-            FOREIGN KEY(lesson_id) REFERENCES lessons(id) ON DELETE CASCADE,
-            FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE
-        )
-    """)
-
-    # 9. Payments table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS payments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            student_id INTEGER NOT NULL,
-            group_id INTEGER,
-            amount_due REAL NOT NULL DEFAULT 0.0,
-            amount_paid REAL NOT NULL DEFAULT 0.0,
-            due_date TEXT NOT NULL,
-            paid_at TEXT,
-            status TEXT NOT NULL DEFAULT 'pending',
-            method TEXT DEFAULT 'cash',
-            note TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE,
-            FOREIGN KEY(group_id) REFERENCES groups(id) ON DELETE SET NULL
-        )
-    """)
-
-    # 10. Notification Logs table
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS notification_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            recipient_type TEXT NOT NULL DEFAULT 'student',
-            recipient_id INTEGER NOT NULL,
-            channel TEXT NOT NULL DEFAULT 'sms',
-            subject TEXT,
-            body TEXT NOT NULL,
-            status TEXT NOT NULL DEFAULT 'sent',
-            sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    # Legacy enrollments table (for backward compatibility)
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS enrollments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            student_id INTEGER NOT NULL,
-            course_id INTEGER NOT NULL,
-            status TEXT NOT NULL DEFAULT 'Active',
-            payment_status TEXT NOT NULL DEFAULT 'Pending',
-            amount_paid REAL DEFAULT 0,
-            FOREIGN KEY(student_id) REFERENCES students(id),
-            FOREIGN KEY(course_id) REFERENCES courses(id)
-        )
-    """)
-
-    # Seed default Admin user if empty
-    cur.execute("SELECT COUNT(*) FROM users;")
-    if cur.fetchone()[0] == 0:
-        admin_pass = hash_password("admin123")
-        cur.execute("""
-            INSERT INTO users (full_name, email, phone, password_hash, role, status)
-            VALUES ('Administrator', 'admin@bildungszentrum.de', '+49 561 000000', ?, 'admin', 'active')
-        """, (admin_pass,))
-
-    # Seed default sample data if empty
-    cur.execute("SELECT COUNT(*) FROM students;")
-    if cur.fetchone()[0] == 0:
-        cur.execute("""
-            INSERT INTO students (full_name, name, email, phone, guardian_name, guardian_phone, status, notes)
-            VALUES
-            ('Jonas Becker', 'Jonas Becker', 'jonas.becker@example.de', '+49 151 11223344', 'Katrin Becker', '+49 151 11223345', 'active', 'Sehr gute Lernfortschritte'),
-            ('Lea Hoffmann', 'Lea Hoffmann', 'lea.hoffmann@example.de', '+49 152 33445566', 'Daniel Hoffmann', '+49 152 33445567', 'active', 'Teilnahme am Englischkurs'),
-            ('Noah Fischer', 'Noah Fischer', 'noah.fischer@example.de', '+49 155 66778899', 'Miriam Fischer', '+49 155 66778900', 'active', 'Teilnahme am Python-Webkurs')
-        """)
-
-    cur.execute("SELECT COUNT(*) FROM courses;")
-    if cur.fetchone()[0] == 0:
-        cur.execute("""
-            INSERT INTO courses (name, title, description, category, default_fee, teacher, status)
-            VALUES
-            ('Python & Webentwicklung', 'Python & Webentwicklung', 'Praxisorientierter Kurs zu Python, Flask, SQLite und Web-Grundlagen', 'Programmierung', 350.0, 'Daniel Weber', 'active'),
-            ('Englisch B2 - Aufbaukurs', 'Englisch B2 - Aufbaukurs', 'Intensiver Englischkurs mit Schwerpunkt Konversation', 'Sprachen', 250.0, 'Elena König', 'active'),
-            ('Grundlagen UI/UX-Design', 'Grundlagen UI/UX-Design', 'Grundlagen in Figma und interaktivem Prototyping', 'Design', 300.0, 'Georg Meier', 'active')
-        """)
-
-    cur.execute("SELECT COUNT(*) FROM teachers;")
-    if cur.fetchone()[0] == 0:
-        cur.execute("""
-            INSERT INTO teachers (full_name, email, phone, specialization, status)
-            VALUES
-            ('Daniel Weber', 'daniel.weber@example.de', '+49 151 44556677', 'Python, Backend, Datenbanken', 'active'),
-            ('Elena König', 'elena.koenig@example.de', '+49 152 55667788', 'Englisch, IELTS', 'active'),
-            ('Georg Meier', 'georg.meier@example.de', '+49 155 66778899', 'UI/UX-Design', 'active')
-        """)
-
-    cur.execute("SELECT COUNT(*) FROM groups;")
-    if cur.fetchone()[0] == 0:
-        course_rows = cur.execute("SELECT id FROM courses ORDER BY id ASC").fetchall()
-        teacher_rows = cur.execute("SELECT id FROM teachers ORDER BY id ASC").fetchall()
-        group_specs = [
-            ("Python 2026 – Gruppe A", 12, "Montag / Mittwoch, 19:00 Uhr"),
-            ("Englisch B2 – Abendkurs", 14, "Dienstag / Donnerstag, 18:30 Uhr"),
-            ("UI/UX – Wochenendkurs", 10, "Samstag, 11:00 Uhr"),
-        ]
-        for index, course_row in enumerate(course_rows[:3]):
-            teacher_id = teacher_rows[index][0] if index < len(teacher_rows) else None
-            name, capacity, schedule = group_specs[index]
-            cur.execute(
-                """
-                INSERT INTO groups (
-                    course_id, teacher_id, name, capacity, start_date, end_date,
-                    schedule_description, status
-                )
-                VALUES (?, ?, ?, ?, date('now', '-14 days'), date('now', '+90 days'), ?, 'active')
-                """,
-                (course_row[0], teacher_id, name, capacity, schedule),
-            )
-
-    cur.execute("SELECT COUNT(*) FROM group_students;")
-    if cur.fetchone()[0] == 0:
-        group_rows = cur.execute("SELECT id FROM groups ORDER BY id ASC").fetchall()
-        student_rows = cur.execute("SELECT id FROM students ORDER BY id ASC").fetchall()
-        for index, student_row in enumerate(student_rows):
-            if group_rows:
-                group_id = group_rows[index % len(group_rows)][0]
-                cur.execute(
-                    "INSERT INTO group_students (group_id, student_id, status) VALUES (?, ?, 'enrolled')",
-                    (group_id, student_row[0]),
-                )
-        if len(group_rows) > 1 and student_rows:
-            cur.execute(
-                "INSERT OR IGNORE INTO group_students (group_id, student_id, status) VALUES (?, ?, 'enrolled')",
-                (group_rows[1][0], student_rows[0][0]),
-            )
-
-    cur.execute("SELECT COUNT(*) FROM lessons;")
-    if cur.fetchone()[0] == 0:
-        now = datetime.now().replace(second=0, microsecond=0)
-        group_rows = cur.execute("SELECT id, teacher_id FROM groups ORDER BY id ASC").fetchall()
-        for index, (group_id, teacher_id) in enumerate(group_rows):
-            starts_at = now.replace(hour=10 + index * 2, minute=0)
-            ends_at = starts_at + timedelta(minutes=90)
-            cur.execute(
-                """
-                INSERT INTO lessons (
-                    group_id, teacher_id, starts_at, ends_at, room_label,
-                    delivery_mode, topic, status
-                )
-                VALUES (?, ?, ?, ?, ?, 'in_person', ?, 'scheduled')
-                """,
-                (
-                    group_id,
-                    teacher_id,
-                    starts_at.strftime("%Y-%m-%d %H:%M"),
-                    ends_at.strftime("%Y-%m-%d %H:%M"),
-                    f"Raum {101 + index}",
-                    ("Python-Funktionen", "Konversationstraining", "Figma-Komponenten")[index],
-                ),
-            )
-
-    cur.execute("SELECT COUNT(*) FROM attendance;")
-    if cur.fetchone()[0] == 0:
-        lesson_rows = cur.execute("SELECT id, group_id FROM lessons ORDER BY id ASC").fetchall()
-        for lesson_id, group_id in lesson_rows:
-            member_rows = cur.execute(
-                "SELECT student_id FROM group_students WHERE group_id = ? ORDER BY student_id",
-                (group_id,),
-            ).fetchall()
-            for member_index, (student_id,) in enumerate(member_rows):
-                status = ("present", "late", "absent")[member_index % 3]
-                cur.execute(
-                    "INSERT INTO attendance (lesson_id, student_id, status, note) VALUES (?, ?, ?, ?)",
-                    (lesson_id, student_id, status, "Demo-Anwesenheitseintrag"),
-                )
-
-    cur.execute("SELECT COUNT(*) FROM payments;")
-    if cur.fetchone()[0] == 0:
-        student_rows = cur.execute("SELECT id FROM students ORDER BY id ASC").fetchall()
-        group_rows = cur.execute("SELECT id FROM groups ORDER BY id ASC").fetchall()
-        payment_specs = [
-            (350.0, 350.0, 5, "paid", "bank_transfer", "Kursgebühr für den aktuellen Monat"),
-            (250.0, 100.0, -2, "overdue", "cash", "Teilzahlung"),
-            (300.0, 0.0, -5, "overdue", "cash", "Offene Rechnung"),
-        ]
-        today = datetime.now().date()
-        for index, student_row in enumerate(student_rows):
-            due, paid, offset, status, method, note = payment_specs[index % len(payment_specs)]
-            due_date = today + timedelta(days=offset)
-            paid_at = today.isoformat() if paid > 0 else None
-            group_id = group_rows[index % len(group_rows)][0] if group_rows else None
-            cur.execute(
-                """
-                INSERT INTO payments (
-                    student_id, group_id, amount_due, amount_paid, due_date,
-                    paid_at, status, method, note
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    student_row[0], group_id, due, paid, due_date.isoformat(),
-                    paid_at, status, method, note,
-                ),
-            )
-
-    conn.commit()
-    conn.close()
-    return path
+    teacher_user_id = conn.execute(
+        "SELECT id FROM users WHERE email = 'teacher@bildungszentrum.de'"
+    ).fetchone()[0]
+    conn.executemany(
+        "INSERT INTO teachers (user_id, full_name, email, phone, specialization) VALUES (?, ?, ?, ?, ?)",
+        [
+            (teacher_user_id, "Daniel Weber", "teacher@bildungszentrum.de", "+49 151 111111", "Python und Webentwicklung"),
+            (None, "Elena Koenig", "elena.koenig@example.de", "+49 152 222222", "Englisch"),
+            (None, "Georg Meier", "georg.meier@example.de", "+49 155 333333", "UI/UX-Design"),
+        ],
+    )
+    conn.executemany(
+        "INSERT INTO students (full_name, email, phone, guardian_name, guardian_phone, notes) VALUES (?, ?, ?, ?, ?, ?)",
+        [
+            ("Jonas Becker", "jonas.becker@example.de", "+49 151 11223344", "Katrin Becker", "+49 151 11223345", "Sehr gute Lernfortschritte"),
+            ("Lea Hoffmann", "lea.hoffmann@example.de", "+49 152 33445566", "Daniel Hoffmann", "+49 152 33445567", "Teilnahme am Englischkurs"),
+            ("Noah Fischer", "noah.fischer@example.de", "+49 155 66778899", "Miriam Fischer", "+49 155 66778900", "Teilnahme am Python-Webkurs"),
+        ],
+    )
+    conn.executemany(
+        "INSERT INTO courses (title, description, category, default_fee) VALUES (?, ?, ?, ?)",
+        [
+            ("Python & Webentwicklung", "Praxisorientierter Kurs zu Python, Flask und SQLite", "Programmierung", 350.0),
+            ("Englisch B2 - Aufbaukurs", "Intensiver Englischkurs mit Schwerpunkt Konversation", "Sprachen", 250.0),
+            ("Grundlagen UI/UX-Design", "Grundlagen in Figma und interaktivem Prototyping", "Design", 300.0),
+        ],
+    )
+    python_course = conn.execute("SELECT id FROM courses WHERE title = 'Python & Webentwicklung'").fetchone()[0]
+    daniel = conn.execute("SELECT id FROM teachers WHERE user_id = ?", (teacher_user_id,)).fetchone()[0]
+    conn.execute(
+        "INSERT INTO groups (course_id, teacher_id, name, capacity, schedule_description) VALUES (?, ?, ?, ?, ?)",
+        (python_course, daniel, "Python 2026 - Abendkurs", 15, "Montag und Mittwoch, 19:00 Uhr"),
+    )
+    group_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+    student_ids = [row[0] for row in conn.execute("SELECT id FROM students ORDER BY id")]
+    conn.executemany(
+        "INSERT INTO group_students (group_id, student_id) VALUES (?, ?)",
+        [(group_id, student_id) for student_id in student_ids],
+    )
+    starts_at = (datetime.now() + timedelta(hours=1)).replace(second=0, microsecond=0)
+    ends_at = starts_at + timedelta(minutes=90)
+    conn.execute(
+        "INSERT INTO lessons (group_id, teacher_id, starts_at, ends_at, room_label, topic) VALUES (?, ?, ?, ?, ?, ?)",
+        (group_id, daniel, starts_at.isoformat(sep=" "), ends_at.isoformat(sep=" "), "Raum 101", "Flask-Grundlagen"),
+    )
+    today = datetime.now().date()
+    conn.executemany(
+        "INSERT INTO payments (student_id, group_id, amount_due, amount_paid, due_date, paid_at, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [
+            (student_ids[0], group_id, 350.0, 350.0, str(today), str(today), "paid"),
+            (student_ids[1], group_id, 350.0, 150.0, str(today), str(today), "partial"),
+            (student_ids[2], group_id, 350.0, 0.0, str(today - timedelta(days=7)), None, "overdue"),
+        ],
+    )

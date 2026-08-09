@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% set active_page = "lessons" %}
+{% block title %}Unterrichtsplan - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card">
+      <div class="card-header">
+        <h3 class="card-title">📅 Unterrichtsplan und Anwesenheit</h3>
+        {% if session.get('user_role') in ['admin', 'manager'] %}
+        <button onclick="document.getElementById('addLessonModal').style.display='flex'" class="btn">+ Unterricht planen</button>
+        {% endif %}
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Gruppe</th><th>Lehrkraft</th><th>Beginn</th><th>Raum</th><th>Thema</th><th>Status</th><th>Anwesenheit</th></tr>
+        </thead>
+        <tbody>
+          {% for l in lessons %}
+          <tr>
+            <td>#{{ l[0] }}</td>
+            <td><strong>{{ l[1] }}</strong></td>
+            <td>{{ l[2] }}</td>
+            <td>{{ l[3]|datetime_de }}</td>
+            <td><span class="badge badge-neutral">{{ l[5] }}</span></td>
+            <td>{{ l[6] or '-' }}</td>
+            <td><span class="badge badge-info">{{ l[7]|status_de }}</span></td>
+            <td>
+              <a href="{{ url_for('attendance_page', lesson_id=l[0]) }}" class="btn btn-sm btn-outline">📝 Anwesenheit erfassen</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" style="text-align: center; color: var(--muted); padding: 2rem;">Noch keine Unterrichtstermine geplant</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Add Lesson -->
+    <div id="addLessonModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
+      <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
+        <h3>+ Neuen Unterrichtstermin planen</h3>
+        <form action="{{ url_for('add_lesson_route') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-group">
+            <label>Gruppe *</label>
+            <select name="group_id" required class="form-control">
+              {% for g in groups %}
+              <option value="{{ g[0] }}">{{ g[1] }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Beginn *</label>
+            <input type="datetime-local" name="starts_at" required class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Ende *</label>
+            <input type="datetime-local" name="ends_at" required class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Raum</label>
+            <input type="text" name="room_label" value="Raum 101" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Unterrichtsthema</label>
+            <input type="text" name="topic" placeholder="z. B. Funktionen und Schleifen" class="form-control">
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button type="button" onclick="document.getElementById('addLessonModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Planen</button>
+          </div>
+        </form>
+      </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% set active_page = "students" %}
+{% block title %}Schüler bearbeiten - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 760px; margin-inline: auto;">
+      <div class="card-header">
+        <h3 class="card-title">✏️ Schüler bearbeiten</h3>
+        <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">← Zurück</a>
+      </div>
+      <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Vollständiger Name *</label>
+            <input class="form-control" name="name" value="{{ student[1] }}" required>
+          </div>
+          <div class="form-group">
+            <label>E-Mail *</label>
+            <input class="form-control" type="email" name="email" value="{{ student[2] }}" required>
+          </div>
+          <div class="form-group">
+            <label>Telefon</label>
+            <input class="form-control" name="phone" value="{{ student[3] or '' }}">
+          </div>
+          <div class="form-group">
+            <label>Erziehungsberechtigte Person</label>
+            <input class="form-control" name="guardian_name" value="{{ student[4] or '' }}">
+          </div>
+          <div class="form-group">
+            <label>Telefon der erziehungsberechtigten Person</label>
+            <input class="form-control" name="guardian_phone" value="{{ student[5] or '' }}">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" name="status">
+              <option value="active" {% if student[6] == 'active' %}selected{% endif %}>Aktiv</option>
+              <option value="inactive" {% if student[6] == 'inactive' %}selected{% endif %}>Inaktiv</option>
+              <option value="archived" {% if student[6] == 'archived' %}selected{% endif %}>Archived</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notiz</label>
+          <textarea class="form-control" name="notes" rows="3">{{ student[7] or '' }}</textarea>
+        </div>
+        <div class="header-actions">
+          <a href="{{ url_for('students_page') }}" class="btn btn-secondary">Abbrechen</a>
+          <button type="submit" class="btn">Änderungen speichern</button>
+        </div>
+      </form>
+    </div>
+{% endblock %}

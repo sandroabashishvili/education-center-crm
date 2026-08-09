@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% set active_page = "groups" %}
+{% block title %}Gruppendetails - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card">
+      <div class="card-header">
+        <h3 class="card-title">🏫 Gruppe: {{ group[1] }}</h3>
+        <a href="{{ url_for('groups_page') }}" class="btn btn-sm btn-outline">← Gruppenübersicht</a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; background: #f8fafc; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
+        <div><strong>Kurs:</strong> {{ group[2] }}</div>
+        <div><strong>Lehrkraft:</strong> {{ group[3] }}</div>
+        <div><strong>Kapazität:</strong> {{ members|length }} / {{ group[4] }}</div>
+        <div><strong>Zeitplan:</strong> {{ group[7] or '-' }}</div>
+        <div><strong>Status:</strong> <span class="badge badge-success">{{ group[8]|status_de }}</span></div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h4>👨‍🎓 Gruppenmitglieder</h4>
+        {% if session.get('user_role') in ['admin', 'manager'] %}
+        <button onclick="document.getElementById('enrollModal').style.display='flex'" class="btn btn-sm">+ Schüler zur Gruppe hinzufügen</button>
+        {% endif %}
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Mitgliedschaftsstatus</th></tr>
+        </thead>
+        <tbody>
+          {% for m in members %}
+          <tr>
+            <td>#{{ m[0] }}</td>
+            <td><strong>{{ m[1] }}</strong></td>
+            <td>{{ m[2] }}</td>
+            <td>{{ m[3] or '-' }}</td>
+            <td><span class="badge badge-success">{{ m[5]|status_de }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" style="text-align: center; color: var(--muted);">In dieser Gruppe sind noch keine Schüler eingeschrieben</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Enroll Student -->
+    <div id="enrollModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
+      <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 420px);">
+        <h3>+ Schüler in die Gruppe aufnehmen</h3>
+        <form action="{{ url_for('enroll_student_route', group_id=group[0]) }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-group">
+            <label>Schüler auswählen *</label>
+            <select name="student_id" required class="form-control">
+              {% for s in all_students %}
+              <option value="{{ s[0] }}">{{ s[1] }} ({{ s[2] }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button type="button" onclick="document.getElementById('enrollModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Aufnehmen</button>
+          </div>
+        </form>
+      </div>
+    </div>
+{% endblock %}

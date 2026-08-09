@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% set active_page = "students" %}
+{% block title %}Schüler - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card">
+      <div class="card-header">
+        <h3 class="card-title">👥 Schülerverwaltung</h3>
+        <div class="header-actions">
+          {% if session.get('logged_in') %}
+          <a href="{{ url_for('export_students_csv') }}" class="btn btn-outline">CSV exportieren</a>
+          <button onclick="document.getElementById('addStudentModal').style.display='flex'" class="btn">+ Neuer Schüler</button>
+          {% endif %}
+        </div>
+      </div>
+
+      <form method="GET" class="filter-bar">
+        <input type="text" name="q" value="{{ query }}" placeholder="Nach Name, E-Mail oder Telefonnummer suchen..." class="form-control" style="max-width: 320px;">
+        <select name="status" class="form-control" style="max-width: 180px;">
+          <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Alle Status</option>
+          <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Aktiv</option>
+          <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inaktiv</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">Suchen</button>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>E-Mail</th>
+            <th>Telefon</th>
+            <th>Erziehungsberechtigte Person</th>
+            <th>Status</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr>
+            <td>#{{ s[0] }}</td>
+            <td><strong>{{ s[1] }}</strong></td>
+            <td>{{ s[2] }}</td>
+            <td>{{ s[3] or 'N/A' }}</td>
+            <td>{{ s[4] or '-' }} ({{ s[5] or '-' }})</td>
+            <td>
+              <span class="badge {% if s[6] == 'active' %}badge-success{% else %}badge-neutral{% endif %}">{{ s[6]|status_de }}</span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <a href="{{ url_for('student_detail_page', student_id=s[0]) }}" class="btn btn-sm btn-outline">Öffnen</a>
+                {% if session.get('logged_in') %}
+                <a href="{{ url_for('edit_student', student_id=s[0]) }}" class="btn btn-sm btn-secondary">Bearbeiten</a>
+                <form action="{{ url_for('delete_student', student_id=s[0]) }}" method="POST" style="margin:0;" onsubmit="return confirm('Möchten Sie diesen Schüler wirklich löschen?');">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
+                </form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" style="text-align: center; color: var(--muted); padding: 2rem;">Keine Schüler gefunden</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Add Student -->
+    <div id="addStudentModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
+      <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
+        <h3>+ Neuen Schüler hinzufügen</h3>
+        <form action="{{ url_for('add_student_route') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-group">
+            <label>Vollständiger Name *</label>
+            <input type="text" name="full_name" required class="form-control">
+          </div>
+          <div class="form-group">
+            <label>E-Mail *</label>
+            <input type="email" name="email" required class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Telefonnummer</label>
+            <input type="text" name="phone" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Name der erziehungsberechtigten Person</label>
+            <input type="text" name="guardian_name" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Telefon der erziehungsberechtigten Person</label>
+            <input type="text" name="guardian_phone" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Notiz</label>
+            <textarea name="notes" class="form-control" rows="2"></textarea>
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button type="button" onclick="document.getElementById('addStudentModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Speichern</button>
+          </div>
+        </form>
+      </div>
+    </div>
+{% endblock %}

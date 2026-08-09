@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% set active_page = "groups" %}
+{% block title %}Gruppen - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card">
+      <div class="card-header">
+        <h3 class="card-title">🏫 Lerngruppen</h3>
+        {% if session.get('user_role') in ['admin', 'manager'] %}
+        <button onclick="document.getElementById('addGroupModal').style.display='flex'" class="btn">+ Neue Gruppe</button>
+        {% endif %}
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Gruppenname</th><th>Kurs</th><th>Lehrkraft</th><th>Schüler / Kapazität</th><th>Zeitplan</th><th>Status</th><th>Aktion</th></tr>
+        </thead>
+        <tbody>
+          {% for g in groups %}
+          <tr>
+            <td>#{{ g[0] }}</td>
+            <td><strong>{{ g[1] }}</strong></td>
+            <td>{{ g[2] }}</td>
+            <td>{{ g[3] }}</td>
+            <td><span class="badge badge-info">{{ g[5] }} / {{ g[4] }}</span></td>
+            <td>{{ g[6] or 'Nicht angegeben' }}</td>
+            <td><span class="badge badge-success">{{ g[7]|status_de }}</span></td>
+            <td>
+              <a href="{{ url_for('group_detail_page', group_id=g[0]) }}" class="btn btn-sm btn-outline">Details</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" style="text-align: center; color: var(--muted); padding: 2rem;">Noch keine Gruppen angelegt</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Add Group -->
+    <div id="addGroupModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
+      <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
+        <h3>+ Neue Gruppe erstellen</h3>
+        <form action="{{ url_for('add_group_route') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-group">
+            <label>Kurs *</label>
+            <select name="course_id" required class="form-control">
+              {% for c in courses %}
+              <option value="{{ c[0] }}">{{ c[1] }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Lehrkraft</label>
+            <select name="teacher_id" class="form-control">
+              <option value="">-- Bitte auswählen --</option>
+              {% for t in teachers %}
+              <option value="{{ t[0] }}">{{ t[1] }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Gruppenname *</label>
+            <input type="text" name="name" required placeholder="z. B. Python 2026 - Abendkurs" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Kapazität (max. Schüler)</label>
+            <input type="number" name="capacity" value="15" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Beschreibung des Zeitplans</label>
+            <input type="text" name="schedule_description" placeholder="Montag und Mittwoch, 19:00 Uhr" class="form-control">
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button type="button" onclick="document.getElementById('addGroupModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Erstellen</button>
+          </div>
+        </form>
+      </div>
+    </div>
+{% endblock %}

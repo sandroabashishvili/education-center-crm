@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% set active_page = "teachers" %}
+{% block title %}Lehrkräfte - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card">
+      <div class="card-header">
+        <h3 class="card-title">👨‍🏫 Verzeichnis der Lehrkräfte</h3>
+        {% if session.get('user_role') == 'admin' %}
+        <button onclick="document.getElementById('addTeacherModal').style.display='flex'" class="btn">+ Neue Lehrkraft</button>
+        {% endif %}
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Fachgebiet</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          {% for t in teachers %}
+          <tr>
+            <td>#{{ t[0] }}</td>
+            <td><strong>{{ t[1] }}</strong></td>
+            <td>{{ t[2] }}</td>
+            <td>{{ t[3] or '-' }}</td>
+            <td><span class="badge badge-info">{{ t[4] or 'Allgemein' }}</span></td>
+            <td><span class="badge badge-success">{{ t[5]|status_de }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" style="text-align: center; color: var(--muted); padding: 2rem;">Keine Lehrkräfte gefunden</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Modal Add Teacher -->
+    <div id="addTeacherModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; align-items: center; justify-content: center;">
+      <div style="background: white; padding: 1.5rem; border-radius: 16px; width: min(100%, 480px);">
+        <h3>+ Neue Lehrkraft hinzufügen</h3>
+        <form action="{{ url_for('add_teacher_route') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-group">
+            <label>Vollständiger Name *</label>
+            <input type="text" name="full_name" required class="form-control">
+          </div>
+          <div class="form-group">
+            <label>E-Mail *</label>
+            <input type="email" name="email" required class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Telefon</label>
+            <input type="text" name="phone" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Fachgebiet</label>
+            <input type="text" name="specialization" placeholder="Python, Languages, Math..." class="form-control">
+          </div>
+          <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+            <button type="button" onclick="document.getElementById('addTeacherModal').style.display='none'" class="btn btn-secondary">Abbrechen</button>
+            <button type="submit" class="btn">Hinzufügen</button>
+          </div>
+        </form>
+      </div>
+    </div>
+{% endblock %}

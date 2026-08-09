@@ -2,7 +2,8 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from flask import Flask
+from flask import Flask, render_template
+from flask_wtf.csrf import CSRFError, CSRFProtect
 
 import database
 from routes import register_routes
@@ -65,9 +66,34 @@ app.config.update(
     DB_PATH=Path(os.environ.get("CRM_DB_PATH", DEFAULT_DB_PATH)),
     SECRET_KEY=os.environ.get("CRM_SECRET_KEY", "local-demo-only-change-me"),
 )
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+)
+csrf = CSRFProtect(app)
 app.jinja_env.filters["status_de"] = status_de
 app.jinja_env.filters["date_de"] = date_de
 app.jinja_env.filters["datetime_de"] = datetime_de
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(error):
+    return render_template(
+        "error.html",
+        status_code=400,
+        title="Ungueltige Anfrage",
+        message="Das Formular ist abgelaufen oder unvollstaendig. Bitte laden Sie die Seite neu.",
+    ), 400
+
+
+@app.errorhandler(403)
+def handle_forbidden(error):
+    return render_template(
+        "error.html",
+        status_code=403,
+        title="Zugriff nicht erlaubt",
+        message="Ihre Rolle ist fuer diese Aktion nicht berechtigt.",
+    ), 403
 
 DB_PATH = app.config["DB_PATH"]
 database.DB_PATH = DB_PATH

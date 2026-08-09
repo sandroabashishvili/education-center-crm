@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% set active_page = "dashboard" %}
+{% block title %}Dashboard - Education Center CRM{% endblock %}
+{% block content %}
+<div class="hero">
+      <h1>Guten Tag, Administrator!</h1>
+      <p>Schüler, Gruppen, Anwesenheit und Zahlungen in einem zentralen Arbeitsbereich.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div>
+          <div class="stat-val">{{ metrics.total_students }}</div>
+          <div class="stat-lbl">Aktive Schüler</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div>
+          <div class="stat-val">{{ metrics.total_courses }}</div>
+          <div class="stat-lbl">Kurse</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏫</div>
+        <div>
+          <div class="stat-val">{{ metrics.active_groups }}</div>
+          <div class="stat-lbl">Aktive Gruppen</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div>
+          <div class="stat-val">{{ metrics.today_lessons }}</div>
+          <div class="stat-lbl">Heutiger Unterricht</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚠️</div>
+        <div>
+          <div class="stat-val" style="color: {% if metrics.overdue_payments > 0 %}#dc2626{% else %}inherit{% endif %};">{{ metrics.overdue_payments }}</div>
+          <div class="stat-lbl">Überfällige Rechnungen</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div>
+          <div class="stat-val">€{{ "%.2f"|format(metrics.monthly_revenue) }}</div>
+          <div class="stat-lbl">Einnahmen im aktuellen Monat</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div>
+          <div class="stat-val">{{ metrics.attendance_rate }}%</div>
+          <div class="stat-lbl">Anwesenheitsquote</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">👥 Zuletzt hinzugefügte Schüler</h3>
+          <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">Alle anzeigen</a>
+        </div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Aktion</th></tr>
+          </thead>
+          <tbody>
+            {% for s in metrics.recent_students %}
+            <tr>
+              <td>#{{ s[0] }}</td>
+              <td><strong>{{ s[1] }}</strong></td>
+              <td>{{ s[2] }}</td>
+              <td><a href="{{ url_for('student_detail_page', student_id=s[0]) }}" class="btn btn-sm btn-outline">Profil</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" style="text-align: center; color: var(--muted);">Noch keine Schüler vorhanden</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">💰 Letzte Zahlungen</h3>
+          <a href="{{ url_for('payments_page') }}" class="btn btn-sm btn-outline">Alle Zahlungen</a>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Schüler</th><th>Betrag</th><th>Status</th><th>Fällig am</th></tr>
+          </thead>
+          <tbody>
+            {% for p in metrics.recent_payments %}
+            <tr>
+              <td><strong>{{ p[1] }}</strong></td>
+              <td>€{{ "%.2f"|format(p[2]) }}</td>
+              <td>
+                <span class="badge {% if p[3] == 'paid' %}badge-success{% elif p[3] == 'partial' %}badge-info{% elif p[3] == 'overdue' %}badge-danger{% else %}badge-warning{% endif %}">
+                  {{ p[3]|status_de }}
+                </span>
+              </td>
+              <td>{{ p[4]|date_de }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" style="text-align: center; color: var(--muted);">Noch keine Zahlungen vorhanden</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+{% endblock %}

@@ -4,8 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Statische Portfolio-Vorschau der aktuellen Education-Center-CRM-Anwendung von Sandro Abashishvili.">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Sandro Abashishvili">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sandroabashishvili.github.io/education-center-crm/">
+  <meta property="og:title" content="Education Center CRM – Portfolio MVP v1.0">
+  <meta property="og:description" content="Flask- und SQLite-CRM für Schüler, Gruppen, Unterricht, Anwesenheit und Zahlungen.">
+  <meta property="og:image" content="https://sandroabashishvili.github.io/education-center-crm/assets/dashboard-preview.png">
+  <meta property="og:image:alt" content="Dashboard des Education Center CRM">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Education Center CRM – Portfolio MVP v1.0">
+  <meta name="twitter:description" content="Funktionale Flask-/SQLite-Anwendung mit Rollen, CSRF-Schutz und Tests.">
+  <meta name="twitter:image" content="https://sandroabashishvili.github.io/education-center-crm/assets/dashboard-preview.png">
+  <meta name="theme-color" content="#4f46e5">
   <link rel="canonical" href="https://sandroabashishvili.github.io/education-center-crm/">
-  <title>Education Center CRM – aktuelle Portfolio-Demo</title>
+  <title>Education Center CRM – Portfolio MVP v1.0</title>
 
 <style>
   :root {
@@ -295,7 +308,7 @@
   </style>
 </head>
 <body class="static-preview">
-  <div class="demo-notice">Aktuelle Read-only Portfolio-Demo · Die vollständige Flask-/SQLite-Anwendung läuft lokal und ist auf <a href="https://github.com/sandroabashishvili/education-center-crm" target="_blank" rel="noopener noreferrer">GitHub dokumentiert ↗</a>.</div>
+  <div class="demo-notice">Portfolio MVP v1.0 · Read-only-Demo · Die vollständige Flask-/SQLite-Anwendung läuft lokal und ist auf <a href="https://github.com/sandroabashishvili/education-center-crm" target="_blank" rel="noopener noreferrer">GitHub dokumentiert ↗</a>.</div>
   <div class="container">
 
 <header class="topbar">
@@ -307,7 +320,7 @@
     </div>
   </div>
   <nav class="nav-links">
-    <a href="/" class="nav-item ">📊 Dashboard</a>
+    <a href="./" class="nav-item active">📊 Dashboard</a>
     <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">👥 Schüler</a>
     <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">📚 Kurse</a>
     <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">🏫 Gruppen</a>
@@ -316,13 +329,7 @@
     <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">👨‍🏫 Lehrkräfte</a>
   </nav>
   <div class="auth-box">
-
-      <form action="#" method="GET" class="login-form" onsubmit="return false" aria-label="Deaktivierte Demo-Anmeldung">
-        <input type="email" name="username" placeholder="admin@bildungszentrum.de" autocomplete="username" disabled>
-        <input type="password" name="password" placeholder="Passwort" autocomplete="current-password" disabled>
-        <button type="button" class="btn btn-sm" disabled>Anmelden</button>
-      </form>
-
+    <span class="user-chip"><strong>Read-only Demo</strong><small>Portfolio v1.0</small></span>
   </div>
 </header>
 
@@ -334,6 +341,14 @@
       <h1>Guten Tag, Administrator!</h1>
       <p>Schüler, Gruppen, Anwesenheit und Zahlungen in einem zentralen Arbeitsbereich.</p>
     </div>
+
+    <section class="stats-grid" aria-label="Technische Merkmale">
+      <div class="stat-card"><div class="stat-icon">🔐</div><div><div class="stat-lbl">Sicherheit</div><strong>CSRF + sichere Passwort-Hashes</strong></div></div>
+      <div class="stat-card"><div class="stat-icon">🧭</div><div><div class="stat-lbl">Berechtigungen</div><strong>Admin · Mitarbeiter · Lehrkraft</strong></div></div>
+      <div class="stat-card"><div class="stat-icon">🗄️</div><div><div class="stat-lbl">Daten</div><strong>Versioniertes SQLite-Schema</strong></div></div>
+      <div class="stat-card"><div class="stat-icon">✅</div><div><div class="stat-lbl">Qualität</div><strong>12 automatisierte Tests</strong></div></div>
+    </section>
+
 
     <div class="stats-grid">
       <div class="stat-card">
@@ -353,14 +368,14 @@
       <div class="stat-card">
         <div class="stat-icon">🏫</div>
         <div>
-          <div class="stat-val">3</div>
+          <div class="stat-val">1</div>
           <div class="stat-lbl">Aktive Gruppen</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📅</div>
         <div>
-          <div class="stat-val">3</div>
+          <div class="stat-val">1</div>
           <div class="stat-lbl">Heutiger Unterricht</div>
         </div>
       </div>

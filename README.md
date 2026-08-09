@@ -3,29 +3,39 @@
 ![Education Center CRM Dashboard](assets/dashboard-preview.png)
 
 Eine deutschsprachige Flask- und SQLite-Anwendung für die tägliche Verwaltung
-eines kleinen Bildungszentrums.
-
-Sie bündelt Teilnehmer, Kurse, Gruppen, Anwesenheit, Rechnungen und Zahlungen
-in einem durchgängigen administrativen Arbeitsablauf.
+eines kleinen Bildungszentrums. Sie verbindet Schüler, Kurse, Gruppen,
+Unterricht, Anwesenheit und Zahlungen in einem nachvollziehbaren
+administrativen Ablauf.
 
 **Portfolio-Demo:** [Statische Vorschau öffnen](https://sandroabashishvili.github.io/education-center-crm/)
 
-Die GitHub-Pages-Demo ist eine statische Vorschau, weil GitHub Pages keinen
-dauerhaft laufenden Flask-/SQLite-Prozess bereitstellt. Dieses Repository
-enthält zusätzlich die funktionale lokale Anwendung.
+Die GitHub-Pages-Version ist bewusst eine schreibgeschützte Vorschau. Die
+vollständige Anwendung mit Anmeldung, Rollen, Formularen und SQLite-Datenbank
+läuft lokal.
 
-## Was das Projekt demonstriert
+## Funktionen
 
-- sitzungsbasierte Administrator-Anmeldung
-- Teilnehmerverwaltung mit Suche, Filtern, Profil, Bearbeitung und Status
-- Kurse, Lehrkräfte, Gruppen und Gruppenzuordnung
-- Unterrichtsplanung und Anwesenheit pro Teilnehmer
-- Rechnungen, Teilzahlungen und automatisch aktualisierte Überfälligkeit
-- aus der Datenbank berechnete Dashboard-Kennzahlen
-- UTF-8-CSV-Exporte für Teilnehmer und Zahlungen
-- responsive Desktop- und Mobile-Oberfläche
-- getrennte Service-Schicht für Geschäftslogik
+- geschützte Anmeldung mit sicherem Werkzeug-Passwort-Hashing
+- rollenbasierte Zugriffe für Administrator, Mitarbeiter und Lehrkraft
+- Schülerverwaltung mit Suche, Status, Profil und Bearbeitung
+- Kurs-, Lehrkraft- und Gruppenverwaltung
+- Gruppenzuordnung und Unterrichtsplanung
+- Anwesenheit je Unterrichtstermin
+- Rechnungen, Teilzahlungen und automatische Überfälligkeit
+- Dashboard-Kennzahlen aus der SQLite-Datenbank
+- UTF-8-CSV-Exporte für Schüler und Zahlungen
+- CSRF-Schutz und serverseitige Eingabevalidierung
+- responsive Jinja-Oberfläche mit getrennten Templates und Styles
+- geprüfte SQLite-Backups und Wiederherstellung
 - automatisierte Regressionstests
+
+## Rollen
+
+| Rolle | Zugriff |
+| --- | --- |
+| Administrator | vollständige Verwaltung einschließlich Löschvorgängen und Lehrkräften |
+| Mitarbeiter | tägliche Verwaltung von Schülern, Kursen, Gruppen, Unterricht und Zahlungen |
+| Lehrkraft | eigene Gruppen, Unterrichtstermine und Anwesenheit |
 
 ## Lokal starten
 
@@ -38,17 +48,17 @@ pip install -r requirements.txt
 python app/main.py
 ```
 
-Anschließend `http://127.0.0.1:5001/` öffnen.
+Danach [http://127.0.0.1:5001/](http://127.0.0.1:5001/) öffnen. Beim ersten
+Start wird eine versionierte SQLite-Datenbank mit realistischen Demodaten
+angelegt.
 
-Beim ersten Start wird die Datenbank automatisch angelegt und mit realistischen
-Demodaten gefüllt.
+### Demo-Konten
 
-### Demo-Anmeldung
-
-```text
-E-Mail:  admin@bildungszentrum.de
-Passwort: admin123
-```
+| Rolle | E-Mail | Passwort |
+| --- | --- | --- |
+| Administrator | `admin@bildungszentrum.de` | `admin123` |
+| Mitarbeiter | `manager@bildungszentrum.de` | `manager123` |
+| Lehrkraft | `teacher@bildungszentrum.de` | `teacher123` |
 
 Diese Zugangsdaten sind ausschließlich für die lokale Portfolio-Demo bestimmt.
 
@@ -58,52 +68,59 @@ Diese Zugangsdaten sind ausschließlich für die lokale Portfolio-Demo bestimmt.
 python -m unittest discover -s tests -v
 ```
 
-Die Tests decken unter anderem Health- und Dashboard-Antworten,
-Authentifizierungsschutz, Teilnehmer-CRUD, POST-only-Löschung,
-Gruppenzuordnung, Anwesenheit, überfällige Zahlungen und CSV-Exporte ab.
+Die Tests prüfen unter anderem CSRF-Schutz, private Seiten, Passwort-Hashes,
+Rollenrechte, Lehrkraft-Sichtbarkeit, Schüler-CRUD, Anwesenheit,
+Teilzahlungen, ungültige Formulare, CSV-Exporte sowie Backup und Restore.
+
+## Datenbank sichern und wiederherstellen
+
+```bash
+python -m tools.database_cli backup
+python -m tools.database_cli restore --from app/backups/education-crm-DATUM.db --confirm
+```
+
+Vor jeder Wiederherstellung erstellt das Werkzeug automatisch eine zusätzliche
+Sicherung der aktiven Datenbank und prüft die SQLite-Integrität.
 
 ## Konfiguration
 
-Optionale Umgebungsvariablen:
-
 ```bash
-export CRM_SECRET_KEY="replace-this-for-non-demo-use"
+export CRM_SECRET_KEY="replace-this-outside-local-demo"
 export CRM_DB_PATH="/absolute/path/to/crm.db"
 export PORT="5001"
 ```
 
-Siehe [.env.example](.env.example).
+Weitere Werte stehen in [.env.example](.env.example).
 
 ## Architektur
 
 ```text
-.
-├── app/
-│   ├── main.py       # Flask-Start und Konfiguration
-│   ├── database.py   # SQLite-Schema, Migrationen und Demodaten
-│   ├── models.py     # Domain-Dataclasses
-│   ├── routes.py     # HTTP-Routen und Request-Verarbeitung
-│   ├── services.py   # Abfragen und Geschäftsregeln
-│   ├── templates.py  # serverseitig gerenderte Oberfläche
-│   └── utils.py      # Parsing-Helfer
-├── assets/
-├── docs/
-├── tests/
-└── requirements.txt
+app/
+├── main.py              Flask-Konfiguration und Fehlerbehandlung
+├── database.py          versioniertes SQLite-Schema und Demodaten
+├── models.py            Domain-Dataclasses
+├── routes.py            HTTP-Routen, Rollen und Validierung
+├── services.py          Datenzugriff und Geschäftsregeln
+├── templates/           Jinja-Seitentemplates
+├── static/css/app.css   gemeinsame Oberfläche
+└── utils.py             Parsing- und Validierungshelfer
+tests/                   automatisierte Regressionstests
+tools/database_cli.py    Backup und Restore
+docs/index.html          statische GitHub-Pages-Demo
 ```
 
-## Status und ehrliche Grenzen
+## Status
 
-Der aktuelle Stand ist ein abgeschlossener Portfolio-MVP für eine lokale
-Demonstration. Er verwendet SQLite und erzeugte Beispieldaten und wird nicht als
-fertiges Produktions-SaaS dargestellt.
+**Functional Portfolio MVP v1.0 abgeschlossen.**
 
-Für einen Produktivbetrieb wären zusätzlich CSRF-Schutz, rollenbasierte
-Berechtigungen, Passwort-Wiederherstellung, Audit-Logging,
-Deployment-Konfiguration, geregelte Datenbankmigrationen, Backups und ein
-Produktions-WSGI-Server erforderlich.
+Die Anwendung ist für eine lokale, realistische Demonstration fertiggestellt.
+Die öffentliche GitHub-Pages-Seite ist kein gehostetes Mehrbenutzer-CRM.
+Für einen extern betriebenen Produktivdienst wären zusätzlich unter anderem
+Passwort-Wiederherstellung, Audit-Logging, geregelte Deployments, ein
+Produktions-WSGI-Server und eine betriebliche Datenschutzprüfung erforderlich.
 
-Weitere Details: [docs/current_status.md](docs/current_status.md).
+- [Aktueller Stand](docs/current_status.md)
+- [Datenmodell](docs/domain_model.md)
 
 ## Autor
 

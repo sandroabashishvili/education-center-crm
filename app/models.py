@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 
@@ -17,7 +17,6 @@ class User:
 class Student:
     id: Optional[int] = None
     full_name: str = ""
-    name: str = ""  # Backward compatibility alias
     email: str = ""
     phone: str = ""
     guardian_name: str = ""
@@ -26,30 +25,18 @@ class Student:
     notes: str = ""
     created_at: str = ""
 
-    def __post_init__(self):
-        if not self.full_name and self.name:
-            self.full_name = self.name
-        elif not self.name and self.full_name:
-            self.name = self.full_name
 
 
 @dataclass
 class Course:
     id: Optional[int] = None
-    name: str = ""
-    title: str = ""  # Backward compatibility alias
+    title: str = ""
     description: str = ""
     category: str = "General"
     default_fee: float = 0.0
-    teacher: str = ""
     status: str = "active"
     created_at: str = ""
 
-    def __post_init__(self):
-        if not self.name and self.title:
-            self.name = self.title
-        elif not self.title and self.name:
-            self.title = self.name
 
 
 @dataclass
@@ -123,15 +110,3 @@ class Payment:
     student_name: str = ""
     group_name: str = ""
     created_at: str = ""
-
-
-@dataclass
-class Enrollment:
-    id: Optional[int] = None
-    student_id: Optional[int] = None
-    course_id: Optional[int] = None
-    status: str = "Active"
-    payment_status: str = "Pending"
-    amount_paid: float = 0.0
-    student_name: str = ""
-    course_title: str = ""

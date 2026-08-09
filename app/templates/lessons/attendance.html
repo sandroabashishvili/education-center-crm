@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% set active_page = "lessons" %}
+{% block title %}Anwesenheit erfassen - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card">
+      <div class="card-header">
+        <h3 class="card-title">📝 Anwesenheit erfassen: {{ lesson[1] }} ({{ lesson[3]|datetime_de }})</h3>
+        <a href="{{ url_for('lessons_page') }}" class="btn btn-sm btn-outline">← Zurück zum Unterrichtsplan</a>
+      </div>
+
+      <form action="{{ url_for('save_attendance_route', lesson_id=lesson[0]) }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <table>
+          <thead>
+            <tr><th>Schüler</th><th>Anwesenheitsstatus</th><th>Notiz</th></tr>
+          </thead>
+          <tbody>
+            {% for r in records %}
+            <tr>
+              <td><strong>{{ r[1] }}</strong></td>
+              <td>
+                <select name="status_{{ r[0] }}" class="form-control" style="width: 160px; display: inline-block;">
+                  <option value="present" {% if r[2] == 'present' %}selected{% endif %}>🟢 Anwesend</option>
+                  <option value="absent" {% if r[2] == 'absent' %}selected{% endif %}>🔴 Abwesend</option>
+                  <option value="late" {% if r[2] == 'late' %}selected{% endif %}>🟡 Verspätet</option>
+                  <option value="excused" {% if r[2] == 'excused' %}selected{% endif %}>⚪ Entschuldigt</option>
+                </select>
+              </td>
+              <td>
+                <input type="text" name="note_{{ r[0] }}" value="{{ r[3] }}" placeholder="Notiz..." class="form-control">
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" style="text-align: center; color: var(--muted);">In dieser Gruppe sind noch keine Schüler eingeschrieben</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        {% if records %}
+        <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+          <button type="submit" class="btn">💾 Anwesenheit speichern</button>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+{% endblock %}
