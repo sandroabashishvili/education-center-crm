@@ -30,7 +30,7 @@
         </thead>
         <tbody>
           {% for p in payments %}
-          <tr>
+          <tr id="payment-{{ p[0] }}">
             <td>#{{ p[0] }}</td>
             <td><strong>{{ p[1] }}</strong></td>
             <td>{{ p[2] }}</td>

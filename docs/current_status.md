@@ -16,11 +16,14 @@
 - courses, teachers, groups and canonical group enrollment
 - lesson scheduling and attendance
 - invoices, partial payments and overdue status calculation
-- dashboard metrics and UTF-8 CSV exports
+- twelve database-backed dashboard metrics and UTF-8 CSV exports
+- dashboard tables for recent students, recent payments, upcoming lessons and group occupancy
+- record-specific dashboard links for students, payments, lessons and groups
 - server-side validation with visible feedback
 - separated Jinja templates and shared static CSS
 - validated SQLite backup and restore CLI
-- responsive desktop and mobile interface
+- responsive desktop and mobile interface with card-style mobile tables
+- linked application brand that returns to the dashboard
 - static read-only GitHub Pages preview
 
 ## Verification
@@ -35,6 +38,7 @@
 - student CRUD, attendance and payment workflows pass
 - invalid forms and overpayments are rejected
 - CSV exports pass
+- dashboard rendering and record-specific links pass
 
 ## Storage
 
@@ -58,6 +62,12 @@ longer part of v1.0.
 This repository contains a functional local CRM application with generated demo
 data. GitHub Pages hosts a static read-only preview because it cannot run a
 persistent Flask and SQLite backend.
+
+## v1.0 completion
+
+The functional portfolio scope is complete. Future changes should be driven by
+a real deployment requirement or a clearly selected v1.1 feature, rather than
+additional portfolio-only expansion.
 
 ## Possible production follow-up
 

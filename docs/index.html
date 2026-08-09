@@ -54,7 +54,7 @@
 
   .topbar {
     position: sticky;
-    top: 0.75rem;
+    top: 0;
     z-index: 20;
     backdrop-filter: blur(18px);
     display: flex;
@@ -70,7 +70,10 @@
     gap: 1rem;
   }
 
-  .brand { display: flex; align-items: center; gap: 0.75rem; }
+  .brand { display: flex; align-items: center; gap: 0.75rem; color: inherit; text-decoration: none; }
+  .brand-title { display: block; font-weight: 700; font-size: 1.1rem; }
+  .brand-subtitle { display: block; font-size: 0.75rem; color: var(--muted); }
+  .brand:hover .brand-title { color: var(--primary); }
   .brand-badge {
     width: 44px;
     height: 44px;
@@ -142,6 +145,8 @@
   .stat-lbl { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; }
+  .dashboard-sections { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+  .dashboard-sections > .card { margin-bottom: 0; }
 
   .card {
     background: var(--surface);
@@ -258,7 +263,7 @@
     .container { padding: 0.75rem 0.65rem 2rem; }
     .topbar { align-items: flex-start; padding: 0.9rem; border-radius: 12px; }
     .topbar > *, .hero, .stats-grid, .card { min-width: 0; max-width: 100%; }
-    .nav-links { width: 100%; max-width: 100%; min-width: 0; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.25rem; }
+    .nav-links { width: 100%; max-width: 100%; min-width: 0; flex-wrap: wrap; overflow-x: visible; gap: 0.25rem; padding-bottom: 0.25rem; }
     .nav-item { flex: 0 0 auto; }
     .auth-box, .login-form { width: 100%; margin-left: 0; }
     .login-form { grid-template-columns: 1fr; }
@@ -267,9 +272,55 @@
     .hero { padding: 1.35rem; border-radius: 15px; }
     .hero h1 { font-size: 1.45rem; }
     .grid-2 { grid-template-columns: 1fr; }
-    .card { padding: 1rem; overflow-x: auto; border-radius: 14px; }
+    .card { padding: 1rem; overflow: visible; border-radius: 14px; }
     .card-header { align-items: flex-start; gap: 0.75rem; flex-wrap: wrap; }
-    table { min-width: 680px; }
+
+    table.responsive-table,
+    table.responsive-table tbody,
+    table.responsive-table tr,
+    table.responsive-table td {
+      display: block;
+      width: 100%;
+      min-width: 0;
+    }
+    table.responsive-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    table.responsive-table tbody { display: grid; gap: 0.75rem; }
+    table.responsive-table tbody tr {
+      padding: 0.25rem 0.85rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    table.responsive-table td {
+      display: grid;
+      grid-template-columns: minmax(7.5rem, 38%) minmax(0, 1fr);
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.65rem 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    table.responsive-table td::before {
+      content: attr(data-label);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    table.responsive-table td[colspan] { display: block; padding: 1rem 0; text-align: center !important; }
+    table.responsive-table td[colspan]::before { display: none; }
+    table.responsive-table td:last-child { border-bottom: 0; }
     .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .stat-card { padding: 0.85rem; align-items: flex-start; }
     .stat-icon { width: 40px; height: 40px; flex: 0 0 auto; }
@@ -312,13 +363,13 @@
   <div class="container">
 
 <header class="topbar">
-  <div class="brand">
+  <a href="./" class="brand" aria-label="Zum Dashboard">
     <span class="brand-badge">🎓</span>
-    <div>
-      <div style="font-weight: 700; font-size: 1.1rem;">Education Center CRM</div>
-      <div style="font-size: 0.75rem; color: var(--muted);">Verwaltungssystem</div>
-    </div>
-  </div>
+    <span>
+      <span class="brand-title">Education Center CRM</span>
+      <span class="brand-subtitle">Verwaltungssystem</span>
+    </span>
+  </a>
   <nav class="nav-links">
     <a href="./" class="nav-item active">📊 Dashboard</a>
     <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">👥 Schüler</a>
@@ -341,14 +392,6 @@
       <h1>Guten Tag, Administrator!</h1>
       <p>Schüler, Gruppen, Anwesenheit und Zahlungen in einem zentralen Arbeitsbereich.</p>
     </div>
-
-    <section class="stats-grid" aria-label="Technische Merkmale">
-      <div class="stat-card"><div class="stat-icon">🔐</div><div><div class="stat-lbl">Sicherheit</div><strong>CSRF + sichere Passwort-Hashes</strong></div></div>
-      <div class="stat-card"><div class="stat-icon">🧭</div><div><div class="stat-lbl">Berechtigungen</div><strong>Admin · Mitarbeiter · Lehrkraft</strong></div></div>
-      <div class="stat-card"><div class="stat-icon">🗄️</div><div><div class="stat-lbl">Daten</div><strong>Versioniertes SQLite-Schema</strong></div></div>
-      <div class="stat-card"><div class="stat-icon">✅</div><div><div class="stat-lbl">Qualität</div><strong>12 automatisierte Tests</strong></div></div>
-    </section>
-
 
     <div class="stats-grid">
       <div class="stat-card">
@@ -373,6 +416,20 @@
         </div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">👨‍🏫</div>
+        <div>
+          <div class="stat-val">3</div>
+          <div class="stat-lbl">Aktive Lehrkräfte</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div>
+          <div class="stat-val">3</div>
+          <div class="stat-lbl">Aktive Einschreibungen</div>
+        </div>
+      </div>
+      <div class="stat-card">
         <div class="stat-icon">📅</div>
         <div>
           <div class="stat-val">1</div>
@@ -380,110 +437,77 @@
         </div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">🗓️</div>
+        <div>
+          <div class="stat-val">1</div>
+          <div class="stat-lbl">Unterricht in 7 Tagen</div>
+        </div>
+      </div>
+      <div class="stat-card">
         <div class="stat-icon">⚠️</div>
         <div>
-          <div class="stat-val" style="color: #dc2626;">2</div>
+          <div class="stat-val" style="color: #dc2626;">1</div>
           <div class="stat-lbl">Überfällige Rechnungen</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">💰</div>
         <div>
-          <div class="stat-val">€450.00</div>
+          <div class="stat-val">€500.00</div>
           <div class="stat-lbl">Einnahmen im aktuellen Monat</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🧾</div>
+        <div>
+          <div class="stat-val" style="color: #b45309;">€550.00</div>
+          <div class="stat-lbl">Offener Rechnungsbetrag</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div>
+          <div class="stat-val">47.6%</div>
+          <div class="stat-lbl">Zahlungseingangsquote</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📊</div>
         <div>
-          <div class="stat-val">75.0%</div>
+          <div class="stat-val">100.0%</div>
           <div class="stat-lbl">Anwesenheitsquote</div>
         </div>
       </div>
     </div>
 
-    <div class="grid-2">
+    <div class="dashboard-sections">
       <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">👥 Zuletzt hinzugefügte Schüler</h3>
-          <a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Alle anzeigen</a>
-        </div>
-        <table>
-          <thead>
-            <tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Aktion</th></tr>
-          </thead>
-          <tbody>
-
-            <tr>
-              <td>#3</td>
-              <td><strong>Noah Fischer</strong></td>
-              <td>noah.fischer@example.de</td>
-              <td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Profil</a></td>
-            </tr>
-
-            <tr>
-              <td>#2</td>
-              <td><strong>Lea Hoffmann</strong></td>
-              <td>lea.hoffmann@example.de</td>
-              <td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Profil</a></td>
-            </tr>
-
-            <tr>
-              <td>#1</td>
-              <td><strong>Jonas Becker</strong></td>
-              <td>jonas.becker@example.de</td>
-              <td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Profil</a></td>
-            </tr>
-
-          </tbody>
-        </table>
+        <div class="card-header"><h3 class="card-title">👥 Zuletzt hinzugefügte Schüler</h3><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Alle anzeigen</a></div>
+        <table><thead><tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Gruppen</th><th>Status</th><th>Hinzugefügt</th><th>Aktion</th></tr></thead><tbody>
+          <tr><td>#3</td><td><strong>Noah Fischer</strong></td><td>noah.fischer@example.de</td><td>+49 155 66778899</td><td><span class="badge badge-info">1</span></td><td><span class="badge badge-success">Aktiv</span></td><td>09.08.2026</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Profil</a></td></tr>
+          <tr><td>#2</td><td><strong>Lea Hoffmann</strong></td><td>lea.hoffmann@example.de</td><td>+49 152 33445566</td><td><span class="badge badge-info">1</span></td><td><span class="badge badge-success">Aktiv</span></td><td>09.08.2026</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Profil</a></td></tr>
+          <tr><td>#1</td><td><strong>Jonas Becker</strong></td><td>jonas.becker@example.de</td><td>+49 151 11223344</td><td><span class="badge badge-info">1</span></td><td><span class="badge badge-success">Aktiv</span></td><td>09.08.2026</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Profil</a></td></tr>
+        </tbody></table>
       </div>
-
       <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">💰 Letzte Zahlungen</h3>
-          <a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Alle Zahlungen</a>
-        </div>
+        <div class="card-header"><h3 class="card-title">💰 Letzte Zahlungen</h3><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Alle Zahlungen</a></div>
+        <table><thead><tr><th>Schüler</th><th>Rechnung</th><th>Bezahlt</th><th>Offen</th><th>Status</th><th>Fällig am</th><th>Zahlungsart</th><th>Aktion</th></tr></thead><tbody>
+          <tr><td><strong>Noah Fischer</strong></td><td>€350.00</td><td>€0.00</td><td>€350.00</td><td><span class="badge badge-danger">Überfällig</span></td><td>02.08.2026</td><td>Bar</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Öffnen</a></td></tr>
+          <tr><td><strong>Lea Hoffmann</strong></td><td>€350.00</td><td>€150.00</td><td>€200.00</td><td><span class="badge badge-info">Teilbezahlt</span></td><td>09.08.2026</td><td>Bar</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Öffnen</a></td></tr>
+          <tr><td><strong>Jonas Becker</strong></td><td>€350.00</td><td>€350.00</td><td>€0.00</td><td><span class="badge badge-success">Bezahlt</span></td><td>09.08.2026</td><td>Bar</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Öffnen</a></td></tr>
+        </tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">🗓️ Kommende Unterrichtstermine</h3><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Unterrichtsplan öffnen</a></div>
+        <table><thead><tr><th>Beginn</th><th>Gruppe</th><th>Lehrkraft</th><th>Raum</th><th>Thema</th><th>Status</th><th>Aktion</th></tr></thead><tbody>
+          <tr><td>09.08.2026, 17:31</td><td><strong>Python 2026 - Abendkurs</strong></td><td>Daniel Weber</td><td><span class="badge badge-neutral">Raum 101</span></td><td>Flask-Grundlagen</td><td><span class="badge badge-info">Geplant</span></td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Termin öffnen</a></td></tr>
+        </tbody></table>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3 class="card-title">🏫 Gruppenauslastung</h3><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Alle Gruppen</a></div>
         <table>
-          <thead>
-            <tr><th>Schüler</th><th>Betrag</th><th>Status</th><th>Fällig am</th></tr>
-          </thead>
-          <tbody>
-
-            <tr>
-              <td><strong>Noah Fischer</strong></td>
-              <td>€0.00</td>
-              <td>
-                <span class="badge badge-danger">
-                  Überfällig
-                </span>
-              </td>
-              <td>04.08.2026</td>
-            </tr>
-
-            <tr>
-              <td><strong>Lea Hoffmann</strong></td>
-              <td>€100.00</td>
-              <td>
-                <span class="badge badge-danger">
-                  Überfällig
-                </span>
-              </td>
-              <td>07.08.2026</td>
-            </tr>
-
-            <tr>
-              <td><strong>Jonas Becker</strong></td>
-              <td>€350.00</td>
-              <td>
-                <span class="badge badge-success">
-                  Bezahlt
-                </span>
-              </td>
-              <td>14.08.2026</td>
-            </tr>
-
-          </tbody>
+          <thead><tr><th>Gruppe</th><th>Kurs</th><th>Belegt</th><th>Kapazität</th><th>Freie Plätze</th><th>Auslastung</th><th>Status</th><th>Aktion</th></tr></thead>
+          <tbody><tr><td><strong>Python 2026 - Abendkurs</strong></td><td>Python &amp; Webentwicklung</td><td>3</td><td>15</td><td>12</td><td><span class="badge badge-info">20.0%</span></td><td><span class="badge badge-success">Aktiv</span></td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Gruppe öffnen</a></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -497,5 +521,21 @@
       </nav>
     </footer>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll("table").forEach((table) => {
+        const labels = Array.from(table.querySelectorAll("thead th"), (cell) => cell.textContent.trim());
+        if (!labels.length) return;
+        table.classList.add("responsive-table");
+        table.querySelectorAll("tbody tr").forEach((row) => {
+          Array.from(row.children)
+            .filter((cell) => cell.tagName === "TD")
+            .forEach((cell, index) => {
+              if (!cell.hasAttribute("colspan")) cell.dataset.label = labels[index] || "";
+            });
+        });
+      });
+    });
+  </script>
 </body>
 </html>

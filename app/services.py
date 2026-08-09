@@ -427,8 +427,31 @@ def get_dashboard_metrics(conn: sqlite3.Connection) -> Dict[str, Any]:
     total_students = conn.execute("SELECT COUNT(*) FROM students WHERE status = 'active'").fetchone()[0]
     total_courses = conn.execute("SELECT COUNT(*) FROM courses WHERE status = 'active'").fetchone()[0]
     active_groups = conn.execute("SELECT COUNT(*) FROM groups WHERE status = 'active'").fetchone()[0]
+    active_teachers = conn.execute("SELECT COUNT(*) FROM teachers WHERE status = 'active'").fetchone()[0]
+    active_enrollments = conn.execute(
+        "SELECT COUNT(*) FROM group_students WHERE status = 'enrolled'"
+    ).fetchone()[0]
 
-    overdue_payments = conn.execute("SELECT COUNT(*) FROM payments WHERE status = 'overdue' OR (status != 'paid' AND due_date < date('now'))").fetchone()[0]
+    overdue_payments = conn.execute(
+        "SELECT COUNT(*) FROM payments WHERE status = 'overdue' OR (status != 'paid' AND due_date < date('now'))"
+    ).fetchone()[0]
+    outstanding_balance = conn.execute(
+        """
+        SELECT COALESCE(
+            SUM(CASE WHEN amount_due > amount_paid THEN amount_due - amount_paid ELSE 0 END),
+            0
+        )
+        FROM payments
+        """
+    ).fetchone()[0]
+    payment_totals = conn.execute(
+        "SELECT COALESCE(SUM(amount_due), 0), COALESCE(SUM(amount_paid), 0) FROM payments"
+    ).fetchone()
+    collection_rate = (
+        round(payment_totals[1] / payment_totals[0] * 100, 1)
+        if payment_totals[0] > 0
+        else 100.0
+    )
 
     monthly_revenue = conn.execute(
         "SELECT COALESCE(SUM(amount_paid), 0) FROM payments WHERE substr(COALESCE(paid_at, created_at), 1, 7) = strftime('%Y-%m', 'now')"
@@ -437,25 +460,98 @@ def get_dashboard_metrics(conn: sqlite3.Connection) -> Dict[str, Any]:
     today_lessons = conn.execute(
         "SELECT COUNT(*) FROM lessons WHERE date(starts_at) = date('now') AND status != 'cancelled'"
     ).fetchone()[0]
+    upcoming_lessons = conn.execute(
+        """
+        SELECT COUNT(*)
+        FROM lessons
+        WHERE status = 'scheduled'
+          AND datetime(starts_at) >= datetime('now')
+          AND datetime(starts_at) < datetime('now', '+7 days')
+        """
+    ).fetchone()[0]
 
     attendance_total = conn.execute("SELECT COUNT(*) FROM attendance").fetchone()[0]
     attendance_present = conn.execute("SELECT COUNT(*) FROM attendance WHERE status = 'present'").fetchone()[0]
-
     attendance_rate = round((attendance_present / attendance_total * 100), 1) if attendance_total > 0 else 100.0
 
-    recent_students = conn.execute("SELECT id, full_name, email, created_at FROM students ORDER BY id DESC LIMIT 5").fetchall()
+    recent_students = conn.execute(
+        """
+        SELECT s.id, s.full_name, s.email, s.phone, s.status, s.created_at,
+               COUNT(gs.id) AS active_group_count
+        FROM students s
+        LEFT JOIN group_students gs
+          ON gs.student_id = s.id AND gs.status = 'enrolled'
+        GROUP BY s.id
+        ORDER BY s.id DESC
+        LIMIT 5
+        """
+    ).fetchall()
     recent_payments = conn.execute(
-        "SELECT p.id, s.full_name, p.amount_paid, p.status, p.due_date FROM payments p JOIN students s ON p.student_id = s.id ORDER BY p.id DESC LIMIT 5"
+        """
+        SELECT p.id, s.full_name, p.amount_due, p.amount_paid,
+               CASE WHEN p.amount_due > p.amount_paid
+                    THEN p.amount_due - p.amount_paid ELSE 0 END AS outstanding,
+               p.status, p.due_date, p.method
+        FROM payments p
+        JOIN students s ON p.student_id = s.id
+        ORDER BY p.id DESC
+        LIMIT 5
+        """
+    ).fetchall()
+    upcoming_lesson_rows = conn.execute(
+        """
+        SELECT l.id, g.name, COALESCE(t.full_name, 'Nicht zugewiesen'),
+               l.starts_at, COALESCE(l.room_label, '-'), COALESCE(l.topic, '-'),
+               l.status
+        FROM lessons l
+        JOIN groups g ON l.group_id = g.id
+        LEFT JOIN teachers t ON l.teacher_id = t.id
+        WHERE l.status = 'scheduled'
+        ORDER BY l.starts_at
+        LIMIT 5
+        """
+    ).fetchall()
+    group_occupancy_rows = conn.execute(
+        """
+        SELECT g.id, g.name, c.title,
+               SUM(CASE WHEN gs.status = 'enrolled' THEN 1 ELSE 0 END) AS enrolled,
+               g.capacity,
+               CASE
+                 WHEN g.capacity > SUM(CASE WHEN gs.status = 'enrolled' THEN 1 ELSE 0 END)
+                 THEN g.capacity - SUM(CASE WHEN gs.status = 'enrolled' THEN 1 ELSE 0 END)
+                 ELSE 0
+               END AS available_places,
+               ROUND(
+                 100.0 * SUM(CASE WHEN gs.status = 'enrolled' THEN 1 ELSE 0 END)
+                 / g.capacity,
+                 1
+               ) AS occupancy_rate,
+               g.status
+        FROM groups g
+        JOIN courses c ON g.course_id = c.id
+        LEFT JOIN group_students gs ON gs.group_id = g.id
+        WHERE g.status IN ('planned', 'active')
+        GROUP BY g.id, g.name, c.title, g.capacity, g.status
+        ORDER BY occupancy_rate DESC, g.name
+        LIMIT 5
+        """
     ).fetchall()
 
     return {
         "total_students": total_students,
         "total_courses": total_courses,
         "active_groups": active_groups,
+        "active_teachers": active_teachers,
+        "active_enrollments": active_enrollments,
         "today_lessons": today_lessons,
+        "upcoming_lessons": upcoming_lessons,
         "overdue_payments": overdue_payments,
         "monthly_revenue": monthly_revenue,
+        "outstanding_balance": outstanding_balance,
+        "collection_rate": collection_rate,
         "attendance_rate": attendance_rate,
         "recent_students": recent_students,
-        "recent_payments": recent_payments
+        "recent_payments": recent_payments,
+        "upcoming_lesson_rows": upcoming_lesson_rows,
+        "group_occupancy_rows": group_occupancy_rows
     }

@@ -22,10 +22,12 @@ läuft lokal.
 - Gruppenzuordnung und Unterrichtsplanung
 - Anwesenheit je Unterrichtstermin
 - Rechnungen, Teilzahlungen und automatische Überfälligkeit
-- Dashboard-Kennzahlen aus der SQLite-Datenbank
+- zwölf Dashboard-Kennzahlen aus der SQLite-Datenbank
+- operative Übersichten für neue Schüler, Zahlungen, Unterrichtstermine und Gruppenauslastung
+- direkte Navigation vom Dashboard zu Schülern, Zahlungen, Terminen und Gruppen
 - UTF-8-CSV-Exporte für Schüler und Zahlungen
 - CSRF-Schutz und serverseitige Eingabevalidierung
-- responsive Jinja-Oberfläche mit getrennten Templates und Styles
+- responsive Jinja-Oberfläche mit getrennten Templates, Styles und mobilen Datentabellen
 - geprüfte SQLite-Backups und Wiederherstellung
 - automatisierte Regressionstests
 
@@ -103,6 +105,7 @@ app/
 ├── services.py          Datenzugriff und Geschäftsregeln
 ├── templates/           Jinja-Seitentemplates
 ├── static/css/app.css   gemeinsame Oberfläche
+├── static/js/            responsive Darstellung der Datentabellen
 └── utils.py             Parsing- und Validierungshelfer
 tests/                   automatisierte Regressionstests
 tools/database_cli.py    Backup und Restore
@@ -111,7 +114,7 @@ docs/index.html          statische GitHub-Pages-Demo
 
 ## Status
 
-**Functional Portfolio MVP v1.0 abgeschlossen.**
+**Functional Portfolio MVP v1.0 abgeschlossen und verifiziert.**
 
 Die Anwendung ist für eine lokale, realistische Demonstration fertiggestellt.
 Die öffentliche GitHub-Pages-Seite ist kein gehostetes Mehrbenutzer-CRM.

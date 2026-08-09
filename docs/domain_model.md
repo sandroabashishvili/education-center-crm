@@ -116,6 +116,9 @@ Relationships:
 
 ## Derived dashboard values
 
-The service layer calculates active students, active courses and groups,
-today's lessons, overdue invoices, monthly received amount and attendance rate.
-The frontend does not recalculate these values.
+The service layer calculates twelve operational metrics, including active
+students, courses and groups, today's lessons, open and overdue invoices,
+monthly revenue, outstanding balances, attendance, teacher count and occupied
+group places. It also prepares group capacity, free-place and occupancy values
+for the dashboard. The frontend only displays these prepared values and does
+not recalculate business data.

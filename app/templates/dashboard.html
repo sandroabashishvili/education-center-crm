@@ -30,10 +30,31 @@
         </div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">👨‍🏫</div>
+        <div>
+          <div class="stat-val">{{ metrics.active_teachers }}</div>
+          <div class="stat-lbl">Aktive Lehrkräfte</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div>
+          <div class="stat-val">{{ metrics.active_enrollments }}</div>
+          <div class="stat-lbl">Aktive Einschreibungen</div>
+        </div>
+      </div>
+      <div class="stat-card">
         <div class="stat-icon">📅</div>
         <div>
           <div class="stat-val">{{ metrics.today_lessons }}</div>
           <div class="stat-lbl">Heutiger Unterricht</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🗓️</div>
+        <div>
+          <div class="stat-val">{{ metrics.upcoming_lessons }}</div>
+          <div class="stat-lbl">Unterricht in 7 Tagen</div>
         </div>
       </div>
       <div class="stat-card">
@@ -51,6 +72,20 @@
         </div>
       </div>
       <div class="stat-card">
+        <div class="stat-icon">🧾</div>
+        <div>
+          <div class="stat-val" style="color: {% if metrics.outstanding_balance > 0 %}#b45309{% else %}inherit{% endif %};">€{{ "%.2f"|format(metrics.outstanding_balance) }}</div>
+          <div class="stat-lbl">Offener Rechnungsbetrag</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div>
+          <div class="stat-val">{{ metrics.collection_rate }}%</div>
+          <div class="stat-lbl">Zahlungseingangsquote</div>
+        </div>
+      </div>
+      <div class="stat-card">
         <div class="stat-icon">📊</div>
         <div>
           <div class="stat-val">{{ metrics.attendance_rate }}%</div>
@@ -59,55 +94,84 @@
       </div>
     </div>
 
-    <div class="grid-2">
+    <div class="dashboard-sections">
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">👥 Zuletzt hinzugefügte Schüler</h3>
           <a href="{{ url_for('students_page') }}" class="btn btn-sm btn-outline">Alle anzeigen</a>
         </div>
         <table>
-          <thead>
-            <tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Aktion</th></tr>
-          </thead>
+          <thead><tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Gruppen</th><th>Status</th><th>Hinzugefügt</th><th>Aktion</th></tr></thead>
           <tbody>
             {% for s in metrics.recent_students %}
             <tr>
-              <td>#{{ s[0] }}</td>
-              <td><strong>{{ s[1] }}</strong></td>
-              <td>{{ s[2] }}</td>
+              <td>#{{ s[0] }}</td><td><strong>{{ s[1] }}</strong></td><td>{{ s[2] }}</td><td>{{ s[3] or '-' }}</td>
+              <td><span class="badge badge-info">{{ s[6] }}</span></td>
+              <td><span class="badge {% if s[4] == 'active' %}badge-success{% else %}badge-neutral{% endif %}">{{ s[4]|status_de }}</span></td>
+              <td>{{ s[5]|date_de }}</td>
               <td><a href="{{ url_for('student_detail_page', student_id=s[0]) }}" class="btn btn-sm btn-outline">Profil</a></td>
             </tr>
-            {% else %}
-            <tr><td colspan="4" style="text-align: center; color: var(--muted);">Noch keine Schüler vorhanden</td></tr>
-            {% endfor %}
+            {% else %}<tr><td colspan="8" style="text-align:center;color:var(--muted);">Noch keine Schüler vorhanden</td></tr>{% endfor %}
           </tbody>
         </table>
       </div>
-
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">💰 Letzte Zahlungen</h3>
           <a href="{{ url_for('payments_page') }}" class="btn btn-sm btn-outline">Alle Zahlungen</a>
         </div>
         <table>
-          <thead>
-            <tr><th>Schüler</th><th>Betrag</th><th>Status</th><th>Fällig am</th></tr>
-          </thead>
+          <thead><tr><th>Schüler</th><th>Rechnung</th><th>Bezahlt</th><th>Offen</th><th>Status</th><th>Fällig am</th><th>Zahlungsart</th><th>Aktion</th></tr></thead>
           <tbody>
             {% for p in metrics.recent_payments %}
             <tr>
-              <td><strong>{{ p[1] }}</strong></td>
-              <td>€{{ "%.2f"|format(p[2]) }}</td>
-              <td>
-                <span class="badge {% if p[3] == 'paid' %}badge-success{% elif p[3] == 'partial' %}badge-info{% elif p[3] == 'overdue' %}badge-danger{% else %}badge-warning{% endif %}">
-                  {{ p[3]|status_de }}
-                </span>
-              </td>
-              <td>{{ p[4]|date_de }}</td>
+              <td><strong>{{ p[1] }}</strong></td><td>€{{ "%.2f"|format(p[2]) }}</td><td>€{{ "%.2f"|format(p[3]) }}</td><td>€{{ "%.2f"|format(p[4]) }}</td>
+              <td><span class="badge {% if p[5] == 'paid' %}badge-success{% elif p[5] == 'partial' %}badge-info{% elif p[5] == 'overdue' %}badge-danger{% else %}badge-warning{% endif %}">{{ p[5]|status_de }}</span></td>
+              <td>{{ p[6]|date_de }}</td><td>{{ p[7]|status_de }}</td>
+              <td><a href="{{ url_for('payments_page') }}#payment-{{ p[0] }}" class="btn btn-sm btn-outline">Öffnen</a></td>
             </tr>
-            {% else %}
-            <tr><td colspan="4" style="text-align: center; color: var(--muted);">Noch keine Zahlungen vorhanden</td></tr>
-            {% endfor %}
+            {% else %}<tr><td colspan="8" style="text-align:center;color:var(--muted);">Noch keine Zahlungen vorhanden</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🗓️ Kommende Unterrichtstermine</h3>
+          <a href="{{ url_for('lessons_page') }}" class="btn btn-sm btn-outline">Unterrichtsplan öffnen</a>
+        </div>
+        <table>
+          <thead><tr><th>Beginn</th><th>Gruppe</th><th>Lehrkraft</th><th>Raum</th><th>Thema</th><th>Status</th><th>Aktion</th></tr></thead>
+          <tbody>
+            {% for lesson in metrics.upcoming_lesson_rows %}
+            <tr>
+              <td>{{ lesson[3]|datetime_de }}</td><td><strong>{{ lesson[1] }}</strong></td><td>{{ lesson[2] }}</td><td><span class="badge badge-neutral">{{ lesson[4] }}</span></td><td>{{ lesson[5] }}</td><td><span class="badge badge-info">{{ lesson[6]|status_de }}</span></td>
+              <td><a href="{{ url_for('attendance_page', lesson_id=lesson[0]) }}" class="btn btn-sm btn-outline">Termin öffnen</a></td>
+            </tr>
+            {% else %}<tr><td colspan="7" style="text-align:center;color:var(--muted);">Keine kommenden Unterrichtstermine</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🏫 Gruppenauslastung</h3>
+          <a href="{{ url_for('groups_page') }}" class="btn btn-sm btn-outline">Alle Gruppen</a>
+        </div>
+        <table>
+          <thead><tr><th>Gruppe</th><th>Kurs</th><th>Belegt</th><th>Kapazität</th><th>Freie Plätze</th><th>Auslastung</th><th>Status</th><th>Aktion</th></tr></thead>
+          <tbody>
+            {% for group in metrics.group_occupancy_rows %}
+            <tr>
+              <td><strong>{{ group[1] }}</strong></td>
+              <td>{{ group[2] }}</td>
+              <td>{{ group[3] }}</td>
+              <td>{{ group[4] }}</td>
+              <td>{{ group[5] }}</td>
+              <td><span class="badge {% if group[6] >= 90 %}badge-danger{% elif group[6] >= 70 %}badge-warning{% else %}badge-info{% endif %}">{{ group[6] }}%</span></td>
+              <td><span class="badge badge-success">{{ group[7]|status_de }}</span></td>
+              <td><a href="{{ url_for('group_detail_page', group_id=group[0]) }}" class="btn btn-sm btn-outline">Gruppe öffnen</a></td>
+            </tr>
+            {% else %}<tr><td colspan="8" style="text-align:center;color:var(--muted);">Keine aktiven Gruppen vorhanden</td></tr>{% endfor %}
           </tbody>
         </table>
       </div>

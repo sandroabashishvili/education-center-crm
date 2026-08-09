@@ -71,7 +71,18 @@ class CRMAppTests(unittest.TestCase):
             self.assertEqual(self.login(client).status_code, 302)
             dashboard = client.get("/")
             self.assertEqual(dashboard.status_code, 200)
-            self.assertIn("Heutiger Unterricht", dashboard.get_data(as_text=True))
+            dashboard_html = dashboard.get_data(as_text=True)
+            for label in (
+                "Heutiger Unterricht",
+                "Aktive Lehrkräfte",
+                "Aktive Einschreibungen",
+                "Unterricht in 7 Tagen",
+                "Offener Rechnungsbetrag",
+                "Zahlungseingangsquote",
+                "Kommende Unterrichtstermine",
+                "Gruppenauslastung",
+            ):
+                self.assertIn(label, dashboard_html)
 
     def test_csrf_and_private_pages_are_protected(self):
         with main.app.test_client() as client:
