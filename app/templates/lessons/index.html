@@ -4,7 +4,7 @@
 {% block content %}
 <div class="card">
       <div class="card-header">
-        <h3 class="card-title">📅 Unterrichtsplan und Anwesenheit</h3>
+        <h1 class="card-title">📅 Unterrichtsplan und Anwesenheit</h1>
         {% if session.get('user_role') in ['admin', 'manager'] %}
         <button onclick="document.getElementById('addLessonModal').style.display='flex'" class="btn">+ Unterricht planen</button>
         {% endif %}

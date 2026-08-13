@@ -4,7 +4,7 @@
 {% block content %}
 <div class="card">
       <div class="card-header">
-        <h3 class="card-title">👨‍🏫 Verzeichnis der Lehrkräfte</h3>
+        <h1 class="card-title">👨‍🏫 Verzeichnis der Lehrkräfte</h1>
         {% if session.get('user_role') == 'admin' %}
         <button onclick="document.getElementById('addTeacherModal').style.display='flex'" class="btn">+ Neue Lehrkraft</button>
         {% endif %}

@@ -4,7 +4,7 @@
 {% block content %}
 <div class="card">
       <div class="card-header">
-        <h3 class="card-title">💰 Zahlungen und Rechnungen</h3>
+        <h1 class="card-title">💰 Zahlungen und Rechnungen</h1>
         <div class="header-actions">
           {% if session.get('logged_in') %}
           <a href="{{ url_for('export_payments_csv') }}" class="btn btn-outline">CSV exportieren</a>
@@ -14,7 +14,7 @@
       </div>
 
       <form method="GET" class="filter-bar">
-        <select name="status" class="form-control" style="max-width: 200px;">
+        <select name="status" class="form-control" style="max-width: 200px;" aria-label="Zahlungsstatus filtern">
           <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Alle Zahlungen</option>
           <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Bezahlt</option>
           <option value="partial" {% if status_filter == 'partial' %}selected{% endif %}>Teilbezahlt</option>

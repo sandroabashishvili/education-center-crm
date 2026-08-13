@@ -10,8 +10,8 @@ APP_DIR = APP_ROOT / "app"
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-import main
-from tools.database_cli import backup_database, restore_database
+import main  # noqa: E402
+from tools.database_cli import backup_database, restore_database  # noqa: E402
 
 
 class CRMAppTests(unittest.TestCase):

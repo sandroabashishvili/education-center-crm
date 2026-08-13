@@ -1,11 +1,11 @@
 # Current Status
 
 **Status:** Functional Portfolio MVP v1.0 completed
-**Updated:** 2026-08-09
+**Updated:** 2026-08-13
 
 ## Implemented
 
-- Flask application with a versioned SQLite schema
+- Flask 3.1.3 application with a versioned SQLite schema
 - secure Werkzeug password hashing
 - CSRF protection for all write requests
 - session-based authentication
@@ -22,7 +22,7 @@
 - server-side validation with visible feedback
 - separated Jinja templates and shared static CSS
 - validated SQLite backup and restore CLI
-- responsive desktop and mobile interface with card-style mobile tables
+- responsive desktop, tablet and mobile interface with card-style compact tables
 - linked application brand that returns to the dashboard
 - static read-only GitHub Pages preview
 
@@ -39,6 +39,7 @@
 - invalid forms and overpayments are rejected
 - CSV exports pass
 - dashboard rendering and record-specific links pass
+- automated browser scan passes without horizontal overflow or serious accessibility violations
 
 ## Storage
 

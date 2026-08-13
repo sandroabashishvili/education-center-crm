@@ -4,7 +4,7 @@
 {% block content %}
 <div class="card">
       <div class="card-header">
-        <h3 class="card-title">👥 Schülerverwaltung</h3>
+        <h1 class="card-title">👥 Schülerverwaltung</h1>
         <div class="header-actions">
           {% if session.get('logged_in') %}
           <a href="{{ url_for('export_students_csv') }}" class="btn btn-outline">CSV exportieren</a>
@@ -15,7 +15,7 @@
 
       <form method="GET" class="filter-bar">
         <input type="text" name="q" value="{{ query }}" placeholder="Nach Name, E-Mail oder Telefonnummer suchen..." class="form-control" style="max-width: 320px;">
-        <select name="status" class="form-control" style="max-width: 180px;">
+        <select name="status" class="form-control" style="max-width: 180px;" aria-label="Schülerstatus filtern">
           <option value="all" {% if status_filter == 'all' %}selected{% endif %}>Alle Status</option>
           <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Aktiv</option>
           <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inaktiv</option>

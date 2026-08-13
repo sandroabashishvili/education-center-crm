@@ -8,7 +8,7 @@ APP_DIR = APP_ROOT / "app"
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from utils import normalize_text, parse_float, parse_int, parse_page
+from utils import normalize_text, parse_float, parse_int, parse_page  # noqa: E402
 
 
 class UtilsTests(unittest.TestCase):

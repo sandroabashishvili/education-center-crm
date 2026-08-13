@@ -30,6 +30,7 @@ läuft lokal.
 - responsive Jinja-Oberfläche mit getrennten Templates, Styles und mobilen Datentabellen
 - geprüfte SQLite-Backups und Wiederherstellung
 - automatisierte Regressionstests
+- geprüft mit Flask 3.1.3 sowie automatisierten Mobile-, Tablet- und Accessibility-Scans
 
 ## Rollen
 
@@ -89,6 +90,7 @@ Sicherung der aktiven Datenbank und prüft die SQLite-Integrität.
 ```bash
 export CRM_SECRET_KEY="replace-this-outside-local-demo"
 export CRM_DB_PATH="/absolute/path/to/crm.db"
+export HOST="127.0.0.1"
 export PORT="5001"
 ```
 

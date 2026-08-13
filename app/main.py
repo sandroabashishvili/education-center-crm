@@ -77,7 +77,7 @@ app.jinja_env.filters["datetime_de"] = datetime_de
 
 
 @app.errorhandler(CSRFError)
-def handle_csrf_error(error):
+def handle_csrf_error(_error):
     return render_template(
         "error.html",
         status_code=400,
@@ -87,7 +87,7 @@ def handle_csrf_error(error):
 
 
 @app.errorhandler(403)
-def handle_forbidden(error):
+def handle_forbidden(_error):
     return render_template(
         "error.html",
         status_code=403,
@@ -104,6 +104,6 @@ register_routes(app)
 if __name__ == "__main__":
     app.run(
         debug=os.environ.get("FLASK_DEBUG") == "1",
-        host="0.0.0.0",
+        host=os.environ.get("HOST", "127.0.0.1"),
         port=int(os.environ.get("PORT", "5001")),
     )
