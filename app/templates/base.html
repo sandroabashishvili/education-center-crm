@@ -19,22 +19,25 @@
     </span>
   </a>
   {% if session.get('logged_in') %}
-  <nav class="nav-links" aria-label="Hauptnavigation">
-    <a href="{{ url_for('index') }}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">📊 Dashboard</a>
-    {% if session.get('user_role') in ['admin', 'manager'] %}
-    <a href="{{ url_for('students_page') }}" class="nav-item {% if active_page == 'students' %}active{% endif %}">👥 Schueler</a>
-    <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}">📚 Kurse</a>
-    {% endif %}
-    <a href="{{ url_for('groups_page') }}" class="nav-item {% if active_page == 'groups' %}active{% endif %}">🏫 Gruppen</a>
-    <a href="{{ url_for('lessons_page') }}" class="nav-item {% if active_page == 'lessons' %}active{% endif %}">📅 Unterricht</a>
-    {% if session.get('user_role') in ['admin', 'manager'] %}
-    <a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}">💰 Zahlungen</a>
-    <a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}">👨‍🏫 Lehrkraefte</a>
-    {% endif %}
-  </nav>
-  {% endif %}
-  <div class="auth-box">
-    {% if session.get('logged_in') %}
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" data-nav-toggle>
+    <span aria-hidden="true">☰</span>
+    <span class="sr-only">Navigation öffnen</span>
+  </button>
+  <div class="topbar-menu" id="primary-navigation" data-mobile-nav>
+    <nav class="nav-links" aria-label="Hauptnavigation">
+      <a href="{{ url_for('index') }}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">📊 Dashboard</a>
+      {% if session.get('user_role') in ['admin', 'manager'] %}
+      <a href="{{ url_for('students_page') }}" class="nav-item {% if active_page == 'students' %}active{% endif %}">👥 Schueler</a>
+      <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}">📚 Kurse</a>
+      {% endif %}
+      <a href="{{ url_for('groups_page') }}" class="nav-item {% if active_page == 'groups' %}active{% endif %}">🏫 Gruppen</a>
+      <a href="{{ url_for('lessons_page') }}" class="nav-item {% if active_page == 'lessons' %}active{% endif %}">📅 Unterricht</a>
+      {% if session.get('user_role') in ['admin', 'manager'] %}
+      <a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}">💰 Zahlungen</a>
+      <a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}">👨‍🏫 Lehrkraefte</a>
+      {% endif %}
+    </nav>
+    <div class="auth-box">
       <span class="user-chip">
         <strong>{{ session.get('user_name') }}</strong>
         <small>{{ session.get('user_role') }}</small>
@@ -43,8 +46,9 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" class="btn btn-sm btn-outline">Abmelden</button>
       </form>
-    {% endif %}
+    </div>
   </div>
+  {% endif %}
 </header>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -68,5 +72,6 @@
     </footer>
   </div>
   <script src="{{ url_for('static', filename='js/responsive-tables.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/mobile-navigation.js') }}" defer></script>
 </body>
 </html>

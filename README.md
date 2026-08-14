@@ -30,6 +30,7 @@ läuft lokal.
 - responsive Jinja-Oberfläche mit getrennten Templates, Styles und mobilen Datentabellen
 - geprüfte SQLite-Backups und Wiederherstellung
 - automatisierte Regressionstests
+- kompakte, auf Mobilgeräten einklappbare Navigation
 - geprüft mit Flask 3.1.3 sowie automatisierten Mobile-, Tablet- und Accessibility-Scans
 
 ## Rollen
