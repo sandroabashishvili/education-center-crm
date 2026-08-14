@@ -452,3 +452,37 @@
   .brand-badge { width: 38px; height: 38px; }
   .topbar-menu .nav-links { grid-template-columns: 1fr; }
 }
+
+
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+  .stat-card {
+    min-height: 118px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.55rem;
+    padding: 0.8rem;
+  }
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .stat-lbl {
+    font-size: 0.68rem;
+    line-height: 1.25;
+  }
+}
+
+@media (max-width: 340px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .stat-card {
+    min-height: 0;
+    flex-direction: row;
+    align-items: center;
+  }
+}
