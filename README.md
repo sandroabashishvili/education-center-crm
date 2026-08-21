@@ -7,7 +7,7 @@ eines kleinen Bildungszentrums. Sie verbindet Schüler, Kurse, Gruppen,
 Unterricht, Anwesenheit und Zahlungen in einem nachvollziehbaren
 administrativen Ablauf.
 
-**Portfolio-Demo:** [Statische Vorschau öffnen](https://sandroabashishvili.github.io/education-center-crm/)
+**Portfolio-Demo:** [Statische Vorschau öffnen](https://sandro-abashishvili.de/education-center-crm/)
 
 Die GitHub-Pages-Version ist bewusst eine schreibgeschützte Vorschau. Die
 vollständige Anwendung mit Anmeldung, Rollen, Formularen und SQLite-Datenbank
@@ -132,6 +132,6 @@ Produktions-WSGI-Server und eine betriebliche Datenschutzprüfung erforderlich.
 
 Sandro Abashishvili
 
-[Portfolio](https://sandroabashishvili.github.io/) ·
+[Portfolio](https://sandro-abashishvili.de/) ·
 [GitHub](https://github.com/sandroabashishvili) ·
 [LinkedIn](https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/)
