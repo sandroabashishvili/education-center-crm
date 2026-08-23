@@ -42,3 +42,7 @@ backups/
 # Lokale JavaScript-Abhängigkeiten
 node_modules/
 .npm/
+
+# Interne Projektdokumentation; docs/ enthält zugleich die öffentliche Demo
+docs/current_status.md
+docs/domain_model.md

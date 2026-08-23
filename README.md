@@ -125,9 +125,6 @@ Für einen extern betriebenen Produktivdienst wären zusätzlich unter anderem
 Passwort-Wiederherstellung, Audit-Logging, geregelte Deployments, ein
 Produktions-WSGI-Server und eine betriebliche Datenschutzprüfung erforderlich.
 
-- [Aktueller Stand](docs/current_status.md)
-- [Datenmodell](docs/domain_model.md)
-
 ## Autor
 
 Sandro Abashishvili
