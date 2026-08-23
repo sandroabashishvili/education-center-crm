@@ -1,6 +1,6 @@
 # Education Center CRM
 
-![Education Center CRM Dashboard](assets/dashboard-preview.png)
+![Education Center CRM Dashboard](docs/assets/dashboard-preview.png)
 
 Eine deutschsprachige Flask- und SQLite-Anwendung für die tägliche Verwaltung
 eines kleinen Bildungszentrums. Sie verbindet Schüler, Kurse, Gruppen,
@@ -112,8 +112,17 @@ app/
 └── utils.py             Parsing- und Validierungshelfer
 tests/                   automatisierte Regressionstests
 tools/database_cli.py    Backup und Restore
-docs/index.html          statische GitHub-Pages-Demo
+docs/                    veröffentlichte statische GitHub-Pages-Demo
+├── index.html            Demo-Einstiegsseite
+├── assets/               Bilder, Icons und Social Preview
+├── manifest.webmanifest  Web-App-Metadaten
+├── robots.txt            Crawler-Regeln
+└── sitemap.xml           öffentliche Demo-URL
 ```
+
+`docs/` ist hier keine interne Dokumentation, sondern der von GitHub Pages
+veröffentlichte, statische Demo-Bereich. Interne Arbeitsnotizen bleiben lokal
+unter `project_notes/` und werden nicht in das Repository aufgenommen.
 
 ## Status
 
