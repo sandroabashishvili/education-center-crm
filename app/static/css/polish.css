@@ -1,0 +1,65 @@
+/* Final UI consistency and responsive pass. */
+html{scrollbar-gutter:stable;overflow-y:scroll}
+body{width:100%;min-width:0}
+.container{margin-inline:auto}
+.app-main{width:100%;min-width:0}
+
+/* One action language across students, teachers, courses, groups and payments. */
+.entity-actions,.row-actions,.management-actions,.action-btns{display:flex;align-items:center;gap:.4rem;flex-wrap:nowrap;min-width:max-content}
+.entity-actions form,.row-actions form,.management-actions form,.action-btns form{margin:0}
+.entity-actions .btn,.row-actions .btn,.management-actions .btn,.action-btns .btn{min-width:78px;height:34px;padding:.38rem .72rem;justify-content:center;white-space:nowrap;font-size:.79rem;border-radius:8px}
+.btn-edit{background:#4f46e5;color:#fff;border:1px solid #4f46e5}
+.btn-edit:hover{background:#4338ca;color:#fff}
+.btn-payment{background:#0f766e;color:#fff;border:1px solid #0f766e}
+.btn-payment:hover{background:#115e59;color:#fff}
+
+/* List filters share one visual rhythm. */
+.list-filter-bar{display:grid;grid-template-columns:minmax(240px,1fr) minmax(160px,210px) auto auto;gap:.65rem;align-items:center;margin:0 0 1rem;padding:.8rem;border:1px solid var(--border);border-radius:12px;background:#f8fafc}
+.list-filter-bar .form-control{margin:0;background:#fff}
+.filter-count{justify-self:end;color:var(--muted);font-size:.8rem;font-weight:700;white-space:nowrap}
+
+/* Dashboard stays on the exact same centered content rail as management pages. */
+.hero,.stats-grid,.dashboard-sections{width:100%;margin-left:0;margin-right:0}
+.dashboard-sections>.card{width:100%}
+
+/* Modal safety on short/mobile screens. */
+.modal-shell{overflow-y:auto}
+.modal-card{max-height:calc(100vh - 2rem);overflow-y:auto}
+
+@media(max-width:900px){
+  .list-filter-bar{grid-template-columns:1fr 1fr}
+  .filter-count{justify-self:start}
+  .entity-actions,.row-actions,.management-actions,.action-btns{min-width:0;flex-wrap:wrap}
+}
+
+@media(max-width:600px){
+  .container{padding-inline:.55rem}
+  .card{padding:.9rem}
+  .hero{padding:1.15rem}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:.7rem}
+  .stat-card{padding:.85rem;gap:.7rem}
+  .stat-icon{width:40px;height:40px;flex:0 0 40px}
+  .stat-val{font-size:1.2rem}
+  .stat-lbl{font-size:.69rem;letter-spacing:.035em}
+  .list-filter-bar{grid-template-columns:1fr;padding:.7rem}
+  .list-filter-bar .btn{width:100%;justify-content:center}
+  .filter-count{justify-self:start}
+  .entity-actions,.row-actions,.management-actions,.action-btns{display:grid;grid-template-columns:1fr;gap:.4rem;width:100%}
+  .entity-actions .btn,.row-actions .btn,.management-actions .btn,.action-btns .btn,.entity-actions form,.row-actions form,.management-actions form,.action-btns form{width:100%;min-width:0}
+  .management-header .entity-actions{grid-template-columns:1fr 1fr}
+  .management-header .entity-actions form{grid-column:1/-1}
+  .header-actions{width:100%}
+  .header-actions .btn{flex:1 1 100%;justify-content:center}
+  .modal-shell{padding:.5rem}
+  .modal-card{width:100%;padding:1rem;border-radius:13px}
+  table.responsive-table tbody tr{padding-inline:.7rem}
+  table.responsive-table td{grid-template-columns:minmax(6.8rem,36%) minmax(0,1fr);gap:.55rem}
+}
+
+@media(max-width:390px){
+  .stats-grid{grid-template-columns:1fr}
+  table.responsive-table td{grid-template-columns:1fr;gap:.2rem}
+  table.responsive-table td::before{margin-bottom:.1rem}
+  .management-header .entity-actions{grid-template-columns:1fr}
+  .management-header .entity-actions form{grid-column:auto}
+}
