@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% set active_page = "payments" %}
+{% block title %}Rechnung bearbeiten - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card form-page">
+  <div class="card-header">
+    <div><p class="management-eyebrow">Zahlungsverwaltung</p><h1 class="card-title">✏️ Rechnung #{{ payment[0] }} bearbeiten</h1><p class="page-subtitle">Rechnungsdaten anpassen. Bereits verbuchte Zahlungen bleiben erhalten.</p></div>
+    <a href="{{ url_for('payment_detail_page', payment_id=payment[0]) }}" class="btn btn-sm btn-outline">← Zur Rechnung</a>
+  </div>
+  <form method="POST" class="management-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-grid">
+      <div class="form-group"><label>Schüler *</label><select name="student_id" class="form-control" required>{% for s in students %}<option value="{{ s[0] }}" {% if s[0] == payment[1] %}selected{% endif %}>{{ s[1] }}</option>{% endfor %}</select></div>
+      <div class="form-group"><label>Gruppe</label><select name="group_id" class="form-control"><option value="">Keine Gruppe</option>{% for g in groups %}<option value="{{ g[0] }}" {% if g[0] == payment[3] %}selected{% endif %}>{{ g[1] }}</option>{% endfor %}</select></div>
+      <div class="form-group"><label>Rechnungsbetrag (€) *</label><input type="number" name="amount_due" step="0.01" min="{{ payment[6] }}" value="{{ '%.2f'|format(payment[5]) }}" class="form-control" required></div>
+      <div class="form-group"><label>Fällig am *</label><input type="date" name="due_date" value="{{ payment[7] }}" class="form-control" required></div>
+      <div class="form-group"><label>Zahlungsart</label><select name="method" class="form-control"><option value="cash" {% if payment[10] == 'cash' %}selected{% endif %}>Bar</option><option value="bank_transfer" {% if payment[10] == 'bank_transfer' %}selected{% endif %}>Banküberweisung</option><option value="card" {% if payment[10] == 'card' %}selected{% endif %}>Karte</option><option value="other" {% if payment[10] == 'other' %}selected{% endif %}>Sonstiges</option></select></div>
+      <div class="form-group"><label>Bereits bezahlt</label><input type="text" value="€{{ '%.2f'|format(payment[6]) }}" class="form-control" disabled></div>
+      <div class="form-group span-2"><label>Notiz</label><textarea name="note" rows="3" class="form-control">{{ payment[11] or '' }}</textarea></div>
+    </div>
+    <div class="form-actions"><a href="{{ url_for('payment_detail_page', payment_id=payment[0]) }}" class="btn btn-secondary">Abbrechen</a><button type="submit" class="btn">Speichern</button></div>
+  </form>
+</div>
+{% endblock %}
