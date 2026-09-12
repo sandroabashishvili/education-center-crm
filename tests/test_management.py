@@ -92,13 +92,49 @@ class ManagementTests(unittest.TestCase):
             with sqlite3.connect(self.db_path) as conn:
                 self.assertIsNone(conn.execute("SELECT id FROM groups WHERE id = ?", (group_id,)).fetchone())
 
-    def test_manager_cannot_delete_teacher_or_group(self):
+    def test_payment_detail_edit_and_delete(self):
+        with main.app.test_client() as client:
+            self.login(client)
+            self.assertEqual(client.get("/payments/1").status_code, 200)
+            self.assertEqual(client.get("/payments/1/edit").status_code, 200)
+            with sqlite3.connect(self.db_path) as conn:
+                paid = conn.execute("SELECT amount_paid FROM payments WHERE id=1").fetchone()[0]
+            token = self.token(client, "/payments/1/edit")
+            response = client.post(
+                "/payments/1/edit",
+                data={
+                    "student_id": "1",
+                    "group_id": "1",
+                    "amount_due": str(max(450, paid)),
+                    "due_date": "2026-12-31",
+                    "method": "bank_transfer",
+                    "note": "Aktualisierte Rechnung",
+                    "csrf_token": token,
+                },
+            )
+            self.assertEqual(response.status_code, 302)
+            with sqlite3.connect(self.db_path) as conn:
+                row = conn.execute("SELECT amount_due, method, note FROM payments WHERE id=1").fetchone()
+                self.assertEqual(row, (450.0, "bank_transfer", "Aktualisierte Rechnung"))
+
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("INSERT INTO payments (student_id, group_id, amount_due, due_date, status, method) VALUES (1, 1, 50, '2026-12-31', 'pending', 'cash')")
+                payment_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+                conn.commit()
+            token = self.token(client, "/payments")
+            self.assertEqual(client.post(f"/payments/{payment_id}/delete", data={"csrf_token": token}).status_code, 302)
+            with sqlite3.connect(self.db_path) as conn:
+                self.assertIsNone(conn.execute("SELECT id FROM payments WHERE id = ?", (payment_id,)).fetchone())
+
+    def test_manager_cannot_delete_teacher_group_or_payment(self):
         with main.app.test_client() as client:
             self.login(client, "manager")
             token = self.token(client, "/teachers")
             self.assertEqual(client.post("/teachers/1/delete", data={"csrf_token": token}).status_code, 403)
             token = self.token(client, "/groups")
             self.assertEqual(client.post("/groups/1/delete", data={"csrf_token": token}).status_code, 403)
+            token = self.token(client, "/payments")
+            self.assertEqual(client.post("/payments/1/delete", data={"csrf_token": token}).status_code, 403)
 
 
 if __name__ == "__main__":
