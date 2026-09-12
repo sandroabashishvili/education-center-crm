@@ -37,6 +37,13 @@ def _archive_legacy_database(path: Path) -> Path:
     return backup_path
 
 
+def _ensure_profile_columns(conn: sqlite3.Connection) -> None:
+    """Add optional account-profile fields without replacing an existing database."""
+    columns = {row[1] for row in conn.execute("PRAGMA table_info(users)")}
+    if "avatar_filename" not in columns:
+        conn.execute("ALTER TABLE users ADD COLUMN avatar_filename TEXT")
+
+
 def init_db(db_path=None) -> None:
     path = Path(db_path or DB_PATH)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -54,6 +61,7 @@ def init_db(db_path=None) -> None:
                 password_hash TEXT NOT NULL,
                 role TEXT NOT NULL CHECK (role IN ('admin', 'manager', 'teacher')),
                 status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+                avatar_filename TEXT,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
             CREATE TABLE IF NOT EXISTS students (
@@ -158,6 +166,7 @@ def init_db(db_path=None) -> None:
             PRAGMA user_version = 1;
             """
         )
+        _ensure_profile_columns(conn)
         _seed_demo_data(conn)
 
 
