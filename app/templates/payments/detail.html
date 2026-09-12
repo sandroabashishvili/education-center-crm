@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% set active_page = "payments" %}
+{% block title %}Rechnung #{{ payment[0] }} - Education Center CRM{% endblock %}
+{% block content %}
+<div class="card management-page">
+  <div class="card-header management-header">
+    <div>
+      <p class="management-eyebrow">Zahlungsverwaltung</p>
+      <h1 class="card-title">💰 Rechnung #{{ payment[0] }}</h1>
+      <p class="management-subtitle">Rechnungsdaten, Zahlungseingang und Fälligkeit auf einen Blick.</p>
+    </div>
+    <div class="entity-actions management-actions">
+      <a href="{{ url_for('payments_page') }}" class="btn btn-sm btn-outline">← Übersicht</a>
+      <a href="{{ url_for('edit_payment', payment_id=payment[0]) }}" class="btn btn-sm btn-edit">Bearbeiten</a>
+      {% if session.get('user_role') == 'admin' %}
+      <form action="{{ url_for('delete_payment', payment_id=payment[0]) }}" method="POST" class="inline-form" onsubmit="return confirm('Möchten Sie diese Rechnung wirklich löschen?');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-sm btn-danger">Löschen</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="management-meta-grid">
+    <div class="management-meta-item"><span>Schüler</span><strong>{{ payment[2] }}</strong></div>
+    <div class="management-meta-item"><span>Gruppe</span><strong>{{ payment[4] }}</strong></div>
+    <div class="management-meta-item"><span>Rechnungsbetrag</span><strong>€{{ "%.2f"|format(payment[5]) }}</strong></div>
+    <div class="management-meta-item"><span>Bezahlt</span><strong>€{{ "%.2f"|format(payment[6]) }}</strong></div>
+    <div class="management-meta-item"><span>Offen</span><strong>€{{ "%.2f"|format(payment[5] - payment[6]) }}</strong></div>
+    <div class="management-meta-item"><span>Fällig am</span><strong>{{ payment[7]|date_de }}</strong></div>
+    <div class="management-meta-item"><span>Status</span><strong><span class="badge {% if payment[9] == 'paid' %}badge-success{% elif payment[9] == 'partial' %}badge-info{% elif payment[9] == 'overdue' %}badge-danger{% else %}badge-warning{% endif %}">{{ payment[9]|status_de }}</span></strong></div>
+    <div class="management-meta-item"><span>Zahlungsart</span><strong>{{ payment[10]|status_de }}</strong></div>
+    <div class="management-meta-item management-meta-wide"><span>Notiz</span><strong>{{ payment[11] or 'Keine Notiz' }}</strong></div>
+    <div class="management-meta-item"><span>Bezahlt am</span><strong>{{ (payment[8] or '-')|date_de }}</strong></div>
+    <div class="management-meta-item"><span>Erstellt am</span><strong>{{ payment[12]|date_de }}</strong></div>
+  </div>
+</div>
+{% endblock %}
