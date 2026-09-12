@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Education Center CRM{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234f46e5'/%3E%3Ctext x='50' y='58' font-size='52' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
 </head>
 <body>
@@ -25,22 +26,25 @@
   </button>
   <div class="topbar-menu" id="primary-navigation" data-mobile-nav>
     <nav class="nav-links" aria-label="Hauptnavigation">
-      <a href="{{ url_for('index') }}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">📊 Dashboard</a>
+      <a href="{{ url_for('index') }}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}"><span class="nav-icon">📊</span><span>Dashboard</span></a>
       {% if session.get('user_role') in ['admin', 'manager'] %}
-      <a href="{{ url_for('students_page') }}" class="nav-item {% if active_page == 'students' %}active{% endif %}">👥 Schueler</a>
-      <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}">📚 Kurse</a>
+      <a href="{{ url_for('students_page') }}" class="nav-item {% if active_page == 'students' %}active{% endif %}"><span class="nav-icon">👥</span><span>Schüler</span></a>
+      <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}"><span class="nav-icon">📚</span><span>Kurse</span></a>
       {% endif %}
-      <a href="{{ url_for('groups_page') }}" class="nav-item {% if active_page == 'groups' %}active{% endif %}">🏫 Gruppen</a>
-      <a href="{{ url_for('lessons_page') }}" class="nav-item {% if active_page == 'lessons' %}active{% endif %}">📅 Unterricht</a>
+      <a href="{{ url_for('groups_page') }}" class="nav-item {% if active_page == 'groups' %}active{% endif %}"><span class="nav-icon">🏫</span><span>Gruppen</span></a>
+      <a href="{{ url_for('lessons_page') }}" class="nav-item {% if active_page == 'lessons' %}active{% endif %}"><span class="nav-icon">📅</span><span>Unterricht</span></a>
       {% if session.get('user_role') in ['admin', 'manager'] %}
-      <a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}">💰 Zahlungen</a>
-      <a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}">👨‍🏫 Lehrkraefte</a>
+      <a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}"><span class="nav-icon">💰</span><span>Zahlungen</span></a>
+      <a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}"><span class="nav-icon">👨‍🏫</span><span>Lehrkräfte</span></a>
       {% endif %}
     </nav>
     <div class="auth-box">
-      <span class="user-chip">
-        <strong>{{ session.get('user_name') }}</strong>
-        <small>{{ session.get('user_role') }}</small>
+      <span class="user-summary">
+        <span class="user-avatar" aria-hidden="true">👤</span>
+        <span class="user-chip">
+          <strong>{{ session.get('user_name') }}</strong>
+          <small>{{ session.get('user_role') }}</small>
+        </span>
       </span>
       <form action="{{ url_for('logout') }}" method="POST" style="margin: 0;">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
