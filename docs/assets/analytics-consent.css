@@ -36,6 +36,239 @@
 .legal-copy h2 { margin-top: 34px; }
 .legal-copy p { color: var(--muted); line-height: 1.72; }
 
+/* Keep the static portfolio demo visually aligned with the real Flask app header. */
+.static-preview .topbar {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: .8rem;
+  padding: .7rem .85rem;
+  border-radius: 14px;
+  box-shadow: 0 10px 28px -16px rgba(15, 23, 42, .28);
+}
+
+.static-preview .brand {
+  flex: 0 0 auto;
+  gap: .65rem;
+  min-width: 0;
+}
+
+.static-preview .brand-badge {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 11px;
+  font-size: 1.2rem;
+}
+
+.static-preview .brand-title {
+  font-size: 1rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.static-preview .brand-subtitle {
+  margin-top: .12rem;
+  font-size: .7rem;
+}
+
+.static-preview .topbar-menu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1 1 auto;
+  gap: .7rem;
+  min-width: 0;
+}
+
+.static-preview .nav-links {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  gap: .16rem;
+  min-width: 0;
+}
+
+.static-preview .nav-item {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  padding: .48rem .58rem;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: .82rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.static-preview .nav-item:hover {
+  border-color: #e0e7ff;
+  background: #f5f7ff;
+}
+
+.static-preview .nav-item.active {
+  border-color: #e0e7ff;
+  background: #eef2ff;
+  box-shadow: inset 0 -2px 0 rgba(79, 70, 229, .16);
+}
+
+.static-preview .auth-box {
+  flex: 0 0 auto;
+  gap: .55rem;
+  margin-left: 0;
+  padding-left: .7rem;
+  border-left: 1px solid var(--border);
+}
+
+.static-preview .auth-box::before {
+  content: "👤";
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+  font-size: .9rem;
+}
+
+.static-preview .user-chip {
+  min-width: 0;
+  text-align: right;
+}
+
+.static-preview .user-chip strong {
+  max-width: 8.5rem;
+  overflow: hidden;
+  font-size: .82rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.static-preview .user-chip small {
+  margin-top: .08rem;
+  font-size: .66rem;
+  letter-spacing: .02em;
+}
+
+@media (max-width: 1120px) and (min-width: 901px) {
+  .static-preview .topbar {
+    gap: .55rem;
+    padding-inline: .7rem;
+  }
+
+  .static-preview .brand { gap: .5rem; }
+
+  .static-preview .brand-badge {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .static-preview .brand-title { font-size: .92rem; }
+  .static-preview .brand-subtitle { display: none; }
+  .static-preview .topbar-menu { gap: .45rem; }
+
+  .static-preview .nav-item {
+    padding-inline: .42rem;
+    font-size: .76rem;
+  }
+
+  .static-preview .auth-box {
+    gap: .4rem;
+    padding-left: .5rem;
+  }
+
+  .static-preview .auth-box::before { display: none; }
+
+  .static-preview .user-chip strong {
+    max-width: 6rem;
+    font-size: .76rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .static-preview .topbar {
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: .72rem .8rem;
+  }
+
+  .static-preview .topbar[data-menu-open="true"] { flex-wrap: wrap; }
+  .static-preview .brand-title { font-size: .98rem; }
+
+  .static-preview .topbar-menu {
+    display: none;
+    width: 100%;
+    flex: 0 0 100%;
+  }
+
+  .static-preview .topbar-menu[data-open="true"] {
+    display: grid;
+    gap: .65rem;
+  }
+
+  .static-preview .topbar-menu .nav-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: .35rem;
+    padding-top: .4rem;
+  }
+
+  .static-preview .topbar-menu .nav-item {
+    justify-content: flex-start;
+    min-height: 42px;
+    padding: .58rem .7rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    text-align: left;
+  }
+
+  .static-preview .topbar-menu .nav-item.active {
+    border-color: #c7d2fe;
+    background: #eef2ff;
+  }
+
+  .static-preview .topbar-menu .auth-box {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    margin-left: 0;
+    padding: .75rem 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .static-preview .user-chip { text-align: left; }
+}
+
+@media (max-width: 430px) {
+  .static-preview .brand-badge {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .static-preview .topbar-menu .nav-links { grid-template-columns: 1fr; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .static-preview .nav-item:hover,
+  .static-preview .nav-item.active,
+  .static-preview .topbar-menu .nav-item.active {
+    border-color: #3f4d70;
+    background: #283554;
+    color: #c7d2fe;
+  }
+
+  .static-preview .topbar-menu .nav-item { background: var(--surface); }
+  .static-preview .auth-box::before { background: linear-gradient(135deg, #283554, #164e63); }
+}
+
 @media (max-width: 700px) {
   .consent-banner { grid-template-columns: 1fr; }
   .consent-actions { flex-wrap: wrap; }
