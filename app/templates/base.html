@@ -18,10 +18,14 @@
       <a href="{{ url_for('index') }}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}"><span class="nav-icon">📊</span><span>Dashboard</span></a>
       {% if session.get('user_role') in ['admin', 'manager'] %}
       <a href="{{ url_for('students_page') }}" class="nav-item {% if active_page == 'students' %}active{% endif %}"><span class="nav-icon">👥</span><span>Schüler</span></a>
-      <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}"><span class="nav-icon">📚</span><span>Kurse</span></a>{% endif %}
+      <a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}"><span class="nav-icon">👨‍🏫</span><span>Lehrkräfte</span></a>
+      <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}"><span class="nav-icon">📚</span><span>Kurse</span></a>
+      {% endif %}
       <a href="{{ url_for('groups_page') }}" class="nav-item {% if active_page == 'groups' %}active{% endif %}"><span class="nav-icon">🏫</span><span>Gruppen</span></a>
       <a href="{{ url_for('lessons_page') }}" class="nav-item {% if active_page == 'lessons' %}active{% endif %}"><span class="nav-icon">📅</span><span>Unterricht</span></a>
-      {% if session.get('user_role') in ['admin', 'manager'] %}<a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}"><span class="nav-icon">💰</span><span>Zahlungen</span></a><a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}"><span class="nav-icon">👨‍🏫</span><span>Lehrkräfte</span></a>{% endif %}
+      {% if session.get('user_role') in ['admin', 'manager'] %}
+      <a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}"><span class="nav-icon">💰</span><span>Zahlungen</span></a>
+      {% endif %}
     </nav>
     <details class="account-menu"><summary class="account-trigger" aria-label="Benutzermenü öffnen"><span class="user-avatar">{% if current_user and current_user['avatar_filename'] %}<img src="{{ url_for('static', filename='uploads/avatars/' ~ current_user['avatar_filename']) }}" alt="">{% else %}<span aria-hidden="true">👤</span>{% endif %}</span><span class="user-chip"><strong>{{ current_user['full_name'] if current_user else session.get('user_name') }}</strong><small>{{ role_labels.get(current_user['role'], current_user['role']) if current_user else session.get('user_role') }}</small></span><span class="account-chevron" aria-hidden="true">⌄</span></summary>
       <div class="account-dropdown"><div class="account-dropdown-heading"><strong>{{ current_user['full_name'] if current_user else session.get('user_name') }}</strong>{% if current_user %}<span>{{ current_user['email'] }}</span>{% endif %}</div><a href="{{ url_for('profile_settings') }}" class="account-link"><span aria-hidden="true">👤</span><span>Mein Profil</span></a><form action="{{ url_for('logout') }}" method="POST" class="account-logout-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="account-link account-logout"><span aria-hidden="true">↪</span><span>Abmelden</span></button></form></div>
