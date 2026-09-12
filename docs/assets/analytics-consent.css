@@ -36,13 +36,31 @@
 .legal-copy h2 { margin-top: 34px; }
 .legal-copy p { color: var(--muted); line-height: 1.72; }
 
-/* Keep the static portfolio demo visually aligned with the real Flask app header. */
+/* The static portfolio preview intentionally uses the same light UI as the Flask app. */
+.static-preview {
+  color-scheme: light;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --secondary: #0f766e;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 20px 30px -10px rgba(15, 23, 42, 0.12);
+  background: var(--bg);
+  color: var(--text);
+}
+
 .static-preview .topbar {
   flex-wrap: nowrap;
   align-items: center;
   gap: .8rem;
   padding: .7rem .85rem;
   border-radius: 14px;
+  background: rgba(255, 255, 255, .96);
+  border-color: var(--border);
   box-shadow: 0 10px 28px -16px rgba(15, 23, 42, .28);
 }
 
@@ -72,9 +90,9 @@
 }
 
 .static-preview .topbar-menu {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   flex: 1 1 auto;
   gap: .7rem;
   min-width: 0;
@@ -83,10 +101,11 @@
 .static-preview .nav-links {
   display: flex;
   align-items: center;
-  flex: 1 1 auto;
+  justify-content: space-evenly;
+  width: 100%;
+  min-width: 0;
   flex-wrap: nowrap;
   gap: .16rem;
-  min-width: 0;
 }
 
 .static-preview .nav-item {
@@ -105,11 +124,13 @@
 .static-preview .nav-item:hover {
   border-color: #e0e7ff;
   background: #f5f7ff;
+  color: var(--primary);
 }
 
 .static-preview .nav-item.active {
   border-color: #e0e7ff;
   background: #eef2ff;
+  color: var(--primary);
   box-shadow: inset 0 -2px 0 rgba(79, 70, 229, .16);
 }
 
@@ -130,6 +151,7 @@
   place-items: center;
   border-radius: 50%;
   background: linear-gradient(135deg, #eef2ff, #e0f2fe);
+  color: var(--primary);
   font-size: .9rem;
 }
 
@@ -153,40 +175,35 @@
   letter-spacing: .02em;
 }
 
+/* Never wash table text out on hover. */
+.static-preview table tbody tr:hover {
+  background: #f1f5f9 !important;
+  color: var(--text) !important;
+}
+.static-preview table tbody tr:hover td,
+.static-preview table tbody tr:hover a,
+.static-preview table tbody tr:hover strong,
+.static-preview table tbody tr:hover span:not(.badge) {
+  color: var(--text) !important;
+}
+.static-preview table tbody tr:hover .badge-success { color: #15803d !important; }
+.static-preview table tbody tr:hover .badge-warning { color: #a16207 !important; }
+.static-preview table tbody tr:hover .badge-danger { color: #b91c1c !important; }
+.static-preview table tbody tr:hover .badge-info { color: #0369a1 !important; }
+.static-preview table tbody tr:hover .badge-neutral { color: #475569 !important; }
+
 @media (max-width: 1120px) and (min-width: 901px) {
-  .static-preview .topbar {
-    gap: .55rem;
-    padding-inline: .7rem;
-  }
-
+  .static-preview .topbar { gap: .55rem; padding-inline: .7rem; }
   .static-preview .brand { gap: .5rem; }
-
-  .static-preview .brand-badge {
-    width: 36px;
-    height: 36px;
-    flex-basis: 36px;
-  }
-
+  .static-preview .brand-badge { width: 36px; height: 36px; flex-basis: 36px; }
   .static-preview .brand-title { font-size: .92rem; }
   .static-preview .brand-subtitle { display: none; }
   .static-preview .topbar-menu { gap: .45rem; }
-
-  .static-preview .nav-item {
-    padding-inline: .42rem;
-    font-size: .76rem;
-  }
-
-  .static-preview .auth-box {
-    gap: .4rem;
-    padding-left: .5rem;
-  }
-
+  .static-preview .nav-links { justify-content: space-between; }
+  .static-preview .nav-item { padding-inline: .42rem; font-size: .76rem; }
+  .static-preview .auth-box { gap: .4rem; padding-left: .5rem; }
   .static-preview .auth-box::before { display: none; }
-
-  .static-preview .user-chip strong {
-    max-width: 6rem;
-    font-size: .76rem;
-  }
+  .static-preview .user-chip strong { max-width: 6rem; font-size: .76rem; }
 }
 
 @media (max-width: 900px) {
@@ -207,6 +224,7 @@
 
   .static-preview .topbar-menu[data-open="true"] {
     display: grid;
+    grid-template-columns: 1fr;
     gap: .65rem;
   }
 
@@ -247,26 +265,8 @@
 }
 
 @media (max-width: 430px) {
-  .static-preview .brand-badge {
-    width: 36px;
-    height: 36px;
-    flex-basis: 36px;
-  }
-
+  .static-preview .brand-badge { width: 36px; height: 36px; flex-basis: 36px; }
   .static-preview .topbar-menu .nav-links { grid-template-columns: 1fr; }
-}
-
-@media (prefers-color-scheme: dark) {
-  .static-preview .nav-item:hover,
-  .static-preview .nav-item.active,
-  .static-preview .topbar-menu .nav-item.active {
-    border-color: #3f4d70;
-    background: #283554;
-    color: #c7d2fe;
-  }
-
-  .static-preview .topbar-menu .nav-item { background: var(--surface); }
-  .static-preview .auth-box::before { background: linear-gradient(135deg, #283554, #164e63); }
 }
 
 @media (max-width: 700px) {
