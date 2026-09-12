@@ -2,44 +2,49 @@
 
 ![Education Center CRM Dashboard](docs/assets/dashboard-preview.png)
 
-Eine deutschsprachige Flask- und SQLite-Anwendung für die tägliche Verwaltung
-eines kleinen Bildungszentrums. Sie verbindet Schüler, Kurse, Gruppen,
-Unterricht, Anwesenheit und Zahlungen in einem nachvollziehbaren
-administrativen Ablauf.
+Eine deutschsprachige Flask- und SQLite-Anwendung für die tägliche Verwaltung eines kleinen Bildungszentrums. Das System verbindet Schüler, Lehrkräfte, Kurse, Gruppen, Unterricht, Anwesenheit, Rechnungen und Zahlungseingänge in einer konsistenten Verwaltungsoberfläche.
 
 **Portfolio-Demo:** [Statische Vorschau öffnen](https://sandro-abashishvili.de/education-center-crm/)
 
-Die GitHub-Pages-Version ist bewusst eine schreibgeschützte Vorschau. Die
-vollständige Anwendung mit Anmeldung, Rollen, Formularen und SQLite-Datenbank
-läuft lokal.
+Die GitHub-Pages-Version ist eine interaktive, aber schreibgeschützte Vorschau der aktuellen Oberfläche. Die vollständige Anwendung mit Anmeldung, Rollen, Formularen, SQLite-Datenbank und echten Änderungen läuft lokal.
 
-## Funktionen
+## Aktueller Funktionsumfang
 
-- geschützte Anmeldung mit sicherem Werkzeug-Passwort-Hashing
+- geschützte Anmeldung mit Werkzeug-Passwort-Hashing
 - rollenbasierte Zugriffe für Administrator, Mitarbeiter und Lehrkraft
-- Schülerverwaltung mit Suche, Status, Profil und Bearbeitung
-- Kurs-, Lehrkraft- und Gruppenverwaltung
-- Gruppenzuordnung und Unterrichtsplanung
-- Anwesenheit je Unterrichtstermin
-- Rechnungen, Teilzahlungen und automatische Überfälligkeit
-- zwölf Dashboard-Kennzahlen aus der SQLite-Datenbank
-- operative Übersichten für neue Schüler, Zahlungen, Unterrichtstermine und Gruppenauslastung
-- direkte Navigation vom Dashboard zu Schülern, Zahlungen, Terminen und Gruppen
+- Benutzerprofil mit Avatar, Kontodaten und Passwortänderung
+- Schülerverwaltung mit Suche, Statusfilter, Detailansicht, Bearbeitung und Löschung
+- Lehrkräfteverwaltung mit Suche, Statusfilter, Detailansicht, Bearbeitung und Löschung
+- Kursverwaltung mit Suche, Statusfilter, Detailansicht, Bearbeitung und Löschung
+- Gruppenverwaltung mit Suche, Statusfilter, Detailansicht, Bearbeitung, Löschung und Teilnehmerzuordnung
+- Unterrichtsplanung mit Suche, Statusfilter und Anwesenheitserfassung
+- Rechnungs- und Zahlungsverwaltung mit Suche, Statusfilter, Detailansicht, Bearbeitung, Löschung und Teilzahlungen
+- automatische Kennzeichnung überfälliger Rechnungen
+- einheitliche Aktionen `Öffnen`, `Bearbeiten`, `Löschen` in den Verwaltungslisten
 - UTF-8-CSV-Exporte für Schüler und Zahlungen
+- Dashboard mit Kennzahlen, Unterricht, Gruppenauslastung und aktuellen Datensätzen
 - CSRF-Schutz und serverseitige Eingabevalidierung
-- responsive Jinja-Oberfläche mit getrennten Templates, Styles und mobilen Datentabellen
-- geprüfte SQLite-Backups und Wiederherstellung
+- responsive Navigation, mobile Datentabellen, adaptive Filterleisten und mobile Formulare
+- stabiles Layout ohne seitliches Springen beim Seitenwechsel
+- Favicon und Web-App-Metadaten
+- SQLite-Backup und Wiederherstellung
 - automatisierte Regressionstests
-- kompakte, auf Mobilgeräten einklappbare Navigation
-- geprüft mit Flask 3.1.3 sowie automatisierten Mobile-, Tablet- und Accessibility-Scans
 
 ## Rollen
 
 | Rolle | Zugriff |
 | --- | --- |
-| Administrator | vollständige Verwaltung einschließlich Löschvorgängen und Lehrkräften |
-| Mitarbeiter | tägliche Verwaltung von Schülern, Kursen, Gruppen, Unterricht und Zahlungen |
+| Administrator | vollständige Verwaltung einschließlich Löschvorgängen |
+| Mitarbeiter | tägliche Verwaltung ohne administrative Löschrechte für geschützte Ressourcen |
 | Lehrkraft | eigene Gruppen, Unterrichtstermine und Anwesenheit |
+
+## Navigation
+
+Die Hauptnavigation folgt dem Arbeitsablauf:
+
+`Dashboard → Schüler → Lehrkräfte → Kurse → Gruppen → Unterricht → Zahlungen`
+
+Damit stehen Personen zuerst, danach die Bildungsstruktur, anschließend der operative Unterricht und zum Schluss die Finanzen.
 
 ## Lokal starten
 
@@ -49,12 +54,14 @@ cd education-center-crm
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python app/main.py
+python3 app/main.py
 ```
 
-Danach [http://127.0.0.1:5001/](http://127.0.0.1:5001/) öffnen. Beim ersten
-Start wird eine versionierte SQLite-Datenbank mit realistischen Demodaten
-angelegt.
+Danach im Browser öffnen:
+
+```text
+http://127.0.0.1:5001/
+```
 
 ### Demo-Konten
 
@@ -69,22 +76,19 @@ Diese Zugangsdaten sind ausschließlich für die lokale Portfolio-Demo bestimmt.
 ## Tests
 
 ```bash
-python -m unittest discover -s tests -v
+python3 -m unittest discover -s tests -v
 ```
 
-Die Tests prüfen unter anderem CSRF-Schutz, private Seiten, Passwort-Hashes,
-Rollenrechte, Lehrkraft-Sichtbarkeit, Schüler-CRUD, Anwesenheit,
-Teilzahlungen, ungültige Formulare, CSV-Exporte sowie Backup und Restore.
+Die Tests decken unter anderem Anmeldung, CSRF-Schutz, Rollenrechte, Schülerverwaltung, Profilfunktionen, Kurs-, Lehrkraft-, Gruppen- und Zahlungsmanagement, Anwesenheit, Formvalidierung, CSV-Exporte sowie Datenbankoperationen ab.
 
 ## Datenbank sichern und wiederherstellen
 
 ```bash
-python -m tools.database_cli backup
-python -m tools.database_cli restore --from app/backups/education-crm-DATUM.db --confirm
+python3 -m tools.database_cli backup
+python3 -m tools.database_cli restore --from app/backups/education-crm-DATUM.db --confirm
 ```
 
-Vor jeder Wiederherstellung erstellt das Werkzeug automatisch eine zusätzliche
-Sicherung der aktiven Datenbank und prüft die SQLite-Integrität.
+Vor einer Wiederherstellung wird eine zusätzliche Sicherung der aktiven Datenbank erstellt und die SQLite-Integrität geprüft.
 
 ## Konfiguration
 
@@ -97,47 +101,54 @@ export PORT="5001"
 
 Weitere Werte stehen in [.env.example](.env.example).
 
-## Architektur
+## Projektstruktur
 
 ```text
 app/
-├── main.py              Flask-Konfiguration und Fehlerbehandlung
-├── database.py          versioniertes SQLite-Schema und Demodaten
-├── models.py            Domain-Dataclasses
-├── routes.py            HTTP-Routen, Rollen und Validierung
-├── services.py          Datenzugriff und Geschäftsregeln
-├── templates/           Jinja-Seitentemplates
-├── static/css/app.css   gemeinsame Oberfläche
-├── static/js/            responsive Darstellung der Datentabellen
-└── utils.py             Parsing- und Validierungshelfer
-tests/                   automatisierte Regressionstests
-tools/database_cli.py    Backup und Restore
-docs/                    veröffentlichte statische GitHub-Pages-Demo
-├── index.html            Demo-Einstiegsseite
-├── assets/               Bilder, Icons und Social Preview
-├── manifest.webmanifest  Web-App-Metadaten
-├── robots.txt            Crawler-Regeln
-└── sitemap.xml           öffentliche Demo-URL
+├── main.py                 Flask-Konfiguration, Filter und Fehlerbehandlung
+├── database.py             SQLite-Schema, Migrationen und Demodaten
+├── models.py               Domain-Dataclasses
+├── routes.py               Kernrouten, Rollen und Formularaktionen
+├── management_routes.py    Detail-, Edit- und Delete-Routen für Verwaltungsobjekte
+├── profile_routes.py       Profil, Avatar und Kontoeinstellungen
+├── services.py             Datenzugriff und Geschäftsregeln
+├── templates/              Jinja-Seitentemplates
+├── static/
+│   ├── css/                App-, Header-, Profil-, Management- und Polish-Styles
+│   ├── js/                 Mobile Navigation, Responsive Tables und Listenfilter
+│   └── favicon.svg
+└── utils.py                Parsing- und Validierungshelfer
+
+tests/                      automatisierte Regressionstests
+tools/database_cli.py       Backup und Restore
+docs/                       veröffentlichte GitHub-Pages-Demo
+DOCUMENTATION.md             technische und funktionale Projektdokumentation
 ```
 
-`docs/` ist hier keine interne Dokumentation, sondern der von GitHub Pages
-veröffentlichte, statische Demo-Bereich. Interne Arbeitsnotizen bleiben lokal
-unter `project_notes/` und werden nicht in das Repository aufgenommen.
+## GitHub-Pages-Demo
+
+`docs/` enthält keine produktive Flask-Anwendung. Die dort veröffentlichte Seite bildet die aktuelle Navigation, Filterleisten, Verwaltungslisten, Aktionsbuttons, Dashboard-Struktur und das responsive Verhalten als statische Portfolio-Vorschau nach.
+
+Schreibaktionen sind dort absichtlich deaktiviert. Die echte CRUD-Logik bleibt der lokalen Flask-Anwendung vorbehalten.
+
+## Responsive Verhalten
+
+Die Oberfläche ist für Desktop, Tablet und Mobilgeräte ausgelegt. Wichtige Breakpoints liegen bei ungefähr `1050px`, `900px`, `600px` und `390px`.
+
+Auf kleineren Geräten werden Navigation, Filter, Metadatenraster, Aktionsbuttons und Tabellen neu angeordnet. Tabellen wechseln in eine cardartige mobile Darstellung, statt horizontal aus dem Viewport zu laufen.
+
+## Dokumentation
+
+Ausführlichere Informationen zu Architektur, Rollen, Seiten, Zahlungslogik, Demo-Abgrenzung und Teststrategie stehen in [DOCUMENTATION.md](DOCUMENTATION.md).
 
 ## Status
 
-**Functional Portfolio MVP v1.0 abgeschlossen und verifiziert.**
+**Functional Portfolio CRM – aktiv weiterentwickelt.**
 
-Die Anwendung ist für eine lokale, realistische Demonstration fertiggestellt.
-Die öffentliche GitHub-Pages-Seite ist kein gehostetes Mehrbenutzer-CRM.
-Für einen extern betriebenen Produktivdienst wären zusätzlich unter anderem
-Passwort-Wiederherstellung, Audit-Logging, geregelte Deployments, ein
-Produktions-WSGI-Server und eine betriebliche Datenschutzprüfung erforderlich.
+Die Anwendung ist als realistische lokale Portfolio-Demonstration funktionsfähig. Für einen extern betriebenen Produktivdienst wären unter anderem geregelte Deployments, produktiver WSGI-Betrieb, Audit-Logging, Passwort-Wiederherstellung, erweiterte Benutzerverwaltung, Monitoring und eine betriebliche Datenschutzprüfung erforderlich.
 
 ## Autor
 
 Sandro Abashishvili
 
-[Portfolio](https://sandro-abashishvili.de/) ·
-[GitHub](https://github.com/sandroabashishvili) ·
-[LinkedIn](https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/)
+[Portfolio](https://sandro-abashishvili.de/) · [GitHub](https://github.com/sandroabashishvili) · [LinkedIn](https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/)
