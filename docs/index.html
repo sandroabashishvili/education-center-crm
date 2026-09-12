@@ -3,631 +3,85 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Statische Portfolio-Vorschau der aktuellen Education-Center-CRM-Anwendung von Sandro Abashishvili.">
+  <meta name="description" content="Interaktive, schreibgeschützte Portfolio-Vorschau des Education Center CRM von Sandro Abashishvili.">
   <meta name="robots" content="index, follow">
   <meta name="author" content="Sandro Abashishvili">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sandro-abashishvili.de/education-center-crm/">
-  <meta property="og:title" content="Education Center CRM – Portfolio MVP v1.0">
-  <meta property="og:description" content="Flask- und SQLite-CRM für Schüler, Gruppen, Unterricht, Anwesenheit und Zahlungen.">
+  <meta property="og:title" content="Education Center CRM – Portfolio Demo">
+  <meta property="og:description" content="Flask- und SQLite-CRM für Schüler, Lehrkräfte, Kurse, Gruppen, Unterricht und Zahlungen.">
   <meta property="og:image" content="https://sandro-abashishvili.de/education-center-crm/assets/social-card.webp">
-  <meta property="og:image:type" content="image/webp">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Dashboard des Education Center CRM">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Education Center CRM – Portfolio MVP v1.0">
-  <meta name="twitter:description" content="Funktionale Flask-/SQLite-Anwendung mit Rollen, CSRF-Schutz und Tests.">
-  <meta name="twitter:image" content="https://sandro-abashishvili.de/education-center-crm/assets/social-card.webp">
   <meta name="theme-color" content="#4f46e5">
   <link rel="canonical" href="https://sandro-abashishvili.de/education-center-crm/">
-  <title>Education Center CRM – Portfolio MVP v1.0</title>
+  <title>Education Center CRM – Portfolio Demo</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="assets/analytics-consent.css">
-
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Education Center CRM","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://sandro-abashishvili.de/education-center-crm/","description":"Flask- und SQLite-CRM-Demo für Bildungszentren."}
-</script>
-<style>
-  :root {
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
-    --secondary: #0f766e;
-    --bg: #f8fafc;
-    --surface: #ffffff;
-    --text: #0f172a;
-    --muted: #64748b;
-    --border: #e2e8f0;
-    --shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
-    --shadow-lg: 0 20px 30px -10px rgba(15, 23, 42, 0.12);
-  }
-
-  * { box-sizing: border-box; }
-  body {
-    overflow-x: hidden;
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
-  }
-
-  .container {
-    width: 100%;
-    min-width: 0;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
-  }
-
-  .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    backdrop-filter: blur(18px);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.96);
-    padding: 0.85rem 1rem;
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .brand { display: flex; align-items: center; gap: 0.75rem; color: inherit; text-decoration: none; }
-  .brand-title { display: block; font-weight: 700; font-size: 1.1rem; }
-  .brand-subtitle { display: block; font-size: 0.75rem; color: var(--muted); }
-  .brand:hover .brand-title { color: var(--primary); }
-  .brand-badge {
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    font-size: 1.4rem;
-  }
-
-  .nav-links { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .nav-item {
-    padding: 0.5rem 0.9rem;
-    border-radius: 10px;
-    color: var(--muted);
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 0.92rem;
-    transition: all 0.2s ease;
-  }
-  .nav-item:hover, .nav-item.active {
-    background: #eef2ff;
-    color: var(--primary);
-  }
-
-  .auth-box { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
-
-  .hero {
-    background: linear-gradient(135deg, #3730a3 0%, #4f46e5 50%, #0f766e 100%);
-    color: white;
-    padding: 2rem;
-    border-radius: 20px;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--shadow-lg);
-  }
-
-  .hero h1 { margin: 0 0 0.4rem; font-size: 1.8rem; font-weight: 700; overflow-wrap: anywhere; word-break: break-word; max-width: 100%; }
-  .hero p { margin: 0; opacity: 0.9; font-size: 0.95rem; overflow-wrap: anywhere; max-width: 100%; }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    padding: 1.2rem;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: #eef2ff;
-    color: var(--primary);
-    display: grid;
-    place-items: center;
-    font-size: 1.3rem;
-  }
-  .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--text); line-height: 1.2; }
-  .stat-lbl { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; }
-  .dashboard-sections { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-  .dashboard-sections > .card { margin-bottom: 0; }
-
-  .card {
-    background: var(--surface);
-    padding: 1.5rem;
-    border-radius: 18px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    margin-bottom: 1.5rem;
-  }
-
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .card-title { font-size: 1.1rem; font-weight: 700; margin: 0; }
-  .table-note { color: var(--muted); font-size: 0.82rem; }
-  .empty-state { text-align: center; color: var(--muted); padding: 2rem; }
-  button:disabled { opacity: 0.55; cursor: not-allowed; }
-
-  table { width: 100%; border-collapse: collapse; text-align: left; }
-  th { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); padding: 0.75rem; border-bottom: 1px solid var(--border); }
-  td { padding: 0.8rem 0.75rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-  tr:hover { background: #f8fafc; }
-
-  .badge {
-    display: inline-block;
-    padding: 0.25rem 0.6rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: capitalize;
-  }
-  .badge-success { background: #dcfce7; color: #15803d; }
-  .badge-warning { background: #fef9c3; color: #a16207; }
-  .badge-danger { background: #fee2e2; color: #b91c1c; }
-  .badge-info { background: #e0f2fe; color: #0369a1; }
-  .badge-neutral { background: #f1f5f9; color: #475569; }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.6rem 1.2rem;
-    border-radius: 10px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    font-weight: 500;
-    font-size: 0.88rem;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background 0.2s ease;
-  }
-  .btn:hover { background: var(--primary-hover); }
-  .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; border-radius: 8px; }
-  .btn-secondary { background: #f1f5f9; color: var(--text); }
-  .btn-secondary:hover { background: #e2e8f0; }
-  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-  .btn-outline:hover { background: #f1f5f9; }
-  .btn-danger { background: #ef4444; color: white; }
-  .btn-danger:hover { background: #dc2626; }
-
-  .form-group { margin-bottom: 1rem; }
-  .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.35rem; color: var(--text); }
-  .form-control {
-    width: 100%;
-    padding: 0.65rem 0.85rem;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    font-size: 0.9rem;
-    background: var(--bg);
-  }
-  .form-control:focus { outline: 2px solid var(--primary); background: white; }
-
-  .filter-bar {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .action-btns { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-  .login-form { display: grid; grid-template-columns: repeat(3, auto); gap: 0.4rem; margin: 0; }
-  .login-form input {
-    width: 170px;
-    padding: 0.45rem 0.65rem;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  .user-chip { display: grid; line-height: 1.15; }
-  .user-chip small { color: var(--muted); text-transform: capitalize; }
-  .flash-stack { display: grid; gap: 0.5rem; margin-bottom: 1rem; }
-  .flash {
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-  }
-  .flash-success { background: #ecfdf5; border-color: #a7f3d0; color: #166534; }
-  .flash-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
-  .flash-danger { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
-  .header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; }
-
-  @media (max-width: 1050px) and (min-width: 761px) {
-    .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  }
-
-  @media (max-width: 900px) {
-    .container { padding: 0.75rem 0.65rem 2rem; }
-    .topbar { align-items: flex-start; padding: 0.9rem; border-radius: 12px; }
-    .topbar > *, .hero, .stats-grid, .card { min-width: 0; max-width: 100%; }
-    .nav-links { width: 100%; max-width: 100%; min-width: 0; flex-wrap: wrap; overflow-x: visible; gap: 0.25rem; padding-bottom: 0.25rem; }
-    .nav-item { flex: 0 0 auto; }
-    .auth-box, .login-form { width: 100%; margin-left: 0; }
-    .login-form { grid-template-columns: 1fr; }
-    .login-form input { width: 100%; min-width: 0; }
-    .login-form .btn { width: 100%; justify-content: center; }
-    .hero { padding: 1.35rem; border-radius: 15px; }
-    .hero h1 { font-size: 1.45rem; }
-    .grid-2 { grid-template-columns: 1fr; }
-    .card { padding: 1rem; overflow: visible; border-radius: 14px; }
-    .card-header { align-items: flex-start; gap: 0.75rem; flex-wrap: wrap; }
-
-    table.responsive-table,
-    table.responsive-table tbody,
-    table.responsive-table tr,
-    table.responsive-table td {
-      display: block;
-      width: 100%;
-      min-width: 0;
-    }
-    table.responsive-table thead {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-    table.responsive-table tbody { display: grid; gap: 0.75rem; }
-    table.responsive-table tbody tr {
-      padding: 0.25rem 0.85rem;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--surface);
-    }
-    table.responsive-table td {
-      display: grid;
-      grid-template-columns: minmax(7.5rem, 38%) minmax(0, 1fr);
-      gap: 0.75rem;
-      align-items: center;
-      padding: 0.65rem 0;
-      overflow-wrap: anywhere;
-      word-break: break-word;
-    }
-    table.responsive-table td::before {
-      content: attr(data-label);
-      color: var(--muted);
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-    table.responsive-table td[colspan] { display: block; padding: 1rem 0; text-align: center !important; }
-    table.responsive-table td[colspan]::before { display: none; }
-    table.responsive-table td:last-child { border-bottom: 0; }
-    .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .stat-card { padding: 0.85rem; align-items: flex-start; }
-    .stat-icon { width: 40px; height: 40px; flex: 0 0 auto; }
-    .stat-val { font-size: 1.25rem; }
-    [id$="Modal"] > div { margin: 0.75rem; max-height: calc(100vh - 1.5rem); overflow-y: auto; }
-  }
-
-  @media (max-width: 600px) {
-    .nav-links {
-      flex-wrap: wrap;
-      overflow-x: visible;
-      gap: 0.25rem;
-    }
-    .nav-item {
-      padding: 0.42rem 0.6rem;
-      font-size: 0.84rem;
-    }
-    .hero h1 { font-size: 1.2rem; line-height: 1.25; }
-    .hero p { font-size: 0.86rem; }
-    .stats-grid { grid-template-columns: 1fr; }
-    .header-actions, .header-actions .btn { width: 100%; }
-    .header-actions .btn { justify-content: center; }
-  }
-  /* WEBSITE-ESSENTIALS-MODES */
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#0f172a; --surface:#172033; --text:#f8fafc; --muted:#b5c0d0; --border:#334155; --shadow:0 10px 25px -5px rgba(0,0,0,.35); --shadow-lg:0 20px 30px -10px rgba(0,0,0,.45); }
-    html { color-scheme: dark; }
-    .topbar { background: rgba(23,32,51,.96); }
-    .nav-item:hover, .nav-item.active { background:#283554; color:#c7d2fe; }
-    table, th, td { color:var(--text); }
-  }
-  @media print {
-    .topbar, .creator-footer, .btn { display:none !important; }
-    body, .card, .stat-card { background:#fff !important; color:#000 !important; box-shadow:none !important; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
-  }
-
-  /* Compact, accessible mobile navigation. */
-  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-  .topbar-menu { display:flex; align-items:center; flex:1; gap:1rem; min-width:0; }
-  .nav-toggle { display:none; width:42px; height:42px; margin-left:auto; border:1px solid var(--border); border-radius:11px; background:var(--surface); color:var(--text); font:inherit; font-size:1.25rem; cursor:pointer; }
-  @media (max-width:900px) {
-    .container { padding-top:0; }
-    .topbar { align-items:center; flex-wrap:nowrap; }
-    .topbar[data-menu-open="true"] { flex-wrap:wrap; }
-    .nav-toggle { display:grid; flex:0 0 auto; place-items:center; }
-    .topbar-menu { display:none; width:100%; flex:0 0 100%; }
-    .topbar-menu[data-open="true"] { display:grid; gap:.75rem; }
-    .topbar-menu .nav-links { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; padding:.5rem 0 0; }
-    .topbar-menu .nav-item { min-width:0; text-align:center; }
-    .topbar-menu .auth-box { display:flex; align-items:center; justify-content:space-between; width:100%; padding-top:.75rem; border-top:1px solid var(--border); }
-  }
-  @media (max-width:430px) {
-    .brand-title { font-size:.98rem; }
-    .brand-subtitle { display:none; }
-    .brand-badge { width:38px; height:38px; }
-    .topbar-menu .nav-links { grid-template-columns:1fr; }
-  }
-
-  @media (max-width:600px) {
-    .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
-    .stat-card { min-height:118px; flex-direction:column; align-items:flex-start; gap:.55rem; padding:.8rem; }
-    .stat-icon { width:36px; height:36px; }
-    .stat-lbl { font-size:.68rem; line-height:1.25; }
-  }
-  @media (max-width:340px) {
-    .stats-grid { grid-template-columns:1fr; }
-    .stat-card { min-height:0; flex-direction:row; align-items:center; }
-  }
-</style>
-
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234f46e5'/%3E%3Ctext x='50' y='58' font-size='52' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
   <style>
-    .demo-notice { padding: .7rem 1rem; background: #fff7d6; border-bottom: 1px solid #eadb99; color: #685717; text-align: center; font-size: .82rem; font-weight: 700; }
-    .demo-notice a { color: inherit; }
-    .static-preview [aria-disabled="true"] { cursor: default; }
-    .creator-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.5rem; padding: 1rem 1.25rem; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow); }
-    .creator-footer p { margin: 0; color: var(--muted); font-size: .82rem; }
-    .creator-links { display: flex; flex-wrap: wrap; gap: 1rem; }
-    .creator-links a { color: var(--primary); font-size: .82rem; font-weight: 700; text-decoration: none; }
-    @media (max-width: 600px) { .creator-footer { align-items: flex-start; flex-direction: column; } }
+    :root{--primary:#4f46e5;--primary-hover:#4338ca;--secondary:#0f766e;--bg:#f8fafc;--surface:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;--danger:#b91c1c;--shadow:0 10px 25px -8px rgba(15,23,42,.12)}
+    *{box-sizing:border-box}html{scrollbar-gutter:stable;overflow-y:scroll}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.5}.container{width:100%;max-width:1280px;margin:0 auto;padding:1.5rem 1rem 3rem}.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:.8rem;padding:.7rem .85rem;margin-bottom:1.5rem;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.96);box-shadow:var(--shadow);backdrop-filter:blur(18px)}.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:inherit;flex:0 0 auto}.brand-badge{width:40px;height:40px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--secondary));font-size:1.2rem}.brand-title{display:block;font-weight:800}.brand-subtitle{display:block;font-size:.7rem;color:var(--muted)}.topbar-menu{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:.7rem;flex:1;min-width:0}.nav-links{display:flex;align-items:center;justify-content:space-evenly;gap:.16rem}.nav-item{border:0;background:transparent;color:var(--muted);padding:.48rem .58rem;border-radius:9px;font-size:.82rem;font-weight:700;white-space:nowrap;cursor:pointer}.nav-item:hover,.nav-item.active{background:#eef2ff;color:var(--primary)}.account{display:flex;align-items:center;gap:.5rem;padding:.3rem .45rem;border-radius:11px}.avatar{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#eef2ff}.user-chip{display:grid;line-height:1.15}.user-chip strong{font-size:.8rem}.user-chip small{font-size:.66rem;color:var(--muted)}.nav-toggle{display:none;margin-left:auto;border:1px solid var(--border);background:#fff;border-radius:9px;padding:.5rem .65rem;font-size:1rem}.demo-note{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 1rem;margin-bottom:1rem;border:1px solid #c7d2fe;border-radius:12px;background:#eef2ff;color:#3730a3;font-size:.86rem}.view{display:none}.view.active{display:block}.hero{padding:2rem;margin-bottom:1.5rem;border-radius:20px;background:linear-gradient(135deg,#3730a3 0%,#4f46e5 50%,#0f766e 100%);color:#fff;box-shadow:var(--shadow)}.hero h1{margin:0 0 .4rem;font-size:1.8rem}.hero p{margin:0;opacity:.9}.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin-bottom:1.5rem}.stat-card,.card{background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow)}.stat-card{display:flex;align-items:center;gap:1rem;padding:1.15rem;border-radius:16px}.stat-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:12px;background:#eef2ff}.stat-val{font-size:1.45rem;font-weight:800}.stat-lbl{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}.card{padding:1.35rem;border-radius:18px;margin-bottom:1.25rem;overflow:hidden}.card-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding-bottom:.75rem;margin-bottom:1rem;border-bottom:1px solid var(--border)}.card-title{margin:0;font-size:1.08rem}.page-subtitle{margin:.25rem 0 0;color:var(--muted);font-size:.9rem}.header-actions,.entity-actions{display:flex;gap:.4rem;align-items:center;flex-wrap:nowrap}.btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;padding:.58rem 1rem;border:0;border-radius:9px;background:var(--primary);color:#fff;font-weight:700;font-size:.84rem;text-decoration:none;cursor:pointer}.btn:hover{background:var(--primary-hover)}.btn-sm{min-width:78px;height:34px;padding:.38rem .72rem;font-size:.79rem}.btn-outline{background:#fff;color:var(--text);border:1px solid var(--border)}.btn-secondary{background:#f1f5f9;color:var(--text)}.btn-edit{background:var(--primary)}.btn-danger{background:var(--danger)}.btn-payment{background:var(--secondary)}.list-filter-bar{display:grid;grid-template-columns:minmax(240px,1fr) minmax(160px,210px) auto auto;gap:.65rem;align-items:center;margin-bottom:1rem;padding:.8rem;border:1px solid var(--border);border-radius:12px;background:#f8fafc}.form-control{width:100%;padding:.65rem .8rem;border:1px solid var(--border);border-radius:9px;background:#fff;font:inherit}.filter-count{justify-self:end;color:var(--muted);font-size:.8rem;font-weight:700;white-space:nowrap}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;text-align:left}th{padding:.7rem;font-size:.72rem;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)}td{padding:.76rem .7rem;font-size:.88rem;border-bottom:1px solid var(--border)}tbody tr:hover{background:#f8fafc}.badge{display:inline-flex;padding:.24rem .58rem;border-radius:999px;font-size:.73rem;font-weight:700}.badge-success{background:#dcfce7;color:#166534}.badge-info{background:#e0f2fe;color:#075985}.badge-warning{background:#fef3c7;color:#92400e}.badge-danger{background:#fee2e2;color:#b91c1c}.badge-neutral{background:#f1f5f9;color:#475569}.management-meta-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin:1rem 0;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--border)}.management-meta-item{background:#f8fafc;padding:.9rem 1rem}.management-meta-item span{display:block;color:var(--muted);font-size:.72rem;font-weight:700;text-transform:uppercase}.management-meta-item strong{display:block;margin-top:.25rem}.footer{display:flex;justify-content:space-between;gap:1rem;margin-top:1.5rem;padding:1rem 1.2rem;border:1px solid var(--border);border-radius:14px;background:#fff;color:var(--muted);font-size:.8rem}.footer a{color:var(--primary);font-weight:700;text-decoration:none}
+    @media(max-width:1050px){.stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.management-meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:900px){.container{padding:.75rem .65rem 2rem}.topbar{flex-wrap:wrap}.nav-toggle{display:block}.topbar-menu{display:none;grid-template-columns:1fr;width:100%}.topbar-menu.open{display:grid}.nav-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem}.nav-item{text-align:left;border:1px solid var(--border);background:#fff}.account{border-top:1px solid var(--border);padding-top:.75rem}.list-filter-bar{grid-template-columns:1fr 1fr}.filter-count{justify-self:start}.entity-actions{flex-wrap:wrap}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.responsive-table,.responsive-table tbody,.responsive-table tr,.responsive-table td{display:block;width:100%}.responsive-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.responsive-table tbody{display:grid;gap:.7rem}.responsive-table tr{padding:.2rem .8rem;border:1px solid var(--border);border-radius:12px}.responsive-table td{display:grid;grid-template-columns:minmax(7rem,38%) minmax(0,1fr);gap:.6rem;padding:.6rem 0}.responsive-table td::before{content:attr(data-label);font-size:.68rem;color:var(--muted);font-weight:800;text-transform:uppercase}.responsive-table .entity-actions{min-width:0}}
+    @media(max-width:600px){.stats-grid{grid-template-columns:1fr 1fr;gap:.65rem}.hero{padding:1.2rem}.card{padding:.9rem}.card-header{align-items:flex-start;flex-wrap:wrap}.header-actions{width:100%;flex-wrap:wrap}.header-actions .btn{flex:1 1 100%}.list-filter-bar{grid-template-columns:1fr}.list-filter-bar .btn{width:100%}.entity-actions{display:grid;grid-template-columns:1fr;width:100%}.entity-actions .btn{width:100%}.management-meta-grid{grid-template-columns:1fr}.footer{flex-direction:column}.demo-note{align-items:flex-start;flex-direction:column}}
+    @media(max-width:390px){.stats-grid{grid-template-columns:1fr}.nav-links{grid-template-columns:1fr}.responsive-table td{grid-template-columns:1fr;gap:.15rem}}
   </style>
 </head>
-<body class="static-preview">
-  <div class="demo-notice">Portfolio MVP v1.0 · Read-only-Demo · Die vollständige Flask-/SQLite-Anwendung läuft lokal und ist auf <a href="https://github.com/sandroabashishvili/education-center-crm" target="_blank" rel="noopener noreferrer">GitHub dokumentiert ↗</a>.</div>
-  <div class="container">
-
-<header class="topbar">
-  <a href="./" class="brand" aria-label="Zum Dashboard">
-    <span class="brand-badge">🎓</span>
-    <span>
-      <span class="brand-title">Education Center CRM</span>
-      <span class="brand-subtitle">Verwaltungssystem</span>
-    </span>
-  </a>
-  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" data-nav-toggle>
-    <span aria-hidden="true">☰</span>
-    <span class="sr-only">Navigation öffnen</span>
-  </button>
-  <div class="topbar-menu" id="primary-navigation" data-mobile-nav>
-    <nav class="nav-links" aria-label="Hauptnavigation">
-      <a href="./" class="nav-item active">📊 Dashboard</a>
-      <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">👥 Schüler</a>
-      <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">📚 Kurse</a>
-      <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">🏫 Gruppen</a>
-      <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">📅 Unterricht</a>
-      <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">💰 Zahlungen</a>
-      <a href="#" aria-disabled="true" onclick="return false" class="nav-item ">👨‍🏫 Lehrkräfte</a>
-    </nav>
-    <div class="auth-box">
-      <span class="user-chip"><strong>Read-only Demo</strong><small>Portfolio v1.0</small></span>
-    </div>
-  </div>
-</header>
-
-
-
-
-
-    <div class="hero">
-      <h1>Guten Tag, Administrator!</h1>
-      <p>Schüler, Gruppen, Anwesenheit und Zahlungen in einem zentralen Arbeitsbereich.</p>
-    </div>
-
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div>
-          <div class="stat-val">3</div>
-          <div class="stat-lbl">Aktive Schüler</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📚</div>
-        <div>
-          <div class="stat-val">3</div>
-          <div class="stat-lbl">Kurse</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🏫</div>
-        <div>
-          <div class="stat-val">1</div>
-          <div class="stat-lbl">Aktive Gruppen</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">👨‍🏫</div>
-        <div>
-          <div class="stat-val">3</div>
-          <div class="stat-lbl">Aktive Lehrkräfte</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🎓</div>
-        <div>
-          <div class="stat-val">3</div>
-          <div class="stat-lbl">Aktive Einschreibungen</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📅</div>
-        <div>
-          <div class="stat-val">1</div>
-          <div class="stat-lbl">Heutiger Unterricht</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🗓️</div>
-        <div>
-          <div class="stat-val">1</div>
-          <div class="stat-lbl">Unterricht in 7 Tagen</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⚠️</div>
-        <div>
-          <div class="stat-val" style="color: #dc2626;">1</div>
-          <div class="stat-lbl">Überfällige Rechnungen</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">💰</div>
-        <div>
-          <div class="stat-val">€500.00</div>
-          <div class="stat-lbl">Einnahmen im aktuellen Monat</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🧾</div>
-        <div>
-          <div class="stat-val" style="color: #b45309;">€550.00</div>
-          <div class="stat-lbl">Offener Rechnungsbetrag</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📈</div>
-        <div>
-          <div class="stat-val">47.6%</div>
-          <div class="stat-lbl">Zahlungseingangsquote</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📊</div>
-        <div>
-          <div class="stat-val">100.0%</div>
-          <div class="stat-lbl">Anwesenheitsquote</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="dashboard-sections">
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">👥 Zuletzt hinzugefügte Schüler</h3><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Alle anzeigen</a></div>
-        <table><thead><tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Gruppen</th><th>Status</th><th>Hinzugefügt</th><th>Aktion</th></tr></thead><tbody>
-          <tr><td>#3</td><td><strong>Noah Fischer</strong></td><td>noah.fischer@example.de</td><td>+49 155 66778899</td><td><span class="badge badge-info">1</span></td><td><span class="badge badge-success">Aktiv</span></td><td>09.08.2026</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Profil</a></td></tr>
-          <tr><td>#2</td><td><strong>Lea Hoffmann</strong></td><td>lea.hoffmann@example.de</td><td>+49 152 33445566</td><td><span class="badge badge-info">1</span></td><td><span class="badge badge-success">Aktiv</span></td><td>09.08.2026</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Profil</a></td></tr>
-          <tr><td>#1</td><td><strong>Jonas Becker</strong></td><td>jonas.becker@example.de</td><td>+49 151 11223344</td><td><span class="badge badge-info">1</span></td><td><span class="badge badge-success">Aktiv</span></td><td>09.08.2026</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Profil</a></td></tr>
-        </tbody></table>
-      </div>
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">💰 Letzte Zahlungen</h3><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Alle Zahlungen</a></div>
-        <table><thead><tr><th>Schüler</th><th>Rechnung</th><th>Bezahlt</th><th>Offen</th><th>Status</th><th>Fällig am</th><th>Zahlungsart</th><th>Aktion</th></tr></thead><tbody>
-          <tr><td><strong>Noah Fischer</strong></td><td>€350.00</td><td>€0.00</td><td>€350.00</td><td><span class="badge badge-danger">Überfällig</span></td><td>02.08.2026</td><td>Bar</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Öffnen</a></td></tr>
-          <tr><td><strong>Lea Hoffmann</strong></td><td>€350.00</td><td>€150.00</td><td>€200.00</td><td><span class="badge badge-info">Teilbezahlt</span></td><td>09.08.2026</td><td>Bar</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Öffnen</a></td></tr>
-          <tr><td><strong>Jonas Becker</strong></td><td>€350.00</td><td>€350.00</td><td>€0.00</td><td><span class="badge badge-success">Bezahlt</span></td><td>09.08.2026</td><td>Bar</td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Öffnen</a></td></tr>
-        </tbody></table>
-      </div>
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">🗓️ Kommende Unterrichtstermine</h3><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Unterrichtsplan öffnen</a></div>
-        <table><thead><tr><th>Beginn</th><th>Gruppe</th><th>Lehrkraft</th><th>Raum</th><th>Thema</th><th>Status</th><th>Aktion</th></tr></thead><tbody>
-          <tr><td>09.08.2026, 17:31</td><td><strong>Python 2026 - Abendkurs</strong></td><td>Daniel Weber</td><td><span class="badge badge-neutral">Raum 101</span></td><td>Flask-Grundlagen</td><td><span class="badge badge-info">Geplant</span></td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Termin öffnen</a></td></tr>
-        </tbody></table>
-      </div>
-      <div class="card">
-        <div class="card-header"><h3 class="card-title">🏫 Gruppenauslastung</h3><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Alle Gruppen</a></div>
-        <table>
-          <thead><tr><th>Gruppe</th><th>Kurs</th><th>Belegt</th><th>Kapazität</th><th>Freie Plätze</th><th>Auslastung</th><th>Status</th><th>Aktion</th></tr></thead>
-          <tbody><tr><td><strong>Python 2026 - Abendkurs</strong></td><td>Python &amp; Webentwicklung</td><td>3</td><td>15</td><td>12</td><td><span class="badge badge-info">20.0%</span></td><td><span class="badge badge-success">Aktiv</span></td><td><a href="#" aria-disabled="true" onclick="return false" class="btn btn-sm btn-outline">Gruppe öffnen</a></td></tr></tbody>
-        </table>
-      </div>
-    </div>
-
-    <footer class="creator-footer">
-      <p>Education Center CRM · Flask, SQLite und serverseitig gerenderte Oberfläche</p>
-      <nav class="creator-links" aria-label="Projektlinks">
-        <a href="https://sandro-abashishvili.de/" target="_blank" rel="noopener noreferrer">Portfolio ↗</a>
-        <a href="https://github.com/sandroabashishvili/education-center-crm" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-        <a href="https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+<body>
+<div class="container">
+  <header class="topbar">
+    <button class="brand" data-view-link="dashboard" aria-label="Dashboard öffnen"><span class="brand-badge">🎓</span><span><span class="brand-title">Education Center CRM</span><span class="brand-subtitle">Verwaltungssystem</span></span></button>
+    <button class="nav-toggle" type="button" aria-label="Navigation öffnen">☰</button>
+    <div class="topbar-menu">
+      <nav class="nav-links" aria-label="Hauptnavigation">
+        <button class="nav-item active" data-view-link="dashboard">📊 Dashboard</button><button class="nav-item" data-view-link="students">👥 Schüler</button><button class="nav-item" data-view-link="teachers">👨‍🏫 Lehrkräfte</button><button class="nav-item" data-view-link="courses">📚 Kurse</button><button class="nav-item" data-view-link="groups">🏫 Gruppen</button><button class="nav-item" data-view-link="lessons">📅 Unterricht</button><button class="nav-item" data-view-link="payments">💰 Zahlungen</button>
       </nav>
-    </footer>
-  </div>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll("table").forEach((table) => {
-        const labels = Array.from(table.querySelectorAll("thead th"), (cell) => cell.textContent.trim());
-        if (!labels.length) return;
-        table.classList.add("responsive-table");
-        table.querySelectorAll("tbody tr").forEach((row) => {
-          Array.from(row.children)
-            .filter((cell) => cell.tagName === "TD")
-            .forEach((cell, index) => {
-              if (!cell.hasAttribute("colspan")) cell.dataset.label = labels[index] || "";
-            });
-        });
-      });
-      const header = document.querySelector(".topbar");
-      const button = document.querySelector("[data-nav-toggle]");
-      const menu = document.querySelector("[data-mobile-nav]");
-      if (header && button && menu) {
-        const closeMenu = () => {
-          button.setAttribute("aria-expanded", "false");
-          button.querySelector("[aria-hidden]")?.replaceChildren("☰");
-          menu.dataset.open = "false";
-          header.dataset.menuOpen = "false";
-        };
-        button.addEventListener("click", () => {
-          const opens = button.getAttribute("aria-expanded") !== "true";
-          button.setAttribute("aria-expanded", String(opens));
-          button.querySelector("[aria-hidden]")?.replaceChildren(opens ? "✕" : "☰");
-          menu.dataset.open = String(opens);
-          header.dataset.menuOpen = String(opens);
-        });
-        menu.addEventListener("click", (event) => {
-          if (event.target.closest("a")) closeMenu();
-        });
-        document.addEventListener("keydown", (event) => {
-          if (event.key === "Escape") closeMenu();
-        });
-        window.addEventListener("resize", () => {
-          if (window.innerWidth > 900) closeMenu();
-        });
-      }
-    });
-  </script>
-  <script src="assets/analytics-consent.js" defer></script>
+      <div class="account"><span class="avatar">👤</span><span class="user-chip"><strong>Demo Administrator</strong><small>Administrator · nur Vorschau</small></span></div>
+    </div>
+  </header>
+
+  <div class="demo-note"><span><strong>Statische Portfolio-Demo:</strong> Navigation, Suche und Filter sind interaktiv. Schreibaktionen sind absichtlich deaktiviert; die vollständige Flask-/SQLite-Anwendung läuft lokal.</span><a class="btn btn-sm btn-outline" href="https://github.com/sandroabashishvili/education-center-crm" target="_blank" rel="noopener">GitHub ↗</a></div>
+
+  <main>
+    <section class="view active" data-view="dashboard">
+      <div class="hero"><h1>Guten Tag, Administrator!</h1><p>Schüler, Gruppen, Anwesenheit und Zahlungen in einem zentralen Arbeitsbereich.</p></div>
+      <div class="stats-grid">
+        <div class="stat-card"><span class="stat-icon">👥</span><div><div class="stat-val">24</div><div class="stat-lbl">Aktive Schüler</div></div></div>
+        <div class="stat-card"><span class="stat-icon">📚</span><div><div class="stat-val">6</div><div class="stat-lbl">Kurse</div></div></div>
+        <div class="stat-card"><span class="stat-icon">🏫</span><div><div class="stat-val">5</div><div class="stat-lbl">Aktive Gruppen</div></div></div>
+        <div class="stat-card"><span class="stat-icon">👨‍🏫</span><div><div class="stat-val">4</div><div class="stat-lbl">Aktive Lehrkräfte</div></div></div>
+        <div class="stat-card"><span class="stat-icon">📅</span><div><div class="stat-val">3</div><div class="stat-lbl">Heutiger Unterricht</div></div></div>
+        <div class="stat-card"><span class="stat-icon">⚠️</span><div><div class="stat-val">2</div><div class="stat-lbl">Überfällige Rechnungen</div></div></div>
+        <div class="stat-card"><span class="stat-icon">💰</span><div><div class="stat-val">€4.850</div><div class="stat-lbl">Monatseinnahmen</div></div></div>
+        <div class="stat-card"><span class="stat-icon">📊</span><div><div class="stat-val">92%</div><div class="stat-lbl">Anwesenheitsquote</div></div></div>
+      </div>
+      <div class="card"><div class="card-header"><h2 class="card-title">🗓️ Kommende Unterrichtstermine</h2><button class="btn btn-sm btn-outline" data-view-link="lessons">Unterrichtsplan öffnen</button></div><div class="table-wrap"><table class="responsive-table"><thead><tr><th>Beginn</th><th>Gruppe</th><th>Lehrkraft</th><th>Raum</th><th>Status</th></tr></thead><tbody><tr><td data-label="Beginn">14.09.2026, 09:00</td><td data-label="Gruppe"><strong>Python A1</strong></td><td data-label="Lehrkraft">Daniel Weber</td><td data-label="Raum">Raum 101</td><td data-label="Status"><span class="badge badge-info">Geplant</span></td></tr><tr><td data-label="Beginn">14.09.2026, 17:30</td><td data-label="Gruppe"><strong>Deutsch B2</strong></td><td data-label="Lehrkraft">Anna Keller</td><td data-label="Raum">Raum 204</td><td data-label="Status"><span class="badge badge-info">Geplant</span></td></tr></tbody></table></div></div>
+    </section>
+
+    <section class="view" data-view="students">
+      <div class="card"><div class="card-header"><div><h1 class="card-title">👥 Schülerverwaltung</h1><p class="page-subtitle">Kontaktdaten, Status und Gruppenzuordnungen verwalten.</p></div><div class="header-actions"><button class="btn btn-outline" disabled>CSV exportieren</button><button class="btn" disabled>+ Neuer Schüler</button></div></div>
+        <div class="list-filter-bar" data-filter><input class="form-control" type="search" placeholder="Nach Name, E-Mail, Telefon oder Kontaktperson suchen..." data-search><select class="form-control" data-status><option value="all">Alle Status</option><option value="active">Aktiv</option><option value="inactive">Inaktiv</option></select><button class="btn btn-secondary" type="button" data-reset>Zurücksetzen</button><span class="filter-count" data-count></span></div>
+        <div class="table-wrap"><table class="responsive-table" data-table><thead><tr><th>ID</th><th>Name</th><th>E-Mail</th><th>Telefon</th><th>Status</th><th>Aktionen</th></tr></thead><tbody><tr data-row data-status-value="active" data-search-value="Lena Hoffmann lena@example.de +49151111"><td data-label="ID">#3</td><td data-label="Name"><strong>Lena Hoffmann</strong></td><td data-label="E-Mail">lena@example.de</td><td data-label="Telefon">+49 151 111</td><td data-label="Status"><span class="badge badge-success">Aktiv</span></td><td data-label="Aktionen"><div class="entity-actions"><button class="btn btn-sm btn-outline" disabled>Öffnen</button><button class="btn btn-sm btn-edit" disabled>Bearbeiten</button><button class="btn btn-sm btn-danger" disabled>Löschen</button></div></td></tr><tr data-row data-status-value="inactive" data-search-value="Max Bauer max@example.de +49152222"><td data-label="ID">#2</td><td data-label="Name"><strong>Max Bauer</strong></td><td data-label="E-Mail">max@example.de</td><td data-label="Telefon">+49 152 222</td><td data-label="Status"><span class="badge badge-info">Inaktiv</span></td><td data-label="Aktionen"><div class="entity-actions"><button class="btn btn-sm btn-outline" disabled>Öffnen</button><button class="btn btn-sm btn-edit" disabled>Bearbeiten</button><button class="btn btn-sm btn-danger" disabled>Löschen</button></div></td></tr></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="view" data-view="teachers"><div class="card"><div class="card-header"><div><h1 class="card-title">👨‍🏫 Verzeichnis der Lehrkräfte</h1><p class="page-subtitle">Kontaktdaten, Fachgebiete und Gruppenzuordnungen verwalten.</p></div><button class="btn" disabled>+ Neue Lehrkraft</button></div><div class="management-meta-grid"><div class="management-meta-item"><span>Aktive Lehrkräfte</span><strong>4</strong></div><div class="management-meta-item"><span>Fachgebiete</span><strong>Python · Deutsch · Mathematik</strong></div><div class="management-meta-item"><span>Gruppenzuordnungen</span><strong>5 aktiv</strong></div><div class="management-meta-item"><span>Rollenmodell</span><strong>Admin / Manager / Lehrkraft</strong></div></div><div class="table-wrap"><table class="responsive-table"><thead><tr><th>Name</th><th>E-Mail</th><th>Fachgebiet</th><th>Status</th><th>Aktionen</th></tr></thead><tbody><tr><td data-label="Name"><strong>Daniel Weber</strong></td><td data-label="E-Mail">teacher@bildungszentrum.de</td><td data-label="Fachgebiet">Python</td><td data-label="Status"><span class="badge badge-success">Aktiv</span></td><td data-label="Aktionen"><div class="entity-actions"><button class="btn btn-sm btn-outline" disabled>Öffnen</button><button class="btn btn-sm btn-edit" disabled>Bearbeiten</button><button class="btn btn-sm btn-danger" disabled>Löschen</button></div></td></tr></tbody></table></div></div></section>
+
+    <section class="view" data-view="courses"><div class="card"><div class="card-header"><div><h1 class="card-title">📚 Kurskatalog</h1><p class="page-subtitle">Kurse, Gebühren und zugehörige Gruppen verwalten.</p></div><button class="btn" disabled>+ Neuer Kurs</button></div><div class="list-filter-bar" data-filter><input class="form-control" type="search" placeholder="Nach Kurs, Kategorie oder Beschreibung suchen..." data-search><select class="form-control" data-status><option value="all">Alle Status</option><option value="active">Aktiv</option><option value="inactive">Inaktiv</option></select><button class="btn btn-secondary" type="button" data-reset>Zurücksetzen</button><span class="filter-count" data-count></span></div><div class="table-wrap"><table class="responsive-table" data-table><thead><tr><th>Kurs</th><th>Kategorie</th><th>Gebühr</th><th>Status</th><th>Aktionen</th></tr></thead><tbody><tr data-row data-status-value="active" data-search-value="Python Grundlagen Programmierung"><td data-label="Kurs"><strong>Python Grundlagen</strong></td><td data-label="Kategorie">Programmierung</td><td data-label="Gebühr">€300.00</td><td data-label="Status"><span class="badge badge-success">Aktiv</span></td><td data-label="Aktionen"><div class="entity-actions"><button class="btn btn-sm btn-outline" disabled>Öffnen</button><button class="btn btn-sm btn-edit" disabled>Bearbeiten</button><button class="btn btn-sm btn-danger" disabled>Löschen</button></div></td></tr></tbody></table></div></div></section>
+
+    <section class="view" data-view="groups"><div class="card"><div class="card-header"><div><h1 class="card-title">🏫 Lerngruppen</h1><p class="page-subtitle">Gruppen, Kurse, Lehrkräfte und Kapazitäten verwalten.</p></div><button class="btn" disabled>+ Neue Gruppe</button></div><div class="list-filter-bar" data-filter><input class="form-control" type="search" placeholder="Nach Gruppe, Kurs, Lehrkraft oder Zeitplan suchen..." data-search><select class="form-control" data-status><option value="all">Alle Status</option><option value="active">Aktiv</option><option value="planned">Geplant</option></select><button class="btn btn-secondary" type="button" data-reset>Zurücksetzen</button><span class="filter-count" data-count></span></div><div class="table-wrap"><table class="responsive-table" data-table><thead><tr><th>Gruppe</th><th>Kurs</th><th>Lehrkraft</th><th>Belegung</th><th>Status</th><th>Aktionen</th></tr></thead><tbody><tr data-row data-status-value="active" data-search-value="Python Abendgruppe Python Grundlagen Daniel Weber Montag Mittwoch"><td data-label="Gruppe"><strong>Python Abendgruppe</strong></td><td data-label="Kurs">Python Grundlagen</td><td data-label="Lehrkraft">Daniel Weber</td><td data-label="Belegung"><span class="badge badge-info">12 / 18</span></td><td data-label="Status"><span class="badge badge-success">Aktiv</span></td><td data-label="Aktionen"><div class="entity-actions"><button class="btn btn-sm btn-outline" disabled>Öffnen</button><button class="btn btn-sm btn-edit" disabled>Bearbeiten</button><button class="btn btn-sm btn-danger" disabled>Löschen</button></div></td></tr></tbody></table></div></div></section>
+
+    <section class="view" data-view="lessons"><div class="card"><div class="card-header"><div><h1 class="card-title">📅 Unterrichtsplan und Anwesenheit</h1><p class="page-subtitle">Termine, Räume, Themen und Anwesenheit organisieren.</p></div><button class="btn" disabled>+ Unterricht planen</button></div><div class="list-filter-bar" data-filter><input class="form-control" type="search" placeholder="Nach Gruppe, Lehrkraft, Raum oder Thema suchen..." data-search><select class="form-control" data-status><option value="all">Alle Status</option><option value="scheduled">Geplant</option><option value="completed">Abgeschlossen</option></select><button class="btn btn-secondary" type="button" data-reset>Zurücksetzen</button><span class="filter-count" data-count></span></div><div class="table-wrap"><table class="responsive-table" data-table><thead><tr><th>Gruppe</th><th>Lehrkraft</th><th>Beginn</th><th>Raum</th><th>Thema</th><th>Status</th><th>Aktion</th></tr></thead><tbody><tr data-row data-status-value="scheduled" data-search-value="Python Abendgruppe Daniel Weber Raum 101 Funktionen Schleifen"><td data-label="Gruppe"><strong>Python Abendgruppe</strong></td><td data-label="Lehrkraft">Daniel Weber</td><td data-label="Beginn">14.09.2026, 17:30</td><td data-label="Raum">Raum 101</td><td data-label="Thema">Funktionen und Schleifen</td><td data-label="Status"><span class="badge badge-info">Geplant</span></td><td data-label="Aktion"><button class="btn btn-sm btn-outline" disabled>Anwesenheit</button></td></tr></tbody></table></div></div></section>
+
+    <section class="view" data-view="payments"><div class="card"><div class="card-header"><div><h1 class="card-title">💰 Zahlungen und Rechnungen</h1><p class="page-subtitle">Rechnungen, offene Beträge und Zahlungseingänge verwalten.</p></div><div class="header-actions"><button class="btn btn-outline" disabled>CSV exportieren</button><button class="btn" disabled>+ Neue Rechnung</button></div></div><div class="list-filter-bar" data-filter><input class="form-control" type="search" placeholder="Nach Schüler, Gruppe, Zahlungsart oder Notiz suchen..." data-search><select class="form-control" data-status><option value="all">Alle Status</option><option value="paid">Bezahlt</option><option value="partial">Teilbezahlt</option><option value="pending">Offen</option><option value="overdue">Überfällig</option></select><button class="btn btn-secondary" type="button" data-reset>Zurücksetzen</button><span class="filter-count" data-count></span></div><div class="table-wrap"><table class="responsive-table" data-table><thead><tr><th>Schüler</th><th>Gruppe</th><th>Fällig</th><th>Bezahlt</th><th>Termin</th><th>Status</th><th>Aktionen</th></tr></thead><tbody><tr data-row data-status-value="partial" data-search-value="Lena Hoffmann Python Abendgruppe Überweisung September"><td data-label="Schüler"><strong>Lena Hoffmann</strong></td><td data-label="Gruppe">Python Abendgruppe</td><td data-label="Fällig">€300.00</td><td data-label="Bezahlt">€150.00</td><td data-label="Termin">30.09.2026</td><td data-label="Status"><span class="badge badge-info">Teilbezahlt</span></td><td data-label="Aktionen"><div class="entity-actions"><button class="btn btn-sm btn-outline" disabled>Öffnen</button><button class="btn btn-sm btn-edit" disabled>Bearbeiten</button><button class="btn btn-sm btn-danger" disabled>Löschen</button><button class="btn btn-sm btn-payment" disabled>Zahlung</button></div></td></tr><tr data-row data-status-value="overdue" data-search-value="Max Bauer Deutsch B2 Bar August"><td data-label="Schüler"><strong>Max Bauer</strong></td><td data-label="Gruppe">Deutsch B2</td><td data-label="Fällig">€280.00</td><td data-label="Bezahlt">€0.00</td><td data-label="Termin">31.08.2026</td><td data-label="Status"><span class="badge badge-danger">Überfällig</span></td><td data-label="Aktionen"><div class="entity-actions"><button class="btn btn-sm btn-outline" disabled>Öffnen</button><button class="btn btn-sm btn-edit" disabled>Bearbeiten</button><button class="btn btn-sm btn-danger" disabled>Löschen</button><button class="btn btn-sm btn-payment" disabled>Zahlung</button></div></td></tr></tbody></table></div></div></section>
+  </main>
+
+  <footer class="footer"><span>Education Center CRM · Flask · SQLite · Jinja · Responsive UI</span><span><a href="https://sandro-abashishvili.de/">Portfolio ↗</a> · <a href="https://github.com/sandroabashishvili/education-center-crm">GitHub ↗</a></span></footer>
+</div>
+<script>
+  const menu=document.querySelector('.topbar-menu');document.querySelector('.nav-toggle').addEventListener('click',()=>menu.classList.toggle('open'));
+  document.querySelectorAll('[data-view-link]').forEach(el=>el.addEventListener('click',()=>{const name=el.dataset.viewLink;document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.dataset.view===name));document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.viewLink===name));if(innerWidth<=900)menu.classList.remove('open');scrollTo({top:0,behavior:'smooth'});}));
+  document.querySelectorAll('[data-filter]').forEach(filter=>{const search=filter.querySelector('[data-search]'),status=filter.querySelector('[data-status]'),reset=filter.querySelector('[data-reset]'),count=filter.querySelector('[data-count]'),table=filter.parentElement.querySelector('[data-table]'),rows=[...table.querySelectorAll('[data-row]')];const apply=()=>{const q=(search.value||'').trim().toLowerCase(),s=status.value;let visible=0;rows.forEach(r=>{const okQ=!q||(r.dataset.searchValue||'').toLowerCase().includes(q);const okS=s==='all'||r.dataset.statusValue===s;r.hidden=!(okQ&&okS);if(!r.hidden)visible++});count.textContent=`${visible} Treffer`;};search.addEventListener('input',apply);status.addEventListener('change',apply);reset.addEventListener('click',()=>{search.value='';status.value='all';apply()});apply();});
+</script>
 </body>
 </html>
