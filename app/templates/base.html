@@ -1,98 +1,34 @@
 <!doctype html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Education Center CRM{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234f46e5'/%3E%3Ctext x='50' y='58' font-size='52' text-anchor='middle' fill='white' font-family='Arial,sans-serif'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/management.css') }}">
 </head>
-<body>
-  <div class="container">
-
+<body><div class="container">
 <header class="topbar">
-  <a href="{{ url_for('index') }}" class="brand" aria-label="Zum Dashboard">
-    <span class="brand-badge">🎓</span>
-    <span>
-      <span class="brand-title">Education Center CRM</span>
-      <span class="brand-subtitle">Verwaltungssystem</span>
-    </span>
-  </a>
+  <a href="{{ url_for('index') }}" class="brand" aria-label="Zum Dashboard"><span class="brand-badge">🎓</span><span><span class="brand-title">Education Center CRM</span><span class="brand-subtitle">Verwaltungssystem</span></span></a>
   {% if session.get('logged_in') %}
-  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" data-nav-toggle>
-    <span aria-hidden="true">☰</span>
-    <span class="sr-only">Navigation öffnen</span>
-  </button>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" data-nav-toggle><span aria-hidden="true">☰</span><span class="sr-only">Navigation öffnen</span></button>
   <div class="topbar-menu" id="primary-navigation" data-mobile-nav>
     <nav class="nav-links" aria-label="Hauptnavigation">
       <a href="{{ url_for('index') }}" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}"><span class="nav-icon">📊</span><span>Dashboard</span></a>
       {% if session.get('user_role') in ['admin', 'manager'] %}
       <a href="{{ url_for('students_page') }}" class="nav-item {% if active_page == 'students' %}active{% endif %}"><span class="nav-icon">👥</span><span>Schüler</span></a>
-      <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}"><span class="nav-icon">📚</span><span>Kurse</span></a>
-      {% endif %}
+      <a href="{{ url_for('courses_page') }}" class="nav-item {% if active_page == 'courses' %}active{% endif %}"><span class="nav-icon">📚</span><span>Kurse</span></a>{% endif %}
       <a href="{{ url_for('groups_page') }}" class="nav-item {% if active_page == 'groups' %}active{% endif %}"><span class="nav-icon">🏫</span><span>Gruppen</span></a>
       <a href="{{ url_for('lessons_page') }}" class="nav-item {% if active_page == 'lessons' %}active{% endif %}"><span class="nav-icon">📅</span><span>Unterricht</span></a>
-      {% if session.get('user_role') in ['admin', 'manager'] %}
-      <a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}"><span class="nav-icon">💰</span><span>Zahlungen</span></a>
-      <a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}"><span class="nav-icon">👨‍🏫</span><span>Lehrkräfte</span></a>
-      {% endif %}
+      {% if session.get('user_role') in ['admin', 'manager'] %}<a href="{{ url_for('payments_page') }}" class="nav-item {% if active_page == 'payments' %}active{% endif %}"><span class="nav-icon">💰</span><span>Zahlungen</span></a><a href="{{ url_for('teachers_page') }}" class="nav-item {% if active_page == 'teachers' %}active{% endif %}"><span class="nav-icon">👨‍🏫</span><span>Lehrkräfte</span></a>{% endif %}
     </nav>
-
-    <details class="account-menu">
-      <summary class="account-trigger" aria-label="Benutzermenü öffnen">
-        <span class="user-avatar">
-          {% if current_user and current_user['avatar_filename'] %}
-          <img src="{{ url_for('static', filename='uploads/avatars/' ~ current_user['avatar_filename']) }}" alt="">
-          {% else %}
-          <span aria-hidden="true">👤</span>
-          {% endif %}
-        </span>
-        <span class="user-chip">
-          <strong>{{ current_user['full_name'] if current_user else session.get('user_name') }}</strong>
-          <small>{{ role_labels.get(current_user['role'], current_user['role']) if current_user else session.get('user_role') }}</small>
-        </span>
-        <span class="account-chevron" aria-hidden="true">⌄</span>
-      </summary>
-      <div class="account-dropdown">
-        <div class="account-dropdown-heading">
-          <strong>{{ current_user['full_name'] if current_user else session.get('user_name') }}</strong>
-          {% if current_user %}<span>{{ current_user['email'] }}</span>{% endif %}
-        </div>
-        <a href="{{ url_for('profile_settings') }}" class="account-link"><span aria-hidden="true">👤</span><span>Mein Profil</span></a>
-        <a href="{{ url_for('profile_settings') }}#security" class="account-link"><span aria-hidden="true">🔒</span><span>Sicherheit</span></a>
-        <form action="{{ url_for('logout') }}" method="POST" class="account-logout-form">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="account-link account-logout"><span aria-hidden="true">↪</span><span>Abmelden</span></button>
-        </form>
-      </div>
+    <details class="account-menu"><summary class="account-trigger" aria-label="Benutzermenü öffnen"><span class="user-avatar">{% if current_user and current_user['avatar_filename'] %}<img src="{{ url_for('static', filename='uploads/avatars/' ~ current_user['avatar_filename']) }}" alt="">{% else %}<span aria-hidden="true">👤</span>{% endif %}</span><span class="user-chip"><strong>{{ current_user['full_name'] if current_user else session.get('user_name') }}</strong><small>{{ role_labels.get(current_user['role'], current_user['role']) if current_user else session.get('user_role') }}</small></span><span class="account-chevron" aria-hidden="true">⌄</span></summary>
+      <div class="account-dropdown"><div class="account-dropdown-heading"><strong>{{ current_user['full_name'] if current_user else session.get('user_name') }}</strong>{% if current_user %}<span>{{ current_user['email'] }}</span>{% endif %}</div><a href="{{ url_for('profile_settings') }}" class="account-link"><span aria-hidden="true">👤</span><span>Mein Profil</span></a><form action="{{ url_for('logout') }}" method="POST" class="account-logout-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="account-link account-logout"><span aria-hidden="true">↪</span><span>Abmelden</span></button></form></div>
     </details>
-  </div>
-  {% endif %}
+  </div>{% endif %}
 </header>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-      <div class="flash-stack" role="status" aria-live="polite">
-        {% for category, message in messages %}
-        <div class="flash flash-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      </div>
-      {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
-
-    <footer class="creator-footer">
-      <p>Education Center CRM · Flask, SQLite und serverseitig gerenderte Oberfläche</p>
-      <nav class="creator-links" aria-label="Projektlinks">
-        <a href="https://sandro-abashishvili.de/" target="_blank" rel="noopener noreferrer">Portfolio ↗</a>
-        <a href="https://github.com/sandroabashishvili/education-center-crm" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-        <a href="https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
-      </nav>
-    </footer>
-  </div>
-  <script src="{{ url_for('static', filename='js/responsive-tables.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/mobile-navigation.js') }}" defer></script>
-</body>
-</html>
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-stack" role="status" aria-live="polite">{% for category, message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+{% block content %}{% endblock %}
+<footer class="creator-footer"><p>Education Center CRM · Flask, SQLite und serverseitig gerenderte Oberfläche</p><nav class="creator-links" aria-label="Projektlinks"><a href="https://sandro-abashishvili.de/" target="_blank" rel="noopener noreferrer">Portfolio ↗</a><a href="https://github.com/sandroabashishvili/education-center-crm" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></nav></footer>
+</div><script src="{{ url_for('static', filename='js/responsive-tables.js') }}" defer></script><script src="{{ url_for('static', filename='js/mobile-navigation.js') }}" defer></script></body></html>
