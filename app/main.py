@@ -6,6 +6,7 @@ from flask import Flask, render_template
 from flask_wtf.csrf import CSRFError, CSRFProtect
 
 import database
+from profile_routes import register_profile_routes
 from routes import register_routes
 
 
@@ -65,6 +66,7 @@ app = Flask(__name__)
 app.config.update(
     DB_PATH=Path(os.environ.get("CRM_DB_PATH", DEFAULT_DB_PATH)),
     SECRET_KEY=os.environ.get("CRM_SECRET_KEY", "local-demo-only-change-me"),
+    MAX_CONTENT_LENGTH=4 * 1024 * 1024,
 )
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
@@ -99,6 +101,7 @@ DB_PATH = app.config["DB_PATH"]
 database.DB_PATH = DB_PATH
 database.init_db(DB_PATH)
 register_routes(app)
+register_profile_routes(app)
 
 
 if __name__ == "__main__":
