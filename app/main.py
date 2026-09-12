@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from flask import Flask, render_template
+from flask import Flask, redirect, render_template, url_for
 from flask_wtf.csrf import CSRFError, CSRFProtect
 
 import database
@@ -56,6 +56,11 @@ csrf = CSRFProtect(app)
 app.jinja_env.filters["status_de"] = status_de
 app.jinja_env.filters["date_de"] = date_de
 app.jinja_env.filters["datetime_de"] = datetime_de
+
+
+@app.route("/favicon.ico")
+def favicon_ico():
+    return redirect(url_for("static", filename="favicon.svg"), code=302)
 
 
 @app.errorhandler(CSRFError)
