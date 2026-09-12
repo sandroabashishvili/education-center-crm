@@ -1,4 +1,6 @@
 /* Refined application header and primary navigation. */
+:root { color-scheme: light; }
+
 .topbar {
   flex-wrap: nowrap;
   gap: 0.8rem;
@@ -33,9 +35,9 @@
 }
 
 .topbar-menu {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   flex: 1 1 auto;
   gap: 0.7rem;
   min-width: 0;
@@ -44,10 +46,11 @@
 .nav-links {
   display: flex;
   align-items: center;
-  flex: 1 1 auto;
+  justify-content: space-evenly;
+  width: 100%;
+  min-width: 0;
   flex-wrap: nowrap;
   gap: 0.16rem;
-  min-width: 0;
 }
 
 .nav-item {
@@ -137,68 +140,29 @@
   white-space: nowrap;
 }
 
-.nav-toggle {
-  flex: 0 0 auto;
+.nav-toggle { flex: 0 0 auto; }
+
+/* Keep table hover states readable and subtle. */
+table tbody tr:hover {
+  background: #f1f5f9;
+  color: var(--text);
 }
+table tbody tr:hover td { color: var(--text); }
 
 @media (max-width: 1120px) and (min-width: 901px) {
-  .topbar {
-    gap: 0.55rem;
-    padding-inline: 0.7rem;
-  }
-
-  .brand {
-    gap: 0.5rem;
-  }
-
-  .brand-badge {
-    width: 36px;
-    height: 36px;
-    flex-basis: 36px;
-  }
-
-  .brand-title {
-    font-size: 0.92rem;
-  }
-
-  .brand-subtitle {
-    display: none;
-  }
-
-  .topbar-menu {
-    gap: 0.45rem;
-  }
-
-  .nav-item {
-    gap: 0.24rem;
-    padding-inline: 0.42rem;
-    font-size: 0.76rem;
-  }
-
-  .nav-icon {
-    width: 0.9rem;
-    flex-basis: 0.9rem;
-    font-size: 0.82rem;
-  }
-
-  .auth-box {
-    gap: 0.4rem;
-    padding-left: 0.5rem;
-  }
-
-  .user-avatar {
-    display: none;
-  }
-
-  .user-chip strong {
-    max-width: 6rem;
-    font-size: 0.76rem;
-  }
-
-  .auth-box .btn {
-    padding-inline: 0.5rem;
-    font-size: 0.74rem;
-  }
+  .topbar { gap: 0.55rem; padding-inline: 0.7rem; }
+  .brand { gap: 0.5rem; }
+  .brand-badge { width: 36px; height: 36px; flex-basis: 36px; }
+  .brand-title { font-size: 0.92rem; }
+  .brand-subtitle { display: none; }
+  .topbar-menu { gap: 0.45rem; }
+  .nav-links { justify-content: space-between; }
+  .nav-item { gap: 0.24rem; padding-inline: 0.42rem; font-size: 0.76rem; }
+  .nav-icon { width: 0.9rem; flex-basis: 0.9rem; font-size: 0.82rem; }
+  .auth-box { gap: 0.4rem; padding-left: 0.5rem; }
+  .user-avatar { display: none; }
+  .user-chip strong { max-width: 6rem; font-size: 0.76rem; }
+  .auth-box .btn { padding-inline: 0.5rem; font-size: 0.74rem; }
 }
 
 @media (max-width: 900px) {
@@ -208,19 +172,25 @@
     padding: 0.72rem 0.8rem;
   }
 
-  .topbar[data-menu-open="true"] {
-    flex-wrap: wrap;
-  }
+  .topbar[data-menu-open="true"] { flex-wrap: wrap; }
+  .brand-title { font-size: 0.98rem; }
 
-  .brand-title {
-    font-size: 0.98rem;
+  .topbar-menu {
+    display: none;
+    width: 100%;
+    flex: 0 0 100%;
   }
 
   .topbar-menu[data-open="true"] {
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 0.65rem;
   }
 
   .topbar-menu .nav-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
     gap: 0.35rem;
     padding-top: 0.4rem;
   }
@@ -240,45 +210,24 @@
   }
 
   .topbar-menu .auth-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
     margin-left: 0;
     padding: 0.75rem 0 0;
     border-left: 0;
     border-top: 1px solid var(--border);
   }
 
-  .user-chip {
-    text-align: left;
-  }
-
-  .user-chip strong {
-    max-width: 12rem;
-    font-size: 0.84rem;
-  }
+  .user-chip { text-align: left; }
+  .user-chip strong { max-width: 12rem; font-size: 0.84rem; }
 }
 
 @media (max-width: 430px) {
-  .brand-badge {
-    width: 36px;
-    height: 36px;
-    flex-basis: 36px;
-  }
-
-  .topbar-menu .nav-links {
-    grid-template-columns: 1fr;
-  }
-
-  .topbar-menu .auth-box {
-    align-items: stretch;
-    gap: 0.6rem;
-    flex-direction: column;
-  }
-
-  .auth-box form,
-  .auth-box .btn {
-    width: 100%;
-  }
-
-  .auth-box .btn {
-    justify-content: center;
-  }
+  .brand-badge { width: 36px; height: 36px; flex-basis: 36px; }
+  .topbar-menu .nav-links { grid-template-columns: 1fr; }
+  .topbar-menu .auth-box { align-items: stretch; gap: 0.6rem; flex-direction: column; }
+  .auth-box form, .auth-box .btn { width: 100%; }
+  .auth-box .btn { justify-content: center; }
 }
