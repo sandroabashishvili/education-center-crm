@@ -4,7 +4,7 @@ from functools import wraps
 from flask import abort, flash, redirect, render_template, request, session, url_for
 
 import database
-from utils import is_valid_email, normalize_text, parse_float
+from utils import is_valid_email, normalize_text, parse_float, parse_int
 
 
 def register_management_routes(app):
@@ -161,3 +161,74 @@ def register_management_routes(app):
         conn.close()
         flash("Lehrkraft wurde gelöscht. Zugeordnete Gruppen bleiben erhalten.", "success")
         return redirect(url_for("teachers_page"))
+
+    @app.route("/groups/<int:group_id>/edit", methods=["GET", "POST"])
+    @roles_required("admin", "manager")
+    def edit_group(group_id):
+        conn = sqlite3.connect(get_db_path())
+        group = conn.execute(
+            "SELECT id, course_id, teacher_id, name, capacity, start_date, end_date, schedule_description, status FROM groups WHERE id = ?",
+            (group_id,),
+        ).fetchone()
+        if not group:
+            conn.close()
+            abort(404)
+
+        if request.method == "POST":
+            course_id = parse_int(request.form.get("course_id"))
+            teacher_id = parse_int(request.form.get("teacher_id")) or None
+            name = normalize_text(request.form.get("name", ""))
+            capacity = parse_int(request.form.get("capacity"), 15)
+            start_date = normalize_text(request.form.get("start_date", "")) or None
+            end_date = normalize_text(request.form.get("end_date", "")) or None
+            schedule_description = normalize_text(request.form.get("schedule_description", ""))
+            status = normalize_text(request.form.get("status", "active"))
+            if not course_id or not name or not capacity or capacity < 1 or status not in {"planned", "active", "completed", "archived"}:
+                conn.close()
+                flash("Bitte prüfen Sie Kurs, Gruppenname, Kapazität und Status.", "danger")
+                return redirect(url_for("edit_group", group_id=group_id))
+            if not conn.execute("SELECT 1 FROM courses WHERE id = ?", (course_id,)).fetchone():
+                conn.close()
+                flash("Der ausgewählte Kurs existiert nicht.", "danger")
+                return redirect(url_for("edit_group", group_id=group_id))
+            if teacher_id and not conn.execute("SELECT 1 FROM teachers WHERE id = ?", (teacher_id,)).fetchone():
+                conn.close()
+                flash("Die ausgewählte Lehrkraft existiert nicht.", "danger")
+                return redirect(url_for("edit_group", group_id=group_id))
+            conn.execute(
+                """
+                UPDATE groups
+                SET course_id = ?, teacher_id = ?, name = ?, capacity = ?, start_date = ?, end_date = ?, schedule_description = ?, status = ?
+                WHERE id = ?
+                """,
+                (course_id, teacher_id, name, capacity, start_date, end_date, schedule_description, status, group_id),
+            )
+            conn.commit()
+            conn.close()
+            flash("Gruppe wurde aktualisiert.", "success")
+            return redirect(url_for("group_detail_page", group_id=group_id))
+
+        courses = conn.execute("SELECT id, title FROM courses ORDER BY title").fetchall()
+        teachers = conn.execute("SELECT id, full_name FROM teachers WHERE status = 'active' ORDER BY full_name").fetchall()
+        conn.close()
+        return render_template("groups/edit.html", group=group, courses=courses, teachers=teachers)
+
+    @app.route("/groups/<int:group_id>/delete", methods=["POST"])
+    @roles_required("admin")
+    def delete_group(group_id):
+        conn = sqlite3.connect(get_db_path())
+        if not conn.execute("SELECT 1 FROM groups WHERE id = ?", (group_id,)).fetchone():
+            conn.close()
+            abort(404)
+        conn.execute(
+            "DELETE FROM attendance WHERE lesson_id IN (SELECT id FROM lessons WHERE group_id = ?)",
+            (group_id,),
+        )
+        conn.execute("DELETE FROM lessons WHERE group_id = ?", (group_id,))
+        conn.execute("DELETE FROM group_students WHERE group_id = ?", (group_id,))
+        conn.execute("UPDATE payments SET group_id = NULL WHERE group_id = ?", (group_id,))
+        conn.execute("DELETE FROM groups WHERE id = ?", (group_id,))
+        conn.commit()
+        conn.close()
+        flash("Gruppe wurde gelöscht.", "success")
+        return redirect(url_for("groups_page"))
