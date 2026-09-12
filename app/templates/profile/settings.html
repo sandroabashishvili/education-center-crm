@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% set active_page = 'profile' %}
+{% block title %}Mein Profil · Education Center CRM{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+  <div class="profile-heading">
+    <div>
+      <p class="eyebrow">Konto & Einstellungen</p>
+      <h1>Mein Profil</h1>
+      <p>Persönliche Kontaktdaten, Profilbild und Passwort verwalten.</p>
+    </div>
+    <span class="profile-role-badge">{{ role_labels.get(user['role'], user['role']) }}</span>
+  </div>
+
+  <div class="profile-layout">
+    <aside class="profile-sidebar card">
+      <div class="profile-avatar-large">
+        {% if user['avatar_filename'] %}
+        <img src="{{ url_for('static', filename='uploads/avatars/' ~ user['avatar_filename']) }}" alt="Profilbild von {{ user['full_name'] }}">
+        {% else %}
+        <span aria-hidden="true">👤</span>
+        {% endif %}
+      </div>
+      <strong>{{ user['full_name'] }}</strong>
+      <span>{{ user['email'] }}</span>
+      <dl class="profile-meta">
+        <div><dt>Rolle</dt><dd>{{ role_labels.get(user['role'], user['role']) }}</dd></div>
+        <div><dt>Status</dt><dd>{{ user['status']|status_de }}</dd></div>
+        <div><dt>Konto seit</dt><dd>{{ user['created_at']|date_de }}</dd></div>
+      </dl>
+      {% if user['avatar_filename'] %}
+      <form action="{{ url_for('remove_profile_avatar') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-sm btn-outline profile-full-button" type="submit">Profilbild entfernen</button>
+      </form>
+      {% endif %}
+    </aside>
+
+    <div class="profile-main">
+      <section class="card profile-card">
+        <div class="card-header profile-card-header">
+          <div>
+            <h2 class="card-title">Persönliche Daten</h2>
+            <p>Diese Angaben werden für dein Benutzerkonto verwendet.</p>
+          </div>
+        </div>
+        <form action="{{ url_for('profile_settings') }}" method="POST" enctype="multipart/form-data" class="profile-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="profile-form-grid">
+            <div class="form-group profile-span-2">
+              <label for="full_name">Vor- und Nachname</label>
+              <input class="form-control" id="full_name" name="full_name" type="text" value="{{ user['full_name'] }}" autocomplete="name" required maxlength="120">
+            </div>
+            <div class="form-group">
+              <label for="email">E-Mail-Adresse</label>
+              <input class="form-control" id="email" name="email" type="email" value="{{ user['email'] }}" autocomplete="email" required maxlength="160">
+            </div>
+            <div class="form-group">
+              <label for="phone">Telefon</label>
+              <input class="form-control" id="phone" name="phone" type="tel" value="{{ user['phone'] or '' }}" autocomplete="tel" maxlength="60">
+            </div>
+            <div class="form-group profile-span-2">
+              <label for="avatar">Profilbild</label>
+              <input class="form-control profile-file-input" id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp">
+              <small>PNG, JPG oder WEBP. Maximal 4 MB.</small>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button class="btn" type="submit">Änderungen speichern</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card profile-card" id="security">
+        <div class="card-header profile-card-header">
+          <div>
+            <h2 class="card-title">Sicherheit</h2>
+            <p>Passwort nur mit dem aktuellen Passwort ändern.</p>
+          </div>
+        </div>
+        <form action="{{ url_for('profile_password') }}" method="POST" class="profile-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="profile-form-grid">
+            <div class="form-group profile-span-2">
+              <label for="current_password">Aktuelles Passwort</label>
+              <input class="form-control" id="current_password" name="current_password" type="password" autocomplete="current-password" required>
+            </div>
+            <div class="form-group">
+              <label for="new_password">Neues Passwort</label>
+              <input class="form-control" id="new_password" name="new_password" type="password" autocomplete="new-password" minlength="8" required>
+            </div>
+            <div class="form-group">
+              <label for="confirm_password">Neues Passwort bestätigen</label>
+              <input class="form-control" id="confirm_password" name="confirm_password" type="password" autocomplete="new-password" minlength="8" required>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button class="btn btn-outline" type="submit">Passwort ändern</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  </div>
+</section>
+{% endblock %}
