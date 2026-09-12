@@ -96,6 +96,14 @@
     const authBox = document.querySelector(".static-preview .topbar-menu > .auth-box");
     if (!authBox || document.querySelector(".static-preview .demo-account-menu")) return;
 
+    if (!document.querySelector("link[data-demo-account-style]")) {
+      const style = document.createElement("link");
+      style.rel = "stylesheet";
+      style.href = "assets/demo-account.css";
+      style.dataset.demoAccountStyle = "true";
+      document.head.appendChild(style);
+    }
+
     const menu = document.createElement("details");
     menu.className = "account-menu demo-account-menu";
     menu.innerHTML = `
