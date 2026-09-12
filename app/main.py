@@ -7,6 +7,7 @@ from flask_wtf.csrf import CSRFError, CSRFProtect
 
 import database
 from management_routes import register_management_routes
+from payment_routes import register_payment_routes
 from profile_routes import register_profile_routes
 from routes import register_routes
 
@@ -20,7 +21,8 @@ STATUS_LABELS_DE = {
     "cancelled": "Abgesagt", "enrolled": "Eingeschrieben", "paid": "Bezahlt",
     "partial": "Teilbezahlt", "pending": "Offen", "overdue": "Überfällig",
     "cash": "Bar", "card": "Karte", "transfer": "Überweisung",
-    "bank_transfer": "Banküberweisung", "present": "Anwesend", "absent": "Abwesend",
+    "bank_transfer": "Banküberweisung", "other": "Sonstiges",
+    "present": "Anwesend", "absent": "Abwesend",
     "late": "Verspätet", "excused": "Entschuldigt",
 }
 
@@ -78,6 +80,7 @@ database.DB_PATH = DB_PATH
 database.init_db(DB_PATH)
 register_routes(app)
 register_management_routes(app)
+register_payment_routes(app)
 register_profile_routes(app)
 
 
