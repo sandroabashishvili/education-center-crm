@@ -92,6 +92,35 @@
     banner.querySelector('[data-consent="denied"]')?.focus();
   }
 
+  function setupDemoAccountMenu() {
+    const authBox = document.querySelector(".static-preview .topbar-menu > .auth-box");
+    if (!authBox || document.querySelector(".static-preview .demo-account-menu")) return;
+
+    const menu = document.createElement("details");
+    menu.className = "account-menu demo-account-menu";
+    menu.innerHTML = `
+      <summary class="account-trigger" aria-label="Demo-Benutzermenü öffnen">
+        <span class="user-avatar"><span aria-hidden="true">👤</span></span>
+        <span class="user-chip">
+          <strong>Read-only Demo</strong>
+          <small>Portfolio v1.0</small>
+        </span>
+        <span class="account-chevron" aria-hidden="true">⌄</span>
+      </summary>
+      <div class="account-dropdown">
+        <div class="account-dropdown-heading">
+          <strong>Read-only Demo</strong>
+          <span>Statische Portfolio-Vorschau</span>
+        </div>
+        <span class="account-link demo-disabled-link"><span aria-hidden="true">👤</span><span>Mein Profil <small>nur App</small></span></span>
+        <span class="account-link demo-disabled-link"><span aria-hidden="true">🔒</span><span>Sicherheit <small>nur App</small></span></span>
+        <span class="account-link demo-disabled-link demo-logout-link"><span aria-hidden="true">↪</span><span>Abmelden <small>nur App</small></span></span>
+      </div>`;
+    authBox.replaceWith(menu);
+  }
+
+  setupDemoAccountMenu();
+
   const consent = readConsent();
   if (consent === "granted") loadAnalytics();
   if (consent !== "granted" && consent !== "denied") showBanner();
