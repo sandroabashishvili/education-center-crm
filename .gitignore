@@ -39,6 +39,11 @@ backups/
 *.db-shm
 *.db-wal
 
+# Benutzeruploads / Laufzeitdateien
+# Profilbilder werden lokal zur Laufzeit unter app/static/uploads/avatars angelegt
+# und dürfen nicht ins Repository gelangen.
+app/static/uploads/
+
 # Lokale JavaScript-Abhängigkeiten
 node_modules/
 .npm/
