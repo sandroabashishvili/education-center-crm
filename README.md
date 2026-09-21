@@ -46,7 +46,11 @@ Die Hauptnavigation folgt dem Arbeitsablauf:
 
 Damit stehen Personen zuerst, danach die Bildungsstruktur, anschließend der operative Unterricht und zum Schluss die Finanzen.
 
-## Lokal starten
+## Desktop-Prototyp
+
+Die erste lokale Desktop-Grundlage ist implementiert: eigenes Fenster, benutzerspezifischer Datenordner, leere Ersteinrichtung, Benutzerverwaltung und vollständige ZIP-Sicherung mit bestätigter Wiederherstellung. Ein freigegebener Windows-Installer ist noch nicht verfügbar. Entwicklungsstart, Teststand und verbleibende Schritte stehen in [desktop/README.md](desktop/README.md).
+
+## Lokale Web-Demo starten
 
 ```bash
 git clone https://github.com/sandroabashishvili/education-center-crm.git
@@ -76,7 +80,8 @@ Diese Zugangsdaten sind ausschließlich für die lokale Portfolio-Demo bestimmt.
 ## Tests
 
 ```bash
-python3 -m unittest discover -s tests -v
+pip install -r requirements-test.txt
+python3 -m tools.run_tests
 ```
 
 Die Tests decken unter anderem Anmeldung, CSRF-Schutz, Rollenrechte, Schülerverwaltung, Profilfunktionen, Kurs-, Lehrkraft-, Gruppen- und Zahlungsmanagement, Anwesenheit, Formvalidierung, CSV-Exporte sowie Datenbankoperationen ab.
@@ -145,7 +150,7 @@ Ausführlichere Informationen zu Architektur, Rollen, Seiten, Zahlungslogik, Dem
 
 **Functional Portfolio CRM – aktiv weiterentwickelt.**
 
-Die Anwendung ist als realistische lokale Portfolio-Demonstration funktionsfähig. Für einen extern betriebenen Produktivdienst wären unter anderem geregelte Deployments, produktiver WSGI-Betrieb, Audit-Logging, Passwort-Wiederherstellung, erweiterte Benutzerverwaltung, Monitoring und eine betriebliche Datenschutzprüfung erforderlich.
+Die Anwendung ist als realistische lokale Portfolio-Demonstration funktionsfähig. Lokale Kontenverwaltung, Admin-Wiederherstellung und vollständige Desktop-Sicherungen sind integriert. Ein extern betriebener Dienst benötigt weiterhin eine eigene Planung für Deployment, HTTPS, zentrale Zugänge, Audit-Logging, Monitoring und Datenschutz.
 
 ## Autor
 

@@ -4,13 +4,13 @@
 {% block content %}
 <section class="login-panel">
   <div class="hero">
-    <p class="eyebrow">Sichere Demo-Anmeldung</p>
+    <p class="eyebrow">{{ "Sichere Demo-Anmeldung" if demo_mode else "Anmeldung" }}</p>
     <h1>Education Center CRM</h1>
     <p>Verwalten Sie Schueler, Gruppen, Unterricht, Anwesenheit und Zahlungen in einem zentralen Arbeitsbereich.</p>
   </div>
   <div class="card login-card">
     <h2>Anmelden</h2>
-    <p class="table-note">Verwenden Sie eines der dokumentierten Demo-Konten.</p>
+    {% if demo_mode %}<p class="table-note">Verwenden Sie eines der dokumentierten Demo-Konten.</p>{% else %}<p class="table-note">Melden Sie sich mit Ihrem persönlichen Konto an.</p>{% endif %}
     <form action="{{ url_for('login') }}" method="POST">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="form-group">
@@ -23,6 +23,7 @@
       </div>
       <button class="btn" type="submit">Sicher anmelden</button>
     </form>
+    <p><a href="{{ url_for('recover_account') }}">Admin-Passwort vergessen?</a></p>
   </div>
 </section>
 {% endblock %}

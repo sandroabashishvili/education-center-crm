@@ -81,14 +81,14 @@
       <div class="stat-card">
         <div class="stat-icon">📈</div>
         <div>
-          <div class="stat-val">{{ metrics.collection_rate }}%</div>
+          {% if metrics.collection_rate is none %}<div class="stat-val stat-empty">Noch keine Daten</div>{% else %}<div class="stat-val">{{ metrics.collection_rate }}%</div>{% endif %}
           <div class="stat-lbl">Zahlungseingangsquote</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📊</div>
         <div>
-          <div class="stat-val">{{ metrics.attendance_rate }}%</div>
+          {% if metrics.attendance_rate is none %}<div class="stat-val stat-empty">Noch keine Daten</div>{% else %}<div class="stat-val">{{ metrics.attendance_rate }}%</div>{% endif %}
           <div class="stat-lbl">Anwesenheitsquote</div>
         </div>
       </div>

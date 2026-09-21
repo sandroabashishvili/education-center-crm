@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Willkommen – Education Center CRM{% endblock %}
+{% block content %}
+<section class="login-panel">
+  <div class="hero"><p class="eyebrow">Erste Einrichtung</p><h1>Willkommen in Ihrem Bildungszentrum</h1><p>Erstellen Sie Ihr Administratorkonto. Schüler, Kurse und Gruppen fügen Sie anschließend selbst hinzu.</p><p>Ihre Daten bleiben auf diesem Computer.</p></div>
+  <div class="card login-card"><h2>Zentrum einrichten</h2>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {% for key,label,type in [('organization_name','Name des Bildungszentrums','text'),('full_name','Ihr vollständiger Name','text'),('email','E-Mail-Adresse','email'),('password','Passwort (mindestens 12 Zeichen)','password'),('confirm_password','Passwort wiederholen','password')] %}
+      <div class="form-group"><label for="{{ key }}">{{ label }}</label><input class="form-control" id="{{ key }}" name="{{ key }}" type="{{ type }}" required {% if type == 'password' %}minlength="12" autocomplete="new-password"{% else %}value="{{ request.form.get(key, '') }}" maxlength="{{ 254 if type == 'email' else 150 }}"{% endif %}></div>
+      {% endfor %}
+      <button class="btn" type="submit">Administrator erstellen</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

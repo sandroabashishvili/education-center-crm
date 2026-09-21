@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from pathlib import Path
-import shutil
+from contextlib import closing
 import sqlite3
 
 from werkzeug.security import generate_password_hash
 
 DB_PATH = Path(__file__).resolve().parent / "crm.db"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 3
 
 
 def _connect(path: Path) -> sqlite3.Connection:
@@ -17,24 +17,29 @@ def _connect(path: Path) -> sqlite3.Connection:
     return conn
 
 
-def _is_current_schema(path: Path) -> bool:
+class DatabaseVersionError(ValueError):
+    """Refuse to replace unknown or damaged customer data."""
+
+
+def _prepare_schema(path: Path) -> None:
     if not path.exists():
-        return True
-    try:
-        with _connect(path) as conn:
-            return conn.execute("PRAGMA user_version").fetchone()[0] == SCHEMA_VERSION
-    except sqlite3.DatabaseError:
-        return False
-
-
-def _archive_legacy_database(path: Path) -> Path:
-    backup_dir = path.parent / "backups"
-    backup_dir.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    backup_path = backup_dir / f"{path.stem}-legacy-{timestamp}{path.suffix}"
-    shutil.copy2(path, backup_path)
-    path.unlink()
-    return backup_path
+        return
+    with closing(_connect(path)) as conn:
+        version = conn.execute("PRAGMA user_version").fetchone()[0]
+        tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
+        if version == 0 and not tables:
+            return
+        if version not in (1, 2, SCHEMA_VERSION):
+            raise DatabaseVersionError(f"Unsupported database version {version}; database was not replaced")
+        required = {"users", "students", "courses", "teachers", "groups", "group_students", "lessons", "attendance", "payments"}
+        if required - tables or conn.execute("PRAGMA quick_check").fetchone()[0] != "ok":
+            raise DatabaseVersionError("Database is incomplete or damaged; restore a verified backup")
+        if version < SCHEMA_VERSION:
+            backup_dir = path.parent / "backups"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+            with closing(sqlite3.connect(backup_dir / f"pre-migration-{stamp}.db")) as backup:
+                conn.backup(backup)
 
 
 def _ensure_profile_columns(conn: sqlite3.Connection) -> None:
@@ -42,17 +47,23 @@ def _ensure_profile_columns(conn: sqlite3.Connection) -> None:
     columns = {row[1] for row in conn.execute("PRAGMA table_info(users)")}
     if "avatar_filename" not in columns:
         conn.execute("ALTER TABLE users ADD COLUMN avatar_filename TEXT")
+    for name, definition in [('auth_version', 'INTEGER NOT NULL DEFAULT 1'), ('must_change_password', 'INTEGER NOT NULL DEFAULT 0')]:
+        if name not in columns:
+            conn.execute(f'ALTER TABLE users ADD COLUMN {name} {definition}')
+    settings_columns = {row[1] for row in conn.execute('PRAGMA table_info(app_settings)')}
+    if 'recovery_hash' not in settings_columns:
+        conn.execute('ALTER TABLE app_settings ADD COLUMN recovery_hash TEXT')
 
 
-def init_db(db_path=None) -> None:
+def init_db(db_path=None, *, seed_demo=False) -> None:
     path = Path(db_path or DB_PATH)
     path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists() and not _is_current_schema(path):
-        _archive_legacy_database(path)
+    _prepare_schema(path)
 
-    with _connect(path) as conn:
+    with closing(_connect(path)) as conn, conn:
         conn.executescript(
             """
+            BEGIN IMMEDIATE;
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 full_name TEXT NOT NULL,
@@ -163,11 +174,20 @@ def init_db(db_path=None) -> None:
             CREATE INDEX IF NOT EXISTS idx_groups_teacher ON groups(teacher_id);
             CREATE INDEX IF NOT EXISTS idx_lessons_start ON lessons(starts_at);
             CREATE INDEX IF NOT EXISTS idx_payments_status_due ON payments(status, due_date);
-            PRAGMA user_version = 1;
+            CREATE TABLE IF NOT EXISTS app_settings (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                organization_name TEXT NOT NULL,
+                setup_completed INTEGER NOT NULL CHECK (setup_completed IN (0, 1))
+            );
+            PRAGMA user_version = 3;
             """
         )
         _ensure_profile_columns(conn)
-        _seed_demo_data(conn)
+        if seed_demo:
+            _seed_demo_data(conn)
+        has_users = bool(conn.execute("SELECT 1 FROM users LIMIT 1").fetchone())
+        conn.execute("INSERT OR IGNORE INTO app_settings (id,organization_name,setup_completed) VALUES (1, ?, ?)",
+                     ("Education Center CRM" if has_users else "", int(has_users)))
 
 
 def _seed_demo_data(conn: sqlite3.Connection) -> None:

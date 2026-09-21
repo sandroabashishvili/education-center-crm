@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime
 from pathlib import Path
+from contextlib import closing
 import sqlite3
 import sys
 import shutil
@@ -24,7 +25,7 @@ REQUIRED_TABLES = {
 def validate_database(path: Path) -> None:
     if not path.is_file():
         raise ValueError(f"Database not found: {path}")
-    with sqlite3.connect(path) as conn:
+    with closing(sqlite3.connect(path)) as conn:
         check = conn.execute("PRAGMA quick_check").fetchone()[0]
         tables = {
             row[0]
@@ -45,7 +46,7 @@ def backup_database(source: Path = DB_PATH, destination_dir: Path | None = None)
     destination_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     destination = destination_dir / f"education-crm-{timestamp}.db"
-    with sqlite3.connect(source) as source_conn, sqlite3.connect(destination) as target_conn:
+    with closing(sqlite3.connect(source)) as source_conn, closing(sqlite3.connect(destination)) as target_conn:
         source_conn.backup(target_conn)
     validate_database(destination)
     return destination

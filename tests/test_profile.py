@@ -1,4 +1,5 @@
 import re
+from contextlib import closing
 import sqlite3
 import sys
 import tempfile
@@ -25,7 +26,7 @@ class ProfileSettingsTests(unittest.TestCase):
             SECRET_KEY="test-secret",
         )
         main.database.DB_PATH = self.db_path
-        main.database.init_db(self.db_path)
+        main.database.init_db(self.db_path, seed_demo=True)
 
     def tearDown(self):
         self.tmpdir.cleanup()
@@ -72,7 +73,7 @@ class ProfileSettingsTests(unittest.TestCase):
             )
             self.assertEqual(response.status_code, 302)
 
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 row = conn.execute(
                     "SELECT full_name, email, phone FROM users WHERE role = 'admin'"
                 ).fetchone()

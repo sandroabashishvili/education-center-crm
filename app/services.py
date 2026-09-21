@@ -450,7 +450,7 @@ def get_dashboard_metrics(conn: sqlite3.Connection) -> Dict[str, Any]:
     collection_rate = (
         round(payment_totals[1] / payment_totals[0] * 100, 1)
         if payment_totals[0] > 0
-        else 100.0
+        else None
     )
 
     monthly_revenue = conn.execute(
@@ -472,7 +472,7 @@ def get_dashboard_metrics(conn: sqlite3.Connection) -> Dict[str, Any]:
 
     attendance_total = conn.execute("SELECT COUNT(*) FROM attendance").fetchone()[0]
     attendance_present = conn.execute("SELECT COUNT(*) FROM attendance WHERE status = 'present'").fetchone()[0]
-    attendance_rate = round((attendance_present / attendance_total * 100), 1) if attendance_total > 0 else 100.0
+    attendance_rate = round((attendance_present / attendance_total * 100), 1) if attendance_total > 0 else None
 
     recent_students = conn.execute(
         """

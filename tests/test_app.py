@@ -1,4 +1,5 @@
 import re
+from contextlib import closing
 import sqlite3
 import sys
 import tempfile
@@ -26,7 +27,7 @@ class CRMAppTests(unittest.TestCase):
             SECRET_KEY="test-secret",
         )
         main.database.DB_PATH = self.db_path
-        main.database.init_db(self.db_path)
+        main.database.init_db(self.db_path, seed_demo=True)
 
     def tearDown(self):
         self.tmpdir.cleanup()
@@ -92,7 +93,7 @@ class CRMAppTests(unittest.TestCase):
                 data={"full_name": "Blocked", "email": "blocked@example.com"},
             )
             self.assertEqual(response.status_code, 400)
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 count = conn.execute(
                     "SELECT COUNT(*) FROM students WHERE email = ?",
                     ("blocked@example.com",),
@@ -100,7 +101,7 @@ class CRMAppTests(unittest.TestCase):
             self.assertEqual(count, 0)
 
     def test_password_hashes_and_seeded_roles(self):
-        with sqlite3.connect(self.db_path) as conn:
+        with closing(sqlite3.connect(self.db_path)) as conn, conn:
             rows = conn.execute(
                 "SELECT password_hash, role FROM users ORDER BY id"
             ).fetchall()
@@ -110,7 +111,7 @@ class CRMAppTests(unittest.TestCase):
             self.assertNotEqual(len(password_hash), 64)
 
     def test_role_permissions_and_teacher_scope(self):
-        with sqlite3.connect(self.db_path) as conn:
+        with closing(sqlite3.connect(self.db_path)) as conn, conn:
             course_id = conn.execute("SELECT id FROM courses ORDER BY id LIMIT 1").fetchone()[0]
             other_teacher = conn.execute(
                 "SELECT id FROM teachers WHERE user_id IS NULL ORDER BY id LIMIT 1"
@@ -124,9 +125,10 @@ class CRMAppTests(unittest.TestCase):
         with main.app.test_client() as client:
             self.login(client, "manager")
             self.assertEqual(client.get("/students").status_code, 200)
-            student_id = sqlite3.connect(self.db_path).execute(
-                "SELECT id FROM students ORDER BY id LIMIT 1"
-            ).fetchone()[0]
+            with closing(sqlite3.connect(self.db_path)) as conn:
+                student_id = conn.execute(
+                    "SELECT id FROM students ORDER BY id LIMIT 1"
+                ).fetchone()[0]
             self.assertEqual(
                 self.post(client, f"/students/{student_id}/delete").status_code,
                 403,
@@ -156,7 +158,7 @@ class CRMAppTests(unittest.TestCase):
                 },
             )
             self.assertEqual(response.status_code, 302)
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 student_id = conn.execute(
                     "SELECT id FROM students WHERE email = ?",
                     ("ana@example.com",),
@@ -193,7 +195,7 @@ class CRMAppTests(unittest.TestCase):
                 "/students/add",
                 {"full_name": "Workflow Student", "email": "workflow@example.com"},
             )
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 student_id = conn.execute(
                     "SELECT id FROM students WHERE email = ?",
                     ("workflow@example.com",),
@@ -211,7 +213,7 @@ class CRMAppTests(unittest.TestCase):
                     "topic": "Regression Test",
                 },
             )
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 lesson_id = conn.execute(
                     "SELECT id FROM lessons WHERE topic = ?",
                     ("Regression Test",),
@@ -232,7 +234,7 @@ class CRMAppTests(unittest.TestCase):
                     "due_date": "2026-08-20",
                 },
             )
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 payment_id = conn.execute(
                     "SELECT id FROM payments WHERE student_id = ? ORDER BY id DESC",
                     (student_id,),
@@ -242,7 +244,7 @@ class CRMAppTests(unittest.TestCase):
                 "/payments/record",
                 {"payment_id": payment_id, "amount_paid": "100", "paid_at": "2026-08-09"},
             )
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 amount, status = conn.execute(
                     "SELECT amount_paid, status FROM payments WHERE id = ?",
                     (payment_id,),
@@ -258,7 +260,7 @@ class CRMAppTests(unittest.TestCase):
                 "/students/add",
                 {"full_name": "Bad Email", "email": "not-an-email"},
             )
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 self.assertEqual(
                     conn.execute(
                         "SELECT COUNT(*) FROM students WHERE full_name = 'Bad Email'"
@@ -277,7 +279,7 @@ class CRMAppTests(unittest.TestCase):
                     "paid_at": "2026-08-09",
                 },
             )
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 unchanged = conn.execute(
                     "SELECT amount_paid FROM payments WHERE id = ?",
                     (payment_id,),
@@ -297,11 +299,11 @@ class CRMAppTests(unittest.TestCase):
     def test_database_backup_and_restore(self):
         backup_dir = Path(self.tmpdir.name) / "backups"
         backup = backup_database(self.db_path, backup_dir)
-        with sqlite3.connect(self.db_path) as conn:
+        with closing(sqlite3.connect(self.db_path)) as conn, conn:
             conn.execute("DELETE FROM students")
             conn.commit()
         restore_database(backup, self.db_path)
-        with sqlite3.connect(self.db_path) as conn:
+        with closing(sqlite3.connect(self.db_path)) as conn, conn:
             self.assertGreater(conn.execute("SELECT COUNT(*) FROM students").fetchone()[0], 0)
             self.assertEqual(conn.execute("PRAGMA quick_check").fetchone()[0], "ok")
 

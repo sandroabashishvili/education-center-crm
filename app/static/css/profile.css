@@ -196,3 +196,6 @@
     justify-content: center;
   }
 }
+
+.localized-file-picker { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.localized-file-picker [data-file-name] { overflow-wrap: anywhere; min-width: 0; }

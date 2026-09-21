@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Anwendung zurücksetzen · Education Center CRM{% endblock %}
+{% block content %}<h1>Anwendung vollständig zurücksetzen</h1>
+<p>Beim nächsten Start werden dieses Bildungszentrum, alle Benutzerkonten, Schüler, Lehrkräfte, Kurse, Gruppen, Unterrichtstermine, Anwesenheiten, Zahlungen, Profilbilder sowie lokale Sicherungen und frühere Wiederherstellungsstände gelöscht. Es wird kein Archiv und keine automatische Sicherung erstellt. Außerhalb des Datenordners gespeicherte Exporte bleiben bestehen.</p>
+<p>Nach der Bestätigung ist die Anwendung gesperrt. Schließen Sie sie vollständig und öffnen Sie dieselbe Verknüpfung erneut. Danach richten Sie das Zentrum und einen neuen Administrator ein. Die Programmdateien bleiben erhalten.</p>
+{% if error %}<p class="flash flash-danger" role="alert">{{ error }}</p>{% endif %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="form-group"><label for="reset-confirmation">Zur Bestätigung ALLES LÖSCHEN eingeben</label><input class="form-control" id="reset-confirmation" name="confirmation" autocomplete="off" required></div>
+<div class="form-group"><label for="reset-password">Ihr aktuelles Admin-Passwort</label><input class="form-control" id="reset-password" name="current_password" type="password" autocomplete="current-password" required></div>
+<button class="btn" type="submit">Unwiderrufliches Zurücksetzen bestätigen</button> <a href="{{ url_for('accounts') }}">Abbrechen</a></form>{% endblock %}

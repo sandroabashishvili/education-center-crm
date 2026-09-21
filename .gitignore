@@ -50,3 +50,10 @@ node_modules/
 
 # Lokale Projektnotizen (nicht auf GitHub veröffentlichen)
 project_notes/
+
+# Desktop build and isolated runtime environments
+.venv-windows/
+.desktop-work/
+build/
+dist/
+installer-output/

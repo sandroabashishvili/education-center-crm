@@ -56,7 +56,11 @@ def register_routes(app):
     def current_teacher_id(conn):
         if session.get("user_role") != "teacher":
             return None
-        return get_teacher_id_for_user(conn, int(session["user_id"]))
+        teacher_id = get_teacher_id_for_user(conn, int(session["user_id"]))
+        if teacher_id is None:
+            conn.close()
+            abort(403)
+        return teacher_id
 
     def require_teacher_resource(conn, table, resource_id):
         teacher_id = current_teacher_id(conn)
@@ -92,11 +96,14 @@ def register_routes(app):
         password = request.form.get("password", "")
         conn = sqlite3.connect(get_db_path())
         user = verify_user_login(conn, email, password)
+        auth_version = conn.execute("SELECT auth_version FROM users WHERE id=?", (user.id,)).fetchone()[0] if user else None
         conn.close()
         if user and user.status == "active":
             session.clear()
             session.update(
                 logged_in=True,
+                auth_version=auth_version,
+                storage_epoch=app.config.get("STORAGE_EPOCH"),
                 user_id=user.id,
                 user_name=user.full_name,
                 user_role=user.role,
@@ -122,7 +129,6 @@ def register_routes(app):
     def index():
         if not session.get("logged_in"):
             return render_template("login.html")
-        database.init_db(get_db_path())
         conn = sqlite3.connect(get_db_path())
         metrics = get_dashboard_metrics(conn)
         conn.close()
@@ -166,7 +172,6 @@ def register_routes(app):
     @app.route("/students", methods=["GET"])
     @roles_required("admin", "manager")
     def students_page():
-        database.init_db(get_db_path())
         conn = sqlite3.connect(get_db_path())
         query = normalize_text(request.args.get("q", ""))
         status_filter = request.args.get("status", "all")

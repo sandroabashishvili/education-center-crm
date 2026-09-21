@@ -1,4 +1,5 @@
 import re
+from contextlib import closing
 import sqlite3
 import sys
 import tempfile
@@ -18,7 +19,7 @@ class ManagementTests(unittest.TestCase):
         main.DB_PATH = self.db_path
         main.app.config.update(DB_PATH=self.db_path, TESTING=True, WTF_CSRF_ENABLED=True, SECRET_KEY="test-secret")
         main.database.DB_PATH = self.db_path
-        main.database.init_db(self.db_path)
+        main.database.init_db(self.db_path, seed_demo=True)
 
     def tearDown(self):
         self.tmpdir.cleanup()
@@ -45,7 +46,7 @@ class ManagementTests(unittest.TestCase):
             token = self.token(client, "/courses/1/edit")
             response = client.post("/courses/1/edit", data={"title": "Python Pro", "category": "Programmierung", "default_fee": "399", "description": "Aktualisiert", "status": "active", "csrf_token": token})
             self.assertEqual(response.status_code, 302)
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 self.assertEqual(conn.execute("SELECT title FROM courses WHERE id=1").fetchone()[0], "Python Pro")
 
     def test_teacher_detail_edit_and_delete(self):
@@ -55,7 +56,7 @@ class ManagementTests(unittest.TestCase):
             token = self.token(client, "/teachers/1/edit")
             response = client.post("/teachers/1/edit", data={"full_name": "Daniel Weber Neu", "email": "teacher@bildungszentrum.de", "phone": "+49 1", "specialization": "Python", "status": "active", "csrf_token": token})
             self.assertEqual(response.status_code, 302)
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 self.assertEqual(conn.execute("SELECT full_name FROM teachers WHERE id=1").fetchone()[0], "Daniel Weber Neu")
 
     def test_group_detail_edit_and_delete(self):
@@ -79,17 +80,17 @@ class ManagementTests(unittest.TestCase):
                 },
             )
             self.assertEqual(response.status_code, 302)
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 row = conn.execute("SELECT name, capacity FROM groups WHERE id=1").fetchone()
                 self.assertEqual(row, ("Python Abendgruppe Neu", 18))
 
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 conn.execute("INSERT INTO groups (course_id, teacher_id, name, capacity, status) VALUES (1, 1, 'Delete me', 10, 'active')")
                 group_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
                 conn.commit()
             token = self.token(client, "/groups")
             self.assertEqual(client.post(f"/groups/{group_id}/delete", data={"csrf_token": token}).status_code, 302)
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 self.assertIsNone(conn.execute("SELECT id FROM groups WHERE id = ?", (group_id,)).fetchone())
 
     def test_payment_detail_edit_and_delete(self):
@@ -97,7 +98,7 @@ class ManagementTests(unittest.TestCase):
             self.login(client)
             self.assertEqual(client.get("/payments/1").status_code, 200)
             self.assertEqual(client.get("/payments/1/edit").status_code, 200)
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 paid = conn.execute("SELECT amount_paid FROM payments WHERE id=1").fetchone()[0]
             token = self.token(client, "/payments/1/edit")
             response = client.post(
@@ -113,17 +114,17 @@ class ManagementTests(unittest.TestCase):
                 },
             )
             self.assertEqual(response.status_code, 302)
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 row = conn.execute("SELECT amount_due, method, note FROM payments WHERE id=1").fetchone()
                 self.assertEqual(row, (450.0, "bank_transfer", "Aktualisierte Rechnung"))
 
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 conn.execute("INSERT INTO payments (student_id, group_id, amount_due, due_date, status, method) VALUES (1, 1, 50, '2026-12-31', 'pending', 'cash')")
                 payment_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
                 conn.commit()
             token = self.token(client, "/payments")
             self.assertEqual(client.post(f"/payments/{payment_id}/delete", data={"csrf_token": token}).status_code, 302)
-            with sqlite3.connect(self.db_path) as conn:
+            with closing(sqlite3.connect(self.db_path)) as conn, conn:
                 self.assertIsNone(conn.execute("SELECT id FROM payments WHERE id = ?", (payment_id,)).fetchone())
 
     def test_manager_cannot_delete_teacher_group_or_payment(self):

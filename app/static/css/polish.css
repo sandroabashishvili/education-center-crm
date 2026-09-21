@@ -97,3 +97,5 @@ body{width:100%;min-width:0}
   table.responsive-table td{grid-template-columns:1fr;gap:.12rem}
   table.responsive-table td::before{margin-bottom:.02rem}
 }
+
+.stat-val.stat-empty { font-size: 1rem; line-height: 1.35; overflow-wrap: anywhere; }

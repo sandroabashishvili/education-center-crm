@@ -186,7 +186,7 @@ Der Pfad kann über folgende Umgebungsvariable geändert werden:
 export CRM_DB_PATH="/absolute/path/to/crm.db"
 ```
 
-Beim Start initialisiert die Anwendung das Schema über `database.init_db()`.
+Beim Start initialisiert die Anwendung Schema 3 über `database.init_db()`. Schema 1 und 2 werden nach einer SQLite-Sicherung erweitert; unbekannte oder beschädigte Datenbanken werden nicht ersetzt. Der Desktop erzeugt keine Demo-Daten und verwendet einen eigenen Datenordner. Details zur Ersteinrichtung und zum Entwicklungsstatus: [Desktop-Dokumentation](desktop/README.md).
 
 ## 10. Backup und Restore
 
@@ -195,14 +195,15 @@ python3 -m tools.database_cli backup
 python3 -m tools.database_cli restore --from app/backups/education-crm-DATUM.db --confirm
 ```
 
-Das Restore-Werkzeug erstellt vor dem Überschreiben eine zusätzliche Sicherung und prüft die SQLite-Datenbank.
+Das Restore-Werkzeug erstellt vor dem Überschreiben eine zusätzliche Sicherung und prüft die SQLite-Datenbank. Die App muss dabei gestoppt sein. Dieses CLI sichert nur die Datenbank, keine Profilbilder; die vollständige Desktop-Sicherung steht Admins unter `Datensicherung` zur Verfügung. Sie enthält Profilbilder, eine Vorschau vor der Wiederherstellung und eine automatische Sicherung des vorherigen Datenstands.
 
 ## 11. Tests
 
 Alle Tests können mit folgendem Befehl ausgeführt werden:
 
 ```bash
-python3 -m unittest discover -s tests -v
+pip install -r requirements-test.txt
+python3 -m tools.run_tests
 ```
 
 Die Tests prüfen unter anderem:
@@ -280,12 +281,11 @@ Das Projekt ist ein funktionsfähiges Portfolio-CRM und wird aktiv weiterentwick
 
 Für einen externen Produktivbetrieb wären zusätzlich sinnvoll:
 
-- produktiver WSGI-Server
+- externer Betrieb des WSGI-Dienstes
 - Reverse Proxy
 - HTTPS-Konfiguration
 - Audit-Logging
-- Passwort-Wiederherstellung
-- erweiterte Benutzerverwaltung
+- zentrale Benutzerverwaltung und Wiederherstellung für einen Mehrbenutzer-Server
 - Monitoring und Fehlertracking
 - Deployment-Pipeline
 - Datenschutz- und Aufbewahrungskonzept
@@ -298,3 +298,11 @@ Sandro Abashishvili
 - Portfolio: https://sandro-abashishvili.de/
 - GitHub: https://github.com/sandroabashishvili
 - LinkedIn: https://www.linkedin.com/in/aleksandre-abashishvili-03417617a/
+
+### Desktop account removal and reset (2026-09-15)
+
+Admin account management now includes confirmed deletion of another account. Full desktop reset is a separate Admin-menu action, completed on next launch without creating a backup. See `desktop/README.md` for lifecycle and failure behavior and `desktop/USER_TEST_GE.md` for the exact user steps. Existing customer data is not reset by installing this update.
+
+### Portable Windows layout (2026-09-15)
+
+The preview now stores all persistent CRM state beneath its own `data/` folder. Relative `Start.cmd` replaces the machine-specific shortcut. Complete portable backups include the program and active data; see `desktop/README.md` and `desktop/USER_TEST_GE.md`. This supersedes earlier AppData deployment instructions.

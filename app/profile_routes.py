@@ -1,9 +1,11 @@
 from functools import wraps
+import io
+import mimetypes
 from pathlib import Path
 import sqlite3
 from uuid import uuid4
 
-from flask import abort, flash, redirect, render_template, request, session, url_for
+from flask import abort, flash, redirect, render_template, request, session, url_for, send_file
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
@@ -38,7 +40,7 @@ def register_profile_routes(app):
         conn.row_factory = sqlite3.Row
         row = conn.execute(
             """
-            SELECT id, full_name, email, phone, role, status, avatar_filename, created_at
+            SELECT id, full_name, email, phone, role, status, avatar_filename, created_at, must_change_password
             FROM users
             WHERE id = ?
             """,
@@ -48,7 +50,7 @@ def register_profile_routes(app):
         return row
 
     def avatar_directory():
-        path = Path(app.static_folder) / "uploads" / "avatars"
+        path = Path(app.config["UPLOAD_DIR"]) if app.config.get("UPLOAD_DIR") else Path(app.static_folder) / "uploads" / "avatars"
         path.mkdir(parents=True, exist_ok=True)
         return path
 
@@ -68,6 +70,21 @@ def register_profile_routes(app):
             "current_user": fetch_user(int(user_id)),
             "role_labels": ROLE_LABELS,
         }
+
+    @app.route("/profile/avatar/<filename>")
+    @login_required
+    def profile_avatar(filename):
+        user = fetch_user(int(session["user_id"]))
+        if not user or filename != user["avatar_filename"] or filename != Path(filename).name:
+            abort(404)
+        path = avatar_directory() / filename
+        if not path.is_file():
+            abort(404)
+        # Release the Windows file handle before another request replaces an avatar.
+        response = send_file(io.BytesIO(path.read_bytes()), mimetype=mimetypes.guess_type(filename)[0] or 'application/octet-stream', download_name=filename)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Cache-Control"] = "private, no-store"
+        return response
 
     @app.route("/profile", methods=["GET", "POST"])
     @login_required
@@ -149,8 +166,9 @@ def register_profile_routes(app):
         new_password = request.form.get("new_password", "")
         confirm_password = request.form.get("confirm_password", "")
 
-        if len(new_password) < 8:
-            flash("Das neue Passwort muss mindestens 8 Zeichen lang sein.", "danger")
+        minimum = 8 if app.config['DEMO_MODE'] else 12
+        if len(new_password) < minimum:
+            flash(f"Das neue Passwort muss mindestens {minimum} Zeichen lang sein.", "danger")
             return redirect(url_for("profile_settings") + "#security")
         if new_password != confirm_password:
             flash("Die neuen Passwörter stimmen nicht überein.", "danger")
@@ -167,11 +185,13 @@ def register_profile_routes(app):
             return redirect(url_for("profile_settings") + "#security")
 
         conn.execute(
-            "UPDATE users SET password_hash = ? WHERE id = ?",
+            "UPDATE users SET password_hash = ?, must_change_password=0, auth_version=auth_version+1 WHERE id = ?",
             (generate_password_hash(new_password), user_id),
         )
+        version = conn.execute("SELECT auth_version FROM users WHERE id=?", (user_id,)).fetchone()[0]
         conn.commit()
         conn.close()
+        session["auth_version"] = version
         flash("Passwort wurde geändert.", "success")
         return redirect(url_for("profile_settings") + "#security")
 

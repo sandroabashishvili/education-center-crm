@@ -1,0 +1,5 @@
+"""Windowed executable entry point; imports no demo application."""
+from desktop.launcher import main
+
+if __name__ == '__main__':
+    raise SystemExit(main())
